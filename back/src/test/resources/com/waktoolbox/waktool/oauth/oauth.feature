@@ -43,10 +43,12 @@ Feature: OAuth through Discord system
     scope: ghi
     token_type: klm
     """
-    Given that if <token-mock> == empty => posting on "/discord/token.*" will return a status OK_200 and:
+    Given that if <token-mock> == void => posting on "/discord/token.*" will return a status OK_200 and:
     """yaml
 
     """
+    Given that if <token-mock> == error => posting on "/discord/token.*" will return a status INTERNAL_SERVER_ERROR_500
+
     Given that if <user-mock> == full => getting on "/discord/user.*" will return a status OK_200 and:
     """yaml
     id: 1
@@ -55,12 +57,18 @@ Feature: OAuth through Discord system
     email: clonet@maude.fr
     useless_field: dummy_value
     """
-    Given that if <user-mock> == empty => getting on "/discord/user.*" will return a status OK_200 and:
+    Given that if <user-mock> == void => getting on "/discord/user.*" will return a status OK_200 and:
     """yaml
 
     """
+    Given that if <user-mock> == error => getting on "/discord/user.*" will return a status INTERNAL_SERVER_ERROR_500
+
+    When we get on "/api/oauth/discord/redirect?code=super-code"
+    Then we receive a status INTERNAL_SERVER_ERROR_500
 
     Examples:
       | token-mock | user-mock |
-      | empty      | full      |
-      | full       | empty     |
+      | void       | full      |
+      | error      | full      |
+      | full       | void      |
+      | full       | error     |
