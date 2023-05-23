@@ -23,18 +23,20 @@ Feature: OAuth through Discord system
     email: clonet@maude.fr
     useless_field: dummy_value
     """
+    And that getting on "/mocked-front" will return a status OK_200
 
     When we get on "/api/oauth/discord/redirect?code=super-code"
-    Then we receive a status OK_200 and a Response:
-    """yaml
-    headers:
-        Set-Cookie: ?e token=eyJhbGciOiJIUzUxMiJ9.eyJkaXNjb3JkX2lkIjoiMSIsInVzZXJuYW1lIjoiQ2xvbmV0TWF1ZGUiLCJkaXNjcmltaW5hdG9yIjoiNDMyMSIsImlhdCI6MTY4NDg1.*
-        Location: changeme
-    """
+    Then we receive a status OK_200
+    # Due to redirection, we can't test headers for token and location
+    # TODO some day: add some step to check this
 
     And the accounts table contains only:
       | id | username    | discriminator | email           | ankama_name | ankama_discriminator | twitch_url                    |
       | 1  | ClonetMaude | 4321          | clonet@maude.fr | MaudeClonet | 1234                 | https://twitch.tv/maudeclonet |
+
+    And "/discord/token.*" has received exactly 1 POST
+    And "/discord/user.*" has received exactly 1 GET
+    And "/mocked-front" has received exactly 1 GET
 
   Scenario Template: Errors - if something goes wrong, we got a 500 error
     Given that if <token-mock> == full => posting on "/discord/token.*" will return a status OK_200 and:

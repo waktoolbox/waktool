@@ -18,6 +18,7 @@ import static com.decathlon.tzatziki.utils.MockFaster.url;
 @ContextConfiguration(initializers = WaktoolApplicationSteps.Initializer.class)
 public class WaktoolApplicationSteps {
 
+    @SuppressWarnings("resource")
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:14.7")
             .withTmpFs(Map.of("/var:lib/postgresql/data", "rw"));
 
@@ -32,7 +33,8 @@ public class WaktoolApplicationSteps {
                     "spring.datasource.username=" + POSTGRES.getUsername(),
                     "spring.datasource.password=" + POSTGRES.getPassword(),
                     "oauth2.discord.token-uri=" + url() + "/discord/token",
-                    "oauth2.discord.user-info-uri=" + url() + "/discord/user"
+                    "oauth2.discord.user-info-uri=" + url() + "/discord/user",
+                    "waktool.base-url=" + url() + "/mocked-front"
             ).applyTo(applicationContext);
         }
     }

@@ -9,6 +9,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -68,10 +69,10 @@ public class OAuthController {
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
                 .path("/")
-                .maxAge((long) 60 * 60 * 24) // 30 days
+                .maxAge((long) 60 * 60 * 24) // 1 day
                 .build();
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .location(URI.create(_baseUrl))
                 .build();
