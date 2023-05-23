@@ -85,14 +85,14 @@
 			<!--		Needed for token compaction	-->
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.3.2</version>
+			<version>2.3.1</version>
 		</dependency>
 
 		<dependency>
 			<!--		Needed for token compaction	-->
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
-			<version>2.3.2</version>
+			<version>2.3.1</version>
 		</dependency>
 
 		<!--	Tests	-->

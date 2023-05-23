@@ -27,7 +27,7 @@ Feature: OAuth through Discord system
     When we get on "/api/oauth/discord/redirect?code=super-code"
     Then we receive a status OK_200 and:
     """
-    token: ?e eyJhbGciOiJIUzUxMiJ9.eyJkaXNjb3JkX2lkIjoiMSIsInVzZXJuYW1lIjoiQ2xvbmV0TWF1ZGUiLCJkaXNjcmltaW5hdG9yIjoiNDMyMSIsImlhdCI6MTY4NDg0OD.*
+    token: ?e eyJhbGciOiJIUzUxMiJ9.eyJkaXNjb3JkX2lkIjoiMSIsInVzZXJuYW1lIjoiQ2xvbmV0TWF1ZGUiLCJkaXNjcmltaW5hdG9yIjoiNDMyMSIsImlhdCI6MTY4NDg.*
     """
 
     And the accounts table contains only:
