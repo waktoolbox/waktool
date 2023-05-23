@@ -9,8 +9,9 @@ jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
-    run:
-      working-directory: back
+    defaults:
+      run:
+        working-directory: back
     steps:
       - uses: actions/checkout@v3
         with:
