@@ -33,3 +33,34 @@ Feature: OAuth through Discord system
     And the accounts table contains only:
       | id | username    | discriminator | email           | ankama_name | ankama_discriminator | twitch_url                    |
       | 1  | ClonetMaude | 4321          | clonet@maude.fr | MaudeClonet | 1234                 | https://twitch.tv/maudeclonet |
+
+  Scenario Template: Errors - if something goes wrong, we got a 500 error
+    Given that if <token-mock> == full => posting on "/discord/token.*" will return a status OK_200 and:
+    """yaml
+    access_token: abc
+    expires_in: 1000000
+    refresh_token: def
+    scope: ghi
+    token_type: klm
+    """
+    Given that if <token-mock> == empty => posting on "/discord/token.*" will return a status OK_200 and:
+    """yaml
+
+    """
+    Given that if <user-mock> == full => getting on "/discord/user.*" will return a status OK_200 and:
+    """yaml
+    id: 1
+    username: ClonetMaude
+    discriminator: 4321
+    email: clonet@maude.fr
+    useless_field: dummy_value
+    """
+    Given that if <user-mock> == empty => getting on "/discord/user.*" will return a status OK_200 and:
+    """yaml
+
+    """
+
+    Examples:
+      | token-mock | user-mock |
+      | empty      | full      |
+      | full       | empty     |
