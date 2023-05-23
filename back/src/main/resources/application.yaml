@@ -21,3 +21,6 @@ oauth2:
 
 jwt:
   secret: ${JWT_SECRET:changeme}
+
+waktool:
+  base-url: ${FRONT_URL:changeme}

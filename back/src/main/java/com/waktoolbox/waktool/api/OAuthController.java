@@ -1,6 +1,5 @@
 package com.waktoolbox.waktool.api;
 
-import com.waktoolbox.waktool.api.models.DiscordOAuthResponse;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.OAuthResponse;
 import com.waktoolbox.waktool.domain.repositories.AccountRepository;
@@ -8,13 +7,18 @@ import com.waktoolbox.waktool.domain.repositories.OAuthRepository;
 import com.waktoolbox.waktool.utils.JwtHelper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerErrorException;
 
+import java.net.URI;
 import java.util.Optional;
 
 @RestController
@@ -22,22 +26,23 @@ import java.util.Optional;
 @RequestMapping("/api")
 @Validated
 public class OAuthController {
+    @Value("${waktool.base-url}")
+    private String _baseUrl;
+
     private final AccountRepository _accountRepository;
     private final OAuthRepository _oAuthRepository;
     private final JwtHelper _jwtHelper;
 
     @GetMapping("/oauth/discord/redirect")
-    public ResponseEntity<DiscordOAuthResponse> discordOAuth(@RequestParam String code) {
+    public ResponseEntity<Void> discordOAuth(@RequestParam String code) {
         OAuthResponse oAuthResponse = _oAuthRepository.authByAuthorizationCode(code);
         if (oAuthResponse == null) {
-            // TODO error
-            return ResponseEntity.internalServerError().build();
+            throw new ServerErrorException("Couldn't get an OAuth response from Discord", new Exception());
         }
 
         Account oAuthAccount = _oAuthRepository.getAccount(oAuthResponse.accessToken(), oAuthResponse.tokenType());
         if (oAuthAccount == null) {
-            // TODO error
-            return ResponseEntity.internalServerError().build();
+            throw new ServerErrorException("Couldn't get an account from Discord", new Exception());
         }
 
         Account savedAccount = _accountRepository.find(oAuthAccount.getId())
@@ -49,7 +54,7 @@ public class OAuthController {
                 })
                 .or(() -> Optional.of(oAuthAccount))
                 .map(_accountRepository::save)
-                .orElseThrow(); // TODO manage error
+                .orElseThrow(() -> new ServerErrorException("Couldn't save the account", new Exception()));
 
         Claims claims = _jwtHelper.buildClaimsFromValues(
                 "discord_id", savedAccount.getId(),
@@ -59,6 +64,16 @@ public class OAuthController {
 
         // We won't keep the sub in the token
         String token = _jwtHelper.generateJwt(claims, null);
-        return ResponseEntity.ok(new DiscordOAuthResponse(token));
+
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .path("/")
+                .maxAge((long) 60 * 60 * 24) // 30 days
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .location(URI.create(_baseUrl))
+                .build();
     }
 }

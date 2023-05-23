@@ -25,9 +25,11 @@ Feature: OAuth through Discord system
     """
 
     When we get on "/api/oauth/discord/redirect?code=super-code"
-    Then we receive a status OK_200 and:
-    """
-    token: ?e eyJhbGciOiJIUzUxMiJ9.eyJkaXNjb3JkX2lkIjoiMSIsInVzZXJuYW1lIjoiQ2xvbmV0TWF1ZGUiLCJkaXNjcmltaW5hdG9yIjoiNDMyMSIsImlhdCI6MTY4NDg.*
+    Then we receive a status OK_200 and a Response:
+    """yaml
+    headers:
+        Set-Cookie: ?e token=eyJhbGciOiJIUzUxMiJ9.eyJkaXNjb3JkX2lkIjoiMSIsInVzZXJuYW1lIjoiQ2xvbmV0TWF1ZGUiLCJkaXNjcmltaW5hdG9yIjoiNDMyMSIsImlhdCI6MTY4NDg1.*
+        Location: changeme
     """
 
     And the accounts table contains only:
