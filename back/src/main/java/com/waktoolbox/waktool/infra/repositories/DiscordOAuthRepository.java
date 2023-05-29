@@ -1,17 +1,23 @@
 package com.waktoolbox.waktool.infra.repositories;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.OAuthResponse;
 import com.waktoolbox.waktool.domain.repositories.OAuthRepository;
 import com.waktoolbox.waktool.infra.repositories.models.DiscordOAuthTokenResponse;
 import com.waktoolbox.waktool.infra.repositories.models.DiscordUserInformationResponse;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -24,6 +30,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class DiscordOAuthRepository implements OAuthRepository {
+    private static final RestTemplate DEFAULT_REST_TEMPLATE = new RestTemplate();
+
     @Value("${oauth2.discord.token-uri}")
     private String _tokenUri;
 
@@ -45,7 +53,18 @@ public class DiscordOAuthRepository implements OAuthRepository {
     @Value("${oauth2.discord.redirect-uri}")
     private String _redirectUri;
 
-    private final RestTemplate _restTemplate;
+    private RestTemplate _camelCaseMappingRestTemplate;
+
+    @PostConstruct
+    public void setupMapperAndTemplates() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+
+        _camelCaseMappingRestTemplate = new RestTemplateBuilder()
+                .additionalMessageConverters(new MappingJackson2HttpMessageConverter(mapper))
+                .build();
+    }
 
     public OAuthResponse authByAuthorizationCode(String code) {
 
@@ -67,7 +86,7 @@ public class DiscordOAuthRepository implements OAuthRepository {
         try {
             // Sorry, I hate url form encoded crap
             // I tried some better way to do this, but after 3 hours, crappy code is working, nice code isn't
-            DiscordOAuthTokenResponse body = new RestTemplate().exchange(_tokenUri, HttpMethod.POST, request, DiscordOAuthTokenResponse.class).getBody();
+            DiscordOAuthTokenResponse body = DEFAULT_REST_TEMPLATE.exchange(_tokenUri, HttpMethod.POST, request, DiscordOAuthTokenResponse.class).getBody();
             if (body == null) throw new IllegalStateException("Null body while request is success, should not happen");
             return new OAuthResponse(body.accessToken(), body.tokenType());
         } catch (Exception e) {
@@ -82,7 +101,7 @@ public class DiscordOAuthRepository implements OAuthRepository {
         httpHeaders.set("Authorization", String.format("%s %s", tokenType, token));
 
         try {
-            DiscordUserInformationResponse userInformation = _restTemplate.exchange(_userInfoUri, HttpMethod.GET, new HttpEntity<>(httpHeaders), DiscordUserInformationResponse.class).getBody();
+            DiscordUserInformationResponse userInformation = _camelCaseMappingRestTemplate.exchange(_userInfoUri, HttpMethod.GET, new HttpEntity<>(httpHeaders), DiscordUserInformationResponse.class).getBody();
             if (userInformation == null) throw new IllegalStateException("User is null, should not happen");
             return Account.builder()
                     .id(userInformation.id())

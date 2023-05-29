@@ -34,7 +34,7 @@ public class JwtHelper {
 
     }
 
-    public Claims decodeJwt(String token) {
+    public Claims decodeJwt(String token) throws RuntimeException {
         Claims body = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
         if (body.getExpiration().before(Date.from(Instant.now()))) {
             throw new RuntimeException("Token expired");

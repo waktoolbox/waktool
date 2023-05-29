@@ -2,7 +2,7 @@ Feature: OAuth through Discord system
 
   Background:
     Given that the accounts table will contain:
-      | id | username     | discriminator | email           | ankama_name | ankama_discriminator | twitch_url                    |
+      | id | username     | discriminator | email           | ankamaName  | ankamaDiscriminator | twitchUrl                     |
       | 1  | Maude Clonet | 1324          | maude@clonet.fr | MaudeClonet | 1234                 | https://twitch.tv/maudeclonet |
 
 
@@ -31,7 +31,7 @@ Feature: OAuth through Discord system
     # TODO some day: add some step to check this
 
     And the accounts table contains only:
-      | id | username    | discriminator | email           | ankama_name | ankama_discriminator | twitch_url                    |
+      | id | username    | discriminator | email           | ankamaName  | ankamaDiscriminator | twitchUrl                     |
       | 1  | ClonetMaude | 4321          | clonet@maude.fr | MaudeClonet | 1234                 | https://twitch.tv/maudeclonet |
 
     And "/discord/token.*" has received exactly 1 POST
