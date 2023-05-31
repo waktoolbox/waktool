@@ -1,6 +1,10 @@
 package com.waktoolbox.waktool;
 
+import com.decathlon.tzatziki.steps.ObjectSteps;
+import com.waktoolbox.waktool.utils.JwtHelper;
+import io.cucumber.java.en.Given;
 import io.cucumber.spring.CucumberContextConfiguration;
+import io.jsonwebtoken.Claims;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -11,7 +15,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.Map;
 
+import static com.decathlon.tzatziki.utils.Guard.GUARD;
 import static com.decathlon.tzatziki.utils.MockFaster.url;
+import static com.decathlon.tzatziki.utils.Patterns.THAT;
+import static com.decathlon.tzatziki.utils.Patterns.VARIABLE;
 
 @CucumberContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WaktoolApplication.class)
@@ -37,5 +44,53 @@ public class WaktoolApplicationSteps {
                     "waktool.base-url=" + url() + "/mocked-front"
             ).applyTo(applicationContext);
         }
+    }
+
+    private final ObjectSteps _objectSteps;
+    private final JwtHelper _jwtHelper;
+
+    public WaktoolApplicationSteps(ObjectSteps objectSteps, JwtHelper jwtHelper) {
+        _objectSteps = objectSteps;
+        _jwtHelper = jwtHelper;
+    }
+
+    private String randomUsername(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            builder.append(chars.charAt((int) (Math.random() * chars.length())));
+        }
+        return builder.toString();
+    }
+
+    private String randomNumber(int decimals) {
+        String chars = "0123456789";
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < decimals; i++) {
+            builder.append(chars.charAt((int) (Math.random() * chars.length())));
+        }
+        return builder.toString();
+    }
+
+    @Given(THAT + GUARD + VARIABLE + " is a valid token")
+    public void generateToken(String name) {
+        Claims claims = _jwtHelper.buildClaimsFromValues(
+                "discord_id", randomNumber(10),
+                "username", randomUsername(10),
+                "discriminator", randomNumber(4)
+        );
+
+        _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
+    }
+
+    @Given(THAT + GUARD + VARIABLE + " is a valid token for " + VARIABLE)
+    public void generateToken(String name, String discordId) {
+        Claims claims = _jwtHelper.buildClaimsFromValues(
+                "discord_id", discordId,
+                "username", randomUsername(10),
+                "discriminator", randomNumber(4)
+        );
+
+        _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
     }
 }

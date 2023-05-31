@@ -13,7 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerErrorException;
 
 import java.net.URI;
@@ -71,20 +74,7 @@ public class OAuthController {
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .location(URI.create(_baseUrl))
+                .location(URI.create(_baseUrl + (savedAccount.areAnkamaInfoValid() ? "" : "/account")))
                 .build();
-    }
-
-    record TokenResponse(String token, boolean expired) {
-    }
-
-    @GetMapping("/oauth/token")
-    public ResponseEntity<TokenResponse> token(@CookieValue("token") String token) {
-        try {
-            _jwtHelper.decodeJwt(token);
-        } catch (RuntimeException e) {
-            return ResponseEntity.ok(new TokenResponse(null, true));
-        }
-        return ResponseEntity.ok(new TokenResponse(token, false));
     }
 }

@@ -15,4 +15,8 @@ public class Account {
     String ankamaName;
     String ankamaDiscriminator;
     String twitchUrl;
+
+    public boolean areAnkamaInfoValid() {
+        return ankamaName != null && ankamaDiscriminator != null;
+    }
 }
