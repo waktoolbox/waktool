@@ -1,6 +1,7 @@
 package com.waktoolbox.waktool;
 
 import com.decathlon.tzatziki.steps.ObjectSteps;
+import com.decathlon.tzatziki.utils.Guard;
 import com.waktoolbox.waktool.utils.JwtHelper;
 import io.cucumber.java.en.Given;
 import io.cucumber.spring.CucumberContextConfiguration;
@@ -84,7 +85,7 @@ public class WaktoolApplicationSteps {
     }
 
     @Given(THAT + GUARD + VARIABLE + " is a valid token for " + VARIABLE)
-    public void generateToken(String name, String discordId) {
+    public void generateToken(Guard guard, String name, String discordId) {
         Claims claims = _jwtHelper.buildClaimsFromValues(
                 "discord_id", discordId,
                 "username", randomUsername(10),

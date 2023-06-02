@@ -1,15 +1,19 @@
 import {AppBar, Box, Button, Divider, IconButton} from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
+import PersonIconOutlined from '@mui/icons-material/PersonOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useTranslation} from "react-i18next";
 import LanguagePicker from "./LanguagePicker.tsx";
 import MenuDrawer from "./MenuDrawer.tsx";
-import {menuDrawerState} from "../atoms/atoms-header.ts";
-import {useRecoilState} from "recoil";
+import {loginState, menuDrawerState} from "../atoms/atoms-header.ts";
+import {useRecoilState, useRecoilValue} from "recoil";
 
 export default function HeaderBar() {
     const {t} = useTranslation();
     const [_, setDrawerState] = useRecoilState(menuDrawerState);
+    const logged = useRecoilValue(loginState);
+
+    console.log(logged)
 
     return (
         <>
@@ -51,10 +55,23 @@ export default function HeaderBar() {
                     justifyContent: "flex-end",
                     alignItems: "center"
                 }}>
-                    <Button variant="outlined" sx={{height: "38px"}}>
-                        <PersonIcon/>
-                        {t('connect')}
-                    </Button>
+                    {!logged?.logged && (
+                        <a href={import.meta.env.VITE_DISCORD_OAUTH_URL}>
+                            <Button variant="outlined" sx={{height: "38px"}}>
+                                <PersonIcon/>
+                                {t('connect')}
+                            </Button>
+                        </a>
+                    )}
+
+                    {logged?.logged && (
+                        <a href={`${import.meta.env.VITE_BACKEND_URL}/api/oauth/disconnect`}>
+                            <Button variant="outlined" sx={{height: "38px"}}>
+                                <PersonIconOutlined/>
+                                {t('disconnect')}
+                            </Button>
+                        </a>
+                    )}
 
                     <Divider sx={{ml: 1, mr: 1}} orientation="vertical" variant="middle" flexItem/>
 

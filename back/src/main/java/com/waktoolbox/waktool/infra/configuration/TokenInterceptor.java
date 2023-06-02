@@ -11,6 +11,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.MappedInterceptor;
 import org.springframework.web.util.WebUtils;
 
+import java.util.Optional;
+
 @Configuration
 @RequiredArgsConstructor
 public class TokenInterceptor implements HandlerInterceptor {
@@ -22,10 +24,13 @@ public class TokenInterceptor implements HandlerInterceptor {
             @Override
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
                 Cookie token = WebUtils.getCookie(request, "token");
-                if (token == null) return true;
+                if (token == null) {
+                    request.setAttribute("discordId", Optional.empty());
+                    return true;
+                }
 
                 try {
-                    request.setAttribute("discordId", _jwtHelper.decodeJwt(token.getValue()).get("discord_id"));
+                    request.setAttribute("discordId", Optional.ofNullable(_jwtHelper.decodeJwt(token.getValue()).get("discord_id")));
                 } catch (RuntimeException e) {
                     // ignored
                 }
