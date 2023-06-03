@@ -3,21 +3,36 @@ import PersonIcon from '@mui/icons-material/Person';
 import PersonIconOutlined from '@mui/icons-material/PersonOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useTranslation} from "react-i18next";
+import {Navigate, useLocation} from "react-router-dom";
 import LanguagePicker from "./LanguagePicker.tsx";
 import MenuDrawer from "./MenuDrawer.tsx";
 import {loginState, menuDrawerState} from "../atoms/atoms-header.ts";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {snackState} from "../atoms/atoms-snackbar.ts";
+import MySnackbar from "./MySnackbar.tsx";
 
 export default function HeaderBar() {
     const {t} = useTranslation();
     const [_, setDrawerState] = useRecoilState(menuDrawerState);
+    const setSnackValue = useSetRecoilState(snackState);
     const logged = useRecoilValue(loginState);
+    const location = useLocation();
 
-    console.log(logged)
+    if (logged && location.pathname !== "/account") {
+        if (!logged.ankamaName || !logged.ankamaDiscriminator) {
+            setSnackValue({
+                severity: "error",
+                message: t('error.missingAnkamaInfo') as string,
+                open: true
+            });
+            return <Navigate to="/account"/>;
+        }
+    }
 
     return (
         <>
             <MenuDrawer/>
+            <MySnackbar/>
 
             <AppBar position="static" sx={{
                 boxShadow: 3,

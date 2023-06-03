@@ -1,4 +1,5 @@
 import {Box, Divider, List, ListItem, ListItemText, Stack, SwipeableDrawer,} from "@mui/material";
+import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {useRecoilState} from "recoil";
 import {menuDrawerState} from "../atoms/atoms-header.ts";
@@ -68,9 +69,12 @@ function MenuDrawer() {
                                 <List>
                                     {category.items && category.items.map((item) => (
                                         <ListItem key={item.key} sx={{color: '#9da5a8', '&:hover': {color: '#10e9d6'}}}>
-                                            {/*<Link to="/draft">*/}
-                                            <ListItemText primary={t(item.translationKey)}/>
-                                            {/*</Link>*/}
+                                            {item.link && (
+                                                <Link to={item.link}>
+                                                    {t(item.translationKey)}
+                                                </Link>
+                                            )}
+                                            {!item.link && <ListItemText primary={t(item.translationKey)}/>}
                                         </ListItem>
                                     ))}
                                 </List>

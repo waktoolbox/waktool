@@ -75,6 +75,18 @@ export default createTheme({
 
         MuiOutlinedInput: {
             styleOverrides: {
+                root: {
+                    borderColor: '#ff0000 !important',
+
+                    ":invalid": {
+                        backgroundColor: "red"
+                    },
+
+                    "legend": {
+                        color: "red"
+                    }
+                },
+
                 notchedOutline: {
                     borderColor: '#03c8be !important',
                 }

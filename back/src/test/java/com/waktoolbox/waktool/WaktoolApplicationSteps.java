@@ -18,8 +18,7 @@ import java.util.Map;
 
 import static com.decathlon.tzatziki.utils.Guard.GUARD;
 import static com.decathlon.tzatziki.utils.MockFaster.url;
-import static com.decathlon.tzatziki.utils.Patterns.THAT;
-import static com.decathlon.tzatziki.utils.Patterns.VARIABLE;
+import static com.decathlon.tzatziki.utils.Patterns.*;
 
 @CucumberContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WaktoolApplication.class)
@@ -82,6 +81,11 @@ public class WaktoolApplicationSteps {
         );
 
         _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
+    }
+
+    @Given(THAT + GUARD + VARIABLE + " is a valid token for " + NUMBER)
+    public void generateToken(Guard guard, String name, int discordId) {
+        generateToken(guard, name, String.valueOf(discordId));
     }
 
     @Given(THAT + GUARD + VARIABLE + " is a valid token for " + VARIABLE)

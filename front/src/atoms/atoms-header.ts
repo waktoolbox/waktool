@@ -1,27 +1,27 @@
 import {atom, selector} from "recoil";
+import {gfetch} from "../utils/fetch-utils.ts";
 
 export const menuDrawerState = atom({
     key: 'menuDrawerState',
     default: false
 })
 
+export const loginStateUpdater = atom({
+    key: "loginStateUpdater",
+    default: 0
+});
+
 export const loginState = atom({
     key: 'loginState',
     default: selector({
         key: 'loginState/default',
-        get: async () => {
-            console.log("call")
-            const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/oauth/whoami", {
-                credentials: 'include',
-                headers: {
-                    "Access-Control-Allow-Origin": import.meta.env.VITE_BACKEND_URL
-                }
-            })
-            const data = await response.json();
+        get: async ({get}) => {
+            get(loginStateUpdater)
+            const data = await gfetch("/api/accounts");
             return {
-                discordId: data.discordId,
+                ...data,
                 logged: data.discordId !== null
             };
         }
     })
-})
+});
