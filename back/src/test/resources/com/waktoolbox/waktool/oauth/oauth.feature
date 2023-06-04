@@ -110,19 +110,6 @@ Feature: OAuth through Discord system
       | full       | void      |
       | full       | error     |
 
-  Scenario: whoami return correct values
-    Given that token is a valid token for abcde
-
-    When we get on "/api/oauth/whoami" with a Request:
-    """yaml
-    headers:
-      Cookie: token={{token}}
-    """
-    Then we receive a status OK_200 and:
-    """yaml
-    discordId: abcde
-    """
-
   Scenario: disconnect does things (just to get coverage...)
     Given that getting on "/mocked-front" will return a status OK_200
 

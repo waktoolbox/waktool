@@ -33,6 +33,22 @@ Feature: Account features are working
       | id | username     | discriminator | email           | ankamaName  | ankamaDiscriminator | twitchUrl                     |
       | 1  | Maude Clonet | 1324          | maude@clonet.fr | ClonetMaude | 4321                | https://twitch.tv/clonetmaude |
 
+
+    Then when we gets on "/api/accounts" a Request:
+    """yaml
+    headers:
+      Cookie: token={{token}}
+    """
+    Then we receive a status OK_200 and exactly:
+    """yaml
+    id: 1
+    username: Maude Clonet
+    discriminator: 1324
+    ankamaName: ClonetMaude
+    ankamaDiscriminator: 4321
+    twitchUrl: https://twitch.tv/clonetmaude
+    """
+
   Scenario Template: Errors - Check a bunch of errors
     Given token is a valid token for <id>
     When we post on "/api/accounts/1" a Request:

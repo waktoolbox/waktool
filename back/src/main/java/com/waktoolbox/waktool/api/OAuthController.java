@@ -13,7 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerErrorException;
 
 import java.net.URI;
@@ -87,13 +90,5 @@ public class OAuthController {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .location(URI.create(_baseUrl))
                 .build();
-    }
-
-    record WhoamiResponse(String discordId) {
-    }
-
-    @GetMapping("/oauth/whoami")
-    public ResponseEntity<WhoamiResponse> whoami(@RequestAttribute Optional<String> discordId) {
-        return ResponseEntity.ok(new WhoamiResponse(discordId.orElse(null)));
     }
 }
