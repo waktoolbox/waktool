@@ -40,6 +40,11 @@ public class DraftSteps implements DraftNotifier {
         _controller = new DraftController(_draft, this);
     }
 
+    @Given("draft is now server provided {word}")
+    public void whenServerProvided(String isServer) {
+        _draft.getConfiguration().setProvidedByServer(Boolean.parseBoolean(isServer));
+    }
+
     @Given("{word} joins draft")
     public void whenJoin(String id) {
         DraftUser user = new DraftUser();
@@ -64,6 +69,11 @@ public class DraftSteps implements DraftNotifier {
     public void whenAction(String user, DraftActionType action, int breed, DraftTeam team, String lockForPicking, String lockForOpponent) {
         DraftAction draftAction = new DraftAction(team, action, (byte) breed, Boolean.parseBoolean(lockForPicking), Boolean.parseBoolean(lockForOpponent));
         _lastActionSuccess = _controller.onAction(draftAction, user);
+    }
+
+    @Given("a draft null action from {word}")
+    public void whenDraftNullAction(String user) {
+        _lastActionSuccess = _controller.onAction(null, user);
     }
 
     @Then("the last action should be {word}")

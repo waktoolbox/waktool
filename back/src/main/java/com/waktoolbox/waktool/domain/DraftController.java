@@ -164,12 +164,11 @@ public class DraftController {
 
     private boolean validate(DraftAction action, String user) {
         if (!areTeamReady()) return false;
+        if (!isCurrentActionTheSameThanProvidedAction(action, getCurrentAction())) return false;
         if (action.getBreed() == null) return false;
 
         DraftTeam userTeam = getUserTeam(user);
         if (userTeam == DraftTeam.NONE || action.getTeam() != userTeam) return false;
-
-        if (!isCurrentActionTheSameThanProvidedAction(action, getCurrentAction())) return false;
 
         if (action.getType() == DraftActionType.PICK) {
             if (action.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(action.getBreed())) return false;
@@ -181,6 +180,7 @@ public class DraftController {
 
     private static boolean isCurrentActionTheSameThanProvidedAction(DraftAction action, DraftAction currentAction) {
         if (currentAction == null) return false;
+        if (action == null) return false;
         if (currentAction.getType() != action.getType()) return false;
         if (currentAction.isLockForOpponentTeam() != action.isLockForOpponentTeam()) return false;
         if (currentAction.isLockForPickingTeam() != action.isLockForPickingTeam()) return false;

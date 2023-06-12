@@ -10,9 +10,21 @@ Feature: Draft works as expected
     Given 1 joins draft
     Then team A does not contains user 1
     Then team B does not contains user 1
+
+    # Do not allow assign for server provided draft
+    Given draft is now server provided true
+    And 1 joins team A
+    Then team A does not contains user 1
+    Then team B does not contains user 1
+    Given draft is now server provided false
+
     Given 1 joins team A
     Then team A contains user 1
     Then team B does not contains user 1
+
+    Given 1 joins draft
+    Given 1 joins team A
+    # Then it improves coverage
 
     Given 2 joins draft
     Then team A does not contains user 2
@@ -20,6 +32,30 @@ Feature: Draft works as expected
     Given 2 joins team B
     Then team A does not contains user 2
     Then team B contains user 2
+
+    Given 3 joins draft
+    And 3 joins team B
+    Given 4 joins draft
+    And 4 joins team B
+    Given 5 joins draft
+    And 5 joins team B
+    Given 6 joins draft
+    And 6 joins team B
+
+    Given 7 joins draft
+
+    # Sorry just a coverage thing
+    Given draft is now server provided true
+    And 7 joins team B
+    Then team B does not contains user 7
+    Given draft is now server provided false
+    And 7 joins team B
+    Then team B contains user 7
+
+    # Team has max size
+    Given 8 joins draft
+    And 8 joins team B
+    Then team B does not contains user 8
 
     # Pick can't happen if not ready
     Given 1 picks 1 for team A true true
@@ -44,12 +80,19 @@ Feature: Draft works as expected
     And team B set ready to false
     Then team A is ready
     And team B is not ready
+    # Can't act if both team aren't ready
+    Given 1 bans 1 for team A true true
+    Then the last action should be false
     Then team B set ready to true
 
     # Being ready does not mean you can do any action
     Given 1 picks 1 for team A true true
     Then the last action should be false
     Given 2 picks 2 for team B true true
+    Then the last action should be false
+    Given a draft null action from 1
+    Then the last action should be false
+    Given a draft null action from 2
     Then the last action should be false
 
     # Can't act for other teamm
