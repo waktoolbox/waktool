@@ -1,0 +1,203 @@
+package com.waktoolbox.waktool.domain;
+
+import com.waktoolbox.waktool.domain.models.draft.*;
+import lombok.RequiredArgsConstructor;
+
+import java.time.Instant;
+import java.util.*;
+
+@RequiredArgsConstructor
+public class DraftController {
+    private static final int MAX_TEAM_SIZE = 6;
+
+    private final Draft _draft;
+    private final DraftNotifier _notifier;
+    private final Instant _startDate = Instant.now();
+
+    private final Set<Byte> _lockedForTeamA = new HashSet<>();
+    private final Set<Byte> _lockedForTeamB = new HashSet<>();
+    private final List<Byte> _pickedByTeamA = new ArrayList<>();
+    private final List<Byte> _pickedByTeamB = new ArrayList<>();
+
+    /**
+     * Call only once to initialize the draft after loading from database
+     */
+    public void restore() {
+        _draft.getHistory().forEach(this::processAction);
+    }
+
+    /**
+     * Add the user to draft users & notify it, then check if it must be auto assigned to a team
+     *
+     * @param user to process
+     */
+    public void onUserJoin(DraftUser user) {
+        if (!_draft.getUsers().contains(user)) _draft.getUsers().add(user);
+        _notifier.onUserJoin(user);
+
+        DraftTeam userTeam = getUserTeam(user.getId());
+        if (userTeam != DraftTeam.NONE) onUserAssigned(user, userTeam);
+    }
+
+    /**
+     * Manual assignation to a team for non-server provided draft, will add user only if not already present in another team and if team is not full
+     *
+     * @param user to process
+     * @param team to assign to
+     */
+    public void assignUser(String user, DraftTeam team) {
+        if (_draft.getConfiguration().isProvidedByServer()) return;
+        if (getUserTeam(user) != DraftTeam.NONE) return;
+        final List<DraftUser> associatedTeam = team == DraftTeam.TEAM_A ? _draft.getTeamA() : _draft.getTeamB();
+        if (associatedTeam.size() >= MAX_TEAM_SIZE) return;
+
+        _draft.getUsers().stream()
+                .filter(u -> u.getId().equals(user))
+                .findFirst()
+                .ifPresent(u -> onUserAssigned(u, team));
+    }
+
+    /**
+     * Validate, process and notify the action
+     *
+     * @param action to process
+     * @param user   doing it
+     * @return true if action was valid and processed
+     */
+    public boolean onAction(DraftAction action, String user) {
+        if (!validate(action, user)) return false;
+
+        processAction(action);
+        _notifier.onAction(action);
+        return true;
+    }
+
+    /**
+     * Toggle ready state for a team and notify it
+     *
+     * @param team  to toggle
+     * @param ready state
+     */
+    public void onTeamReady(DraftTeam team, boolean ready) {
+        if (team == DraftTeam.TEAM_A) _draft.setTeamAReady(ready);
+        if (team == DraftTeam.TEAM_B) _draft.setTeamBReady(ready);
+
+        _notifier.onTeamReady(team, ready);
+    }
+
+    /**
+     * Compute a draft result for a single team
+     *
+     * @param team to compute
+     * @return the picked and banned classes
+     */
+    public DraftTeamResult computeDraftResult(DraftTeam team) {
+        final Byte[] picked = _draft.getHistory().stream()
+                .filter(a -> a.getTeam() == team && a.getType() == DraftActionType.PICK)
+                .map(DraftAction::getBreed)
+                .toArray(Byte[]::new);
+
+        final Byte[] banned = _draft.getHistory().stream()
+                .filter(a -> a.getTeam() == team && a.getType() == DraftActionType.BAN)
+                .map(DraftAction::getBreed)
+                .distinct()
+                .toArray(Byte[]::new);
+
+        return new DraftTeamResult(picked, banned);
+    }
+
+    // *****************************************************************************************************************
+    // ***************************************** INTERNAL MECHANIC ONLY METHODS ****************************************
+    // *****************************************************************************************************************
+
+    private void onUserAssigned(DraftUser user, DraftTeam team) {
+        if (team == DraftTeam.NONE) throw new IllegalStateException("Unexpected team: " + team);
+        final List<DraftUser> associatedTeam = team == DraftTeam.TEAM_A ? _draft.getTeamA() : _draft.getTeamB();
+
+        if (!_draft.getConfiguration().isProvidedByServer()) {
+            final List<DraftUser> otherTeam = team == DraftTeam.TEAM_A ? _draft.getTeamB() : _draft.getTeamA();
+            if (otherTeam.contains(user)) return; // do not allow to be in both teams
+
+            if (!associatedTeam.contains(user)) associatedTeam.add(user);
+            _notifier.onUserAssigned(user, team);
+            return;
+        }
+
+        associatedTeam.stream()
+                .filter(u -> Objects.equals(u.getId(), user.getId()))
+                .findFirst()
+                .ifPresent(u -> {
+                    u.setUsername(user.getUsername());
+                    u.setDiscriminator(user.getDiscriminator());
+                    u.setPresent(true);
+                    _notifier.onUserAssigned(u, team);
+                });
+    }
+
+    private void processAction(DraftAction action) {
+        switch (action.getType()) {
+            case PICK -> {
+                lockForAppropriateTeam(action);
+                switch (action.getTeam()) {
+                    case TEAM_A -> _pickedByTeamA.add(action.getBreed());
+                    case TEAM_B -> _pickedByTeamB.add(action.getBreed());
+                    default -> throw new IllegalStateException("Unexpected team action: " + action.getTeam());
+                }
+            }
+            case BAN -> lockForAppropriateTeam(action);
+            default -> throw new IllegalStateException("Unexpected action type: " + action.getType());
+        }
+        _draft.getHistory().add(action);
+        _draft.setCurrentAction(_draft.getCurrentAction() + 1);
+    }
+
+    private void lockForAppropriateTeam(DraftAction action) {
+        if (action.isLockForOpponentTeam()) {
+            if (action.getTeam() == DraftTeam.TEAM_A) _lockedForTeamB.add(action.getBreed());
+            else if (action.getTeam() == DraftTeam.TEAM_B) _lockedForTeamA.add(action.getBreed());
+        }
+        if (action.isLockForPickingTeam()) {
+            if (action.getTeam() == DraftTeam.TEAM_A) _lockedForTeamA.add(action.getBreed());
+            else if (action.getTeam() == DraftTeam.TEAM_B) _lockedForTeamB.add(action.getBreed());
+        }
+    }
+
+    private boolean validate(DraftAction action, String user) {
+        if (!areTeamReady()) return false;
+        if (action.getBreed() == null) return false;
+
+        DraftTeam userTeam = getUserTeam(user);
+        if (userTeam == DraftTeam.NONE || action.getTeam() != userTeam) return false;
+
+        if (!isCurrentActionTheSameThanProvidedAction(action, getCurrentAction())) return false;
+
+        if (action.getType() == DraftActionType.PICK) {
+            if (action.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(action.getBreed())) return false;
+            if (action.getTeam() == DraftTeam.TEAM_B && _lockedForTeamB.contains(action.getBreed())) return false;
+        }
+
+        return true;
+    }
+
+    private static boolean isCurrentActionTheSameThanProvidedAction(DraftAction action, DraftAction currentAction) {
+        if (currentAction == null) return false;
+        if (currentAction.getType() != action.getType()) return false;
+        if (currentAction.isLockForOpponentTeam() != action.isLockForOpponentTeam()) return false;
+        if (currentAction.isLockForPickingTeam() != action.isLockForPickingTeam()) return false;
+        return currentAction.getTeam() == action.getTeam();
+    }
+
+    private boolean areTeamReady() {
+        return _draft.isTeamAReady() && _draft.isTeamBReady();
+    }
+
+    private DraftAction getCurrentAction() {
+        return _draft.getConfiguration().getActions()[_draft.getCurrentAction()];
+    }
+
+    private DraftTeam getUserTeam(String user) {
+        if (_draft.getTeamA().stream().anyMatch(u -> u.getId().equals(user))) return DraftTeam.TEAM_A;
+        if (_draft.getTeamB().stream().anyMatch(u -> u.getId().equals(user))) return DraftTeam.TEAM_B;
+        return DraftTeam.NONE;
+    }
+}
