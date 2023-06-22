@@ -75,9 +75,9 @@ public class WaktoolApplicationSteps {
     @Given(THAT + GUARD + VARIABLE + " is a valid token")
     public void generateToken(String name) {
         Claims claims = _jwtHelper.buildClaimsFromValues(
-                "discord_id", randomNumber(10),
-                "username", randomUsername(10),
-                "discriminator", randomNumber(4)
+                JwtHelper.DISCORD_ID, randomNumber(10),
+                JwtHelper.USERNAME, randomUsername(10),
+                JwtHelper.DISCRIMINATOR, randomNumber(4)
         );
 
         _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
@@ -91,9 +91,9 @@ public class WaktoolApplicationSteps {
     @Given(THAT + GUARD + VARIABLE + " is a valid token for " + VARIABLE)
     public void generateToken(Guard guard, String name, String discordId) {
         Claims claims = _jwtHelper.buildClaimsFromValues(
-                "discord_id", discordId,
-                "username", randomUsername(10),
-                "discriminator", randomNumber(4)
+                JwtHelper.DISCORD_ID, discordId,
+                JwtHelper.USERNAME, randomUsername(10),
+                JwtHelper.DISCRIMINATOR, randomNumber(4)
         );
 
         _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));

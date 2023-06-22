@@ -1,7 +1,6 @@
 package com.waktoolbox.waktool.infra.configuration;
 
 import com.waktoolbox.waktool.utils.JwtHelper;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,9 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.MappedInterceptor;
-import org.springframework.web.util.WebUtils;
 
-import java.util.Optional;
+import static com.waktoolbox.waktool.utils.JwtHelper.DISCORD_ID;
 
 @Configuration
 @RequiredArgsConstructor
@@ -23,19 +21,10 @@ public class TokenInterceptor implements HandlerInterceptor {
         return new MappedInterceptor(null, new HandlerInterceptor() {
             @Override
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                Cookie token = WebUtils.getCookie(request, "token");
-                if (token == null) {
-                    request.setAttribute("discordId", Optional.empty());
-                    return true;
-                }
-
-                try {
-                    request.setAttribute("discordId", Optional.ofNullable(_jwtHelper.decodeJwt(token.getValue()).get("discord_id")));
-                } catch (RuntimeException e) {
-                    // ignored
-                }
+                request.setAttribute("discordId", _jwtHelper.extractFromRequest(request).map(claims -> claims.get(DISCORD_ID)));
                 return true;
             }
         });
     }
+
 }

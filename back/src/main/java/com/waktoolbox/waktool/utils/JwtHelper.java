@@ -3,15 +3,23 @@ package com.waktoolbox.waktool.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.WebUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class JwtHelper {
+    public static final String DISCORD_ID = "discord_id";
+    public static final String USERNAME = "username";
+    public static final String DISCRIMINATOR = "discriminator";
+
     @Value("#{'${jwt.secret}'.getBytes()}")
     private byte[] SECRET;
 
@@ -40,5 +48,18 @@ public class JwtHelper {
             throw new RuntimeException("Token expired");
         }
         return body;
+    }
+
+    public Optional<Claims> extractFromRequest(HttpServletRequest request) {
+        Cookie token = WebUtils.getCookie(request, "token");
+        if (token == null) return Optional.empty();
+
+        try {
+            Claims claims = decodeJwt(token.getValue());
+            return Optional.ofNullable(claims);
+        } catch (RuntimeException e) {
+            // ignored
+        }
+        return Optional.empty();
     }
 }

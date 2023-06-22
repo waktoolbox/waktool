@@ -20,7 +20,7 @@ export const loginState = atom({
             const data = await gfetch("/api/accounts");
             return {
                 ...data,
-                logged: data.discordId !== null
+                logged: data.id !== null && data.id !== undefined
             };
         }
     })

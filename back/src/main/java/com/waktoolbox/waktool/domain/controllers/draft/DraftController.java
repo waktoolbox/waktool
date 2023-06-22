@@ -1,15 +1,20 @@
-package com.waktoolbox.waktool.domain;
+package com.waktoolbox.waktool.domain.controllers.draft;
 
 import com.waktoolbox.waktool.domain.models.draft.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @RequiredArgsConstructor
+@Accessors(prefix = "_")
 public class DraftController {
     private static final int MAX_TEAM_SIZE = 6;
 
+    @Getter
     private final Draft _draft;
     private final DraftNotifier _notifier;
     private final Instant _startDate = Instant.now();
@@ -40,12 +45,13 @@ public class DraftController {
     }
 
     /**
-     * Manual assignation to a team for non-server provided draft, will add user only if not already present in another team and if team is not full
+     * Manual assignation to a team for non-server provided draft, will add user only if draft has not started, is not already present in another team and if team is not full
      *
      * @param user to process
      * @param team to assign to
      */
     public void assignUser(String user, DraftTeam team) {
+        if (_draft.getCurrentAction() > 0) return;
         if (_draft.getConfiguration().isProvidedByServer()) return;
         if (getUserTeam(user) != DraftTeam.NONE) return;
         final List<DraftUser> associatedTeam = team == DraftTeam.TEAM_A ? _draft.getTeamA() : _draft.getTeamB();
@@ -104,6 +110,20 @@ public class DraftController {
                 .toArray(Byte[]::new);
 
         return new DraftTeamResult(picked, banned);
+    }
+
+    public DraftTeam getUserTeam(String user) {
+        if (_draft.getTeamA().stream().anyMatch(u -> u.getId().equals(user))) return DraftTeam.TEAM_A;
+        if (_draft.getTeamB().stream().anyMatch(u -> u.getId().equals(user))) return DraftTeam.TEAM_B;
+        return DraftTeam.NONE;
+    }
+
+    public boolean isExpired() {
+        return Instant.now().isAfter(_startDate.plus(1, ChronoUnit.HOURS));
+    }
+
+    public boolean isEnded() {
+        return _draft.getCurrentAction() >= _draft.getConfiguration().getActions().length;
     }
 
     // *****************************************************************************************************************
@@ -193,11 +213,5 @@ public class DraftController {
 
     private DraftAction getCurrentAction() {
         return _draft.getConfiguration().getActions()[_draft.getCurrentAction()];
-    }
-
-    private DraftTeam getUserTeam(String user) {
-        if (_draft.getTeamA().stream().anyMatch(u -> u.getId().equals(user))) return DraftTeam.TEAM_A;
-        if (_draft.getTeamB().stream().anyMatch(u -> u.getId().equals(user))) return DraftTeam.TEAM_B;
-        return DraftTeam.NONE;
     }
 }

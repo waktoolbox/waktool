@@ -58,9 +58,9 @@ public class OAuthController {
                 .orElseThrow(() -> new ServerErrorException("Couldn't save the account", new Exception()));
 
         Claims claims = _jwtHelper.buildClaimsFromValues(
-                "discord_id", savedAccount.getId(),
-                "username", savedAccount.getUsername(),
-                "discriminator", savedAccount.getDiscriminator()
+                JwtHelper.DISCORD_ID, savedAccount.getId(),
+                JwtHelper.USERNAME, savedAccount.getUsername(),
+                JwtHelper.DISCRIMINATOR, savedAccount.getDiscriminator()
         );
 
         // We won't keep the sub in the token

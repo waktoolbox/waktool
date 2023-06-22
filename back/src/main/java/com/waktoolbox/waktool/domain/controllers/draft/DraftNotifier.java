@@ -1,4 +1,4 @@
-package com.waktoolbox.waktool.domain;
+package com.waktoolbox.waktool.domain.controllers.draft;
 
 import com.waktoolbox.waktool.domain.models.draft.DraftAction;
 import com.waktoolbox.waktool.domain.models.draft.DraftTeam;

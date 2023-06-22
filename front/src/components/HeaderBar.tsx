@@ -18,7 +18,7 @@ export default function HeaderBar() {
     const logged = useRecoilValue(loginState);
     const location = useLocation();
 
-    if (logged && location.pathname !== "/account") {
+    if (logged && location.pathname !== "/account" && logged.logged) {
         if (!logged.ankamaName || !logged.ankamaDiscriminator) {
             setSnackValue({
                 severity: "error",
