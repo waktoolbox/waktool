@@ -20,6 +20,9 @@ public class SocketDraftNotifier implements DraftNotifier {
     private record DraftUserAssigned(DraftUser user, DraftTeam team) {
     }
 
+    private record DraftActionWithIndex(DraftAction draftAction, int index) {
+    }
+
     private record DraftTeamReady(DraftTeam team, boolean ready) {
     }
 
@@ -38,8 +41,8 @@ public class SocketDraftNotifier implements DraftNotifier {
     }
 
     @Override
-    public void onAction(DraftAction action) {
-        send(new DraftNotificationWrapper("draft::action", action));
+    public void onAction(DraftAction action, int index) {
+        send(new DraftNotificationWrapper("draft::action", new DraftActionWithIndex(action, index)));
     }
 
 

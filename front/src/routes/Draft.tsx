@@ -7,11 +7,13 @@ import {send, subscribe, unsubscribe} from "../utils/socket.ts";
 import {DraftData} from "../chore/draft.ts";
 import {useRecoilState} from "recoil";
 import {draftDataState} from "../atoms/atoms-draft.ts";
+import {socketWhoAmIState} from "../atoms/atoms-socket.ts";
 
 export default function Draft() {
     const navigate = useNavigate();
     const {draftId} = useParams();
     const [draftData, setDraftData] = useRecoilState(draftDataState);
+    const [whoAmI, setWhoAmI] = useRecoilState(socketWhoAmIState);
 
     useEffect(() => {
         subscribe("draft::data", (data: DraftData) => {
@@ -26,8 +28,17 @@ export default function Draft() {
             navigate("/draft/" + response.id)
         });
 
+        subscribe("whoami", (response: { id: string }) => {
+            setWhoAmI(response.id)
+            unsubscribe("whoami")
+        });
+
         if (draftId) {
             send("draft::get", {id: draftId});
+        }
+
+        if (!whoAmI) {
+            send("whoami", {});
         }
 
         return () => {
@@ -39,7 +50,7 @@ export default function Draft() {
     return (
         <Grid container direction="row" sx={{pt: 4, pb: 4, margin: "auto"}}>
             {(!draftData || !draftData.id) && <DraftConfigurator/>}
-            {draftId && <DraftViewer/>}
+            {draftData && draftData.id && <DraftViewer/>}
         </Grid>
     );
 }

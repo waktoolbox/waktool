@@ -11,6 +11,7 @@ export enum DraftTeam {
 export type DraftAction = {
     type: DraftActionType;
     team: DraftTeam;
+    breed?: number;
     lockForPickingTeam?: boolean;
     lockForOpponentTeam?: boolean;
 }

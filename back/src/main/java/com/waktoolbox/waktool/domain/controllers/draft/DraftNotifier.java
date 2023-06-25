@@ -9,7 +9,7 @@ public interface DraftNotifier {
 
     void onUserAssigned(DraftUser user, DraftTeam team);
 
-    void onAction(DraftAction action);
+    void onAction(DraftAction action, int index);
 
     void onTeamReady(DraftTeam team, boolean ready);
 }

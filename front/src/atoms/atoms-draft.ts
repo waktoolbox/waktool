@@ -2,7 +2,7 @@ import {atom} from "recoil";
 import {DraftData} from "../chore/draft.ts";
 
 
-export const draftDataState = atom<DraftData>({
+export const draftDataState = atom<DraftData | undefined>({
     key: "draftData",
-    default: {} as DraftData
+    default: undefined
 })

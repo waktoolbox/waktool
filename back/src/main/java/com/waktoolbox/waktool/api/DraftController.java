@@ -27,6 +27,15 @@ public class DraftController {
     private record DraftIdOnlyMessage(String id) {
     }
 
+    @MessageMapping("/whoami")
+    @SendToUser("/topic/whoami")
+    public DraftIdOnlyMessage whoami(
+            @Header("simpSessionAttributes") Map<String, Optional<String>> attributes,
+            @Header String simpSessionId
+    ) {
+        return new DraftIdOnlyMessage(attributes.get(DISCORD_ID).orElse(simpSessionId));
+    }
+
     @MessageMapping("/draft::get")
     @SendToUser("/topic/draft::data")
     public Draft getDraft(
@@ -80,7 +89,7 @@ public class DraftController {
     }
 
     @MessageMapping("/draft::teamReady")
-    public void draftAssignUser(
+    public void draftTeamReady(
             @Header("simpSessionAttributes") Map<String, Optional<String>> attributes,
             @Header String simpSessionId,
             DraftTeamReadyMessage message

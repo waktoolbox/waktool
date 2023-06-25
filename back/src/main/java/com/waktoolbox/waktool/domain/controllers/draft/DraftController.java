@@ -73,8 +73,10 @@ public class DraftController {
     public boolean onAction(DraftAction action, String user) {
         if (!validate(action, user)) return false;
 
+        int currentAction = _draft.getCurrentAction();
+
         processAction(action);
-        _notifier.onAction(action);
+        _notifier.onAction(action, currentAction);
         return true;
     }
 

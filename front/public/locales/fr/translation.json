@@ -5,16 +5,30 @@
     "action": {
       "add": "Ajouter une action"
     },
-    "start": "Démarrer la draft",
+    "assignToA": "Assigner à l'équipe A",
+    "assignToB": "Assigner à l'équipe B",
     "ban": "<span>Ban</span>",
+    "banDesc": "doit <span>bannir</span>",
+    "currentAction": "Action en cours",
+    "ended": "Draft terminé",
     "importTemplate": "Importer",
+    "link": "Draft",
+    "lockForBothDesc": "une classe et la bloque pour les deux équipes",
+    "lockForNoneDesc": "une classe",
     "lockForPicking": "et la bloque pour son équipe",
     "lockForOpponent": "et la bloque pour l'autre équipe",
+    "lockForOpponentDesc": "une classe et la bloque pour l'équipe adverse",
+    "lockForOwnDesc": "une classe et la bloque pour son équipe",
+    "noUserToAssign": "Personne à assigner",
     "pick": "<span>Pick</span>",
+    "pickDesc": "doit <span>choisir</span>",
+    "start": "Démarrer la draft",
+    "setTeamNotReady": "Mon équipe n'est pas prête",
+    "setTeamReady": "Mon équipe est prête",
     "team": "Équipe",
-    "template": "Modèle",
     "teamA": "Équipe A",
     "teamB": "Équipe B",
+    "template": "Modèle",
     "type": "Type"
   },
   "footer": {
@@ -30,5 +44,6 @@
       "link": "Mon profil"
     },
     "tools": "Outils"
-  }
+  },
+  "validate": "Valider"
 }

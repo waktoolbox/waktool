@@ -58,7 +58,7 @@ function DraftConfigurator() {
                             setDraftTemplate(+event.target.value || 0)
                         }}>
                     {DraftTemplates.map((template, index) => (
-                        <MenuItem value={index}>{template.name}</MenuItem>
+                        <MenuItem key={index} value={index}>{template.name}</MenuItem>
                     ))}
                 </Select>
                 <Button

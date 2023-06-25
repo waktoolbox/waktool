@@ -65,10 +65,11 @@ public class DraftManager {
         DraftController draft = _currentDrafts.get(draftId);
         if (draft == null) return null;
 
-        _users.putIfAbsent(user.getId(), user);
-        user.addDraft(draftId);
+        DraftUser updatableUser = Optional.ofNullable(_users.putIfAbsent(user.getId(), user)).orElse(user);
+        updatableUser.setPresent(true);
+        updatableUser.addDraft(draftId);
 
-        draft.onUserJoin(user);
+        draft.onUserJoin(updatableUser);
         return draft.getDraft();
     }
 

@@ -15,6 +15,12 @@ export function subscribe(path: string, callback: (data: any) => void) {
     client.subscribe(subscriptionPrefix + path, (response) => callback(JSON.parse(response.body)));
 }
 
+export function subscribeWithoutUserPrefix(path: string, callback: (data: any) => void) {
+    if (subscriptions.has(path)) return;
+    subscriptions.add(path);
+    client.subscribe(path, (response) => callback(JSON.parse(response.body)));
+}
+
 export function unsubscribe(path: string) {
     if (!subscriptions.has(path)) return;
     subscriptions.delete(path);

@@ -1,0 +1,13 @@
+.draftImagePicked {
+    box-shadow: inset 0 0 0 10px #03c8be;
+}
+
+.draftImageHover {
+    box-shadow: inset 0 0 0 10px #03c8be;
+    cursor: pointer
+}
+
+.draftImageDisabled {
+    filter: grayscale(1);
+    cursor: not-allowed;
+}
