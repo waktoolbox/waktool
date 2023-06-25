@@ -18,7 +18,6 @@ import java.util.Optional;
 public class JwtHelper {
     public static final String DISCORD_ID = "discord_id";
     public static final String USERNAME = "username";
-    public static final String DISCRIMINATOR = "discriminator";
 
     @Value("#{'${jwt.secret}'.getBytes()}")
     private byte[] SECRET;

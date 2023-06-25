@@ -147,8 +147,7 @@ public class DraftController {
                 .filter(u -> Objects.equals(u.getId(), user.getId()))
                 .findFirst()
                 .ifPresent(u -> {
-                    u.setUsername(user.getUsername());
-                    u.setDiscriminator(user.getDiscriminator());
+                    u.setDisplayName(user.getDisplayName());
                     u.setPresent(true);
                     _notifier.onUserAssigned(u, team);
                 });

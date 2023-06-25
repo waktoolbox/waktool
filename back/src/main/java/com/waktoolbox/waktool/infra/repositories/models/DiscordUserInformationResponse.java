@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public record DiscordUserInformationResponse(
         String id,
         String username,
+
+        String globalName,
         String discriminator,
         String email
 ) {

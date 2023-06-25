@@ -1,5 +1,6 @@
 package com.waktoolbox.waktool.domain.models.draft;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,15 +18,15 @@ public class DraftUser {
     String id;
     boolean captain;
     boolean present;
-    String username;
-    String discriminator;
 
+    String displayName;
+
+    @JsonIgnore
     Set<String> drafts = new HashSet<>();
 
-    public DraftUser(String id, String username, String discriminator) {
+    public DraftUser(String id, String displayName) {
         this.id = id;
-        this.username = username;
-        this.discriminator = discriminator;
+        this.displayName = displayName;
     }
 
     @Override

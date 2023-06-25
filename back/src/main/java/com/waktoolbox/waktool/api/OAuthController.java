@@ -51,6 +51,7 @@ public class OAuthController {
                     account.setEmail(oAuthAccount.getEmail());
                     account.setUsername(oAuthAccount.getUsername());
                     account.setDiscriminator(oAuthAccount.getDiscriminator());
+                    account.setGlobalName(oAuthAccount.getGlobalName());
                     return account;
                 })
                 .or(() -> Optional.of(oAuthAccount))
@@ -59,8 +60,7 @@ public class OAuthController {
 
         Claims claims = _jwtHelper.buildClaimsFromValues(
                 JwtHelper.DISCORD_ID, savedAccount.getId(),
-                JwtHelper.USERNAME, savedAccount.getUsername(),
-                JwtHelper.DISCRIMINATOR, savedAccount.getDiscriminator()
+                JwtHelper.USERNAME, savedAccount.getDisplayName()
         );
 
         // We won't keep the sub in the token

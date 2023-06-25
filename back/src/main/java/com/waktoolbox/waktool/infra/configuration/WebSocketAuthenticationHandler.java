@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.waktoolbox.waktool.utils.JwtHelper.*;
+import static com.waktoolbox.waktool.utils.JwtHelper.DISCORD_ID;
+import static com.waktoolbox.waktool.utils.JwtHelper.USERNAME;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class WebSocketAuthenticationHandler extends HttpSessionHandshakeIntercep
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         Optional<Claims> claims = _jwtHelper.extractFromRequest(((ServletServerHttpRequest) request).getServletRequest());
 
-        Stream.of(DISCORD_ID, USERNAME, DISCRIMINATOR).forEach(tag -> attributes.put(tag, claims.filter(c -> c.containsKey(tag)).map(c -> (String) c.get(tag))));
+        Stream.of(DISCORD_ID, USERNAME).forEach(tag -> attributes.put(tag, claims.filter(c -> c.containsKey(tag)).map(c -> (String) c.get(tag))));
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }
 }

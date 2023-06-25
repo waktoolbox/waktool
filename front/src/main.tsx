@@ -4,6 +4,7 @@ import './index.css'
 import './utils/i18n';
 import {RouterProvider} from "react-router-dom";
 import {createRouter} from "./utils/router.tsx";
+import './utils/socket.ts'
 
 const router = createRouter();
 

@@ -3,6 +3,7 @@ import Account from "../routes/Account.tsx";
 import Home from "../routes/Home.tsx";
 import App from "../App.tsx";
 import {accountLoader, accountSaver} from "../services/account.ts";
+import Draft from "../routes/Draft.tsx";
 
 export function createRouter() {
     return createBrowserRouter([
@@ -28,7 +29,11 @@ export function createRouter() {
                 },
                 {
                     path: "draft",
-                    element: <div>TODO Draft</div>
+                    element: <Draft/>
+                },
+                {
+                    path: "draft/:draftId",
+                    element: <Draft/>
                 }
             ]
         },

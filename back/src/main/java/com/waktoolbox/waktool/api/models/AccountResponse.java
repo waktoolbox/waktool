@@ -1,8 +1,7 @@
 package com.waktoolbox.waktool.api.models;
 
 public record AccountResponse(String id,
-                              String username,
-                              String discriminator,
+                              String displayName,
                               String ankamaName,
                               String ankamaDiscriminator,
                               String twitchUrl

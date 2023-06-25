@@ -46,3 +46,27 @@ h5 {
 .blueWord {
     color: #03c8be;
 }
+
+.darkBlueContainer {
+    background-color: #162834;
+    border-radius: 10px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    margin-bottom: 6px;
+}
+
+.teamA {
+    color: #07c6b6 !important;
+}
+
+.teamB {
+    color: #00A4E9 !important;
+}
+
+.pick {
+    color: #4be64b !important;
+}
+
+.ban {
+    color: #e64b4b !important;
+}

@@ -1,7 +1,34 @@
 {
   "connect": "Connexion",
+  "disconnect": "Déconnexion",
+  "draft": {
+    "action": {
+      "add": "Ajouter une action"
+    },
+    "start": "Démarrer la draft",
+    "ban": "<span>Ban</span>",
+    "importTemplate": "Importer",
+    "lockForPicking": "et la bloque pour son équipe",
+    "lockForOpponent": "et la bloque pour l'autre équipe",
+    "pick": "<span>Pick</span>",
+    "team": "Équipe",
+    "template": "Modèle",
+    "teamA": "Équipe A",
+    "teamB": "Équipe B",
+    "type": "Type"
+  },
   "footer": {
     "wakfu": "Wakfu est un MMORPG édité par Ankama Studio. Tous droits réservés.\nLe site internet “Waktool” est un fansite communautaire non-officiel du MMORPG Wakfu sans aucun lien avec Ankama.\n",
     "login": "Attention ! Ne communiquez jamais vos identifiants de jeu."
+  },
+  "menu": {
+    "account": "Compte",
+    "draft": {
+      "link": "Draft"
+    },
+    "profile": {
+      "link": "Mon profil"
+    },
+    "tools": "Outils"
   }
 }

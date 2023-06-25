@@ -107,6 +107,7 @@ public class DiscordOAuthRepository implements OAuthRepository {
                     .id(userInformation.id())
                     .email(userInformation.email())
                     .username(userInformation.username())
+                    .globalName(userInformation.globalName())
                     .discriminator(userInformation.discriminator())
                     .build();
         } catch (Exception e) {

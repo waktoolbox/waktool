@@ -18,6 +18,9 @@ public class AccountEntity {
     String id;
 
     @Column
+    String globalName;
+
+    @Column
     String username;
 
     @Column

@@ -16,22 +16,26 @@ import org.springframework.stereotype.Controller;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.waktoolbox.waktool.utils.JwtHelper.*;
+import static com.waktoolbox.waktool.utils.JwtHelper.DISCORD_ID;
+import static com.waktoolbox.waktool.utils.JwtHelper.USERNAME;
 
 @Controller
 @RequiredArgsConstructor
 public class DraftController {
     private final DraftManager _draftManager;
 
+    private record DraftIdOnlyMessage(String id) {
+    }
+
     @MessageMapping("/draft::get")
-    @SendToUser("/queue/draft")
+    @SendToUser("/topic/draft::data")
     public Draft getDraft(
             @Header("simpSessionAttributes") Map<String, Optional<String>> attributes,
             @Header String simpSessionId,
-            String draftId
+            DraftIdOnlyMessage draft
     ) {
         DraftUser user = computeDraftUser(attributes, simpSessionId);
-        return _draftManager.userRequestDraft(user, draftId);
+        return _draftManager.userRequestDraft(user, draft.id);
     }
 
     private record DraftCreateMessage(DraftAction[] actions) {
@@ -39,13 +43,13 @@ public class DraftController {
 
     @MessageMapping("/draft::create")
     @SendToUser("/topic/draft")
-    public Draft createDraft(
+    public DraftIdOnlyMessage createDraft(
             @Header("simpSessionAttributes") Map<String, Optional<String>> attributes,
             @Header String simpSessionId,
             DraftCreateMessage message
     ) {
         DraftUser user = computeDraftUser(attributes, simpSessionId);
-        return _draftManager.createDraftByUser(user, message.actions);
+        return new DraftIdOnlyMessage(_draftManager.createDraftByUser(user, message.actions).getId());
     }
 
     private record DraftActionMessage(String draftId, DraftAction action) {
@@ -86,7 +90,7 @@ public class DraftController {
 
     private DraftUser computeDraftUser(Map<String, Optional<String>> attributes, String simpSessionId) {
         String id = attributes.get(DISCORD_ID).orElse(simpSessionId);
-        return _draftManager.getUser(id).orElse(new DraftUser(id, attributes.get(USERNAME).orElse(null), attributes.get(DISCRIMINATOR).orElse(null)));
+        return _draftManager.getUser(id).orElse(new DraftUser(id, attributes.get(USERNAME).orElse(null)));
     }
 
     @EventListener

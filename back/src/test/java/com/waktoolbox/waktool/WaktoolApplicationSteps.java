@@ -76,8 +76,7 @@ public class WaktoolApplicationSteps {
     public void generateToken(String name) {
         Claims claims = _jwtHelper.buildClaimsFromValues(
                 JwtHelper.DISCORD_ID, randomNumber(10),
-                JwtHelper.USERNAME, randomUsername(10),
-                JwtHelper.DISCRIMINATOR, randomNumber(4)
+                JwtHelper.USERNAME, randomUsername(10)
         );
 
         _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
@@ -92,8 +91,7 @@ public class WaktoolApplicationSteps {
     public void generateToken(Guard guard, String name, String discordId) {
         Claims claims = _jwtHelper.buildClaimsFromValues(
                 JwtHelper.DISCORD_ID, discordId,
-                JwtHelper.USERNAME, randomUsername(10),
-                JwtHelper.DISCRIMINATOR, randomNumber(4)
+                JwtHelper.USERNAME, randomUsername(10)
         );
 
         _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
