@@ -1,4 +1,5 @@
-import {Alert, Snackbar} from "@mui/material";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import {SyntheticEvent} from "react";
 import {useRecoilState} from "recoil";
 import {snackState} from "../atoms/atoms-snackbar.ts";

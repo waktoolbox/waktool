@@ -1,5 +1,7 @@
 import {useTranslation} from "react-i18next";
-import {Icon, MenuItem, Select, SelectProps} from "@mui/material";
+import Icon from "@mui/material/Icon";
+import MenuItem from "@mui/material/MenuItem";
+import Select, {SelectProps} from "@mui/material/Select";
 import {useState} from "react";
 
 interface Language {

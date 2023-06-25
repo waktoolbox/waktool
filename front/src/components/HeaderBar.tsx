@@ -1,4 +1,8 @@
-import {AppBar, Box, Button, Divider, IconButton} from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
 import PersonIcon from '@mui/icons-material/Person';
 import PersonIconOutlined from '@mui/icons-material/PersonOutlined';
 import MenuIcon from '@mui/icons-material/Menu';

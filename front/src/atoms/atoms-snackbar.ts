@@ -1,5 +1,5 @@
 import {atom} from "recoil";
-import {AlertColor} from "@mui/material";
+import {AlertColor} from "@mui/material/Alert";
 
 export type SnackMessage = {
     severity?: AlertColor,

@@ -1,4 +1,5 @@
-import {Divider, Typography} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 import {useTranslation} from "react-i18next";
 
 function Footer() {

@@ -2,9 +2,9 @@ import {Stomp} from "@stomp/stompjs";
 
 console.log("Initiating Stomp configuration")
 const client = Stomp.client(import.meta.env.VITE_SOCKET_URL);
-await new Promise((resolve, reject) => {
-    client.connect({}, () => resolve(true), () => reject())
-});
+client.connect({}, () => {
+}, () => {
+})
 
 const subscriptionPrefix = "/user/topic/";
 const subscriptions = new Set<string>();

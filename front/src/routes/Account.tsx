@@ -1,4 +1,7 @@
-import {Button, Grid, TextField, Typography} from "@mui/material";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import {Trans, useTranslation} from "react-i18next";
 import {Form, useActionData, useLoaderData} from 'react-router-dom'
 import {Account as AccountModel} from "../services/account.ts";

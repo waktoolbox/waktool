@@ -1,5 +1,5 @@
 import './App.css'
-import {ThemeProvider} from "@mui/material";
+import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import Grid from "@mui/material/Grid";
 import theme from "./utils/theme.ts";
 import Footer from "./components/Footer.tsx";
