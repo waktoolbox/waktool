@@ -17,21 +17,20 @@ Feature: Account features are working
       payload:
         ankamaName: ClonetMaude
         ankamaDiscriminator: 4321
-        twitchUrl: https://twitch.tv/clonetmaude
+        twitchUrl: https://www.twitch.tv/clonetmaude
     """
     Then we receive a status OK_200 and:
     """
     id: 1
-    username: Maude Clonet
-    discriminator: 1324
+    displayName: Maude Clonet#1324
     ankamaName: ClonetMaude
     ankamaDiscriminator: 4321
-    twitchUrl: https://twitch.tv/clonetmaude
+    twitchUrl: https://www.twitch.tv/clonetmaude
     """
 
     And the accounts table contains only:
       | id | username     | discriminator | email           | ankamaName  | ankamaDiscriminator | twitchUrl                     |
-      | 1  | Maude Clonet | 1324          | maude@clonet.fr | ClonetMaude | 4321                | https://twitch.tv/clonetmaude |
+      | 1  | Maude Clonet | 1324          | maude@clonet.fr | ClonetMaude | 4321                | https://www.twitch.tv/clonetmaude |
 
 
     Then when we gets on "/api/accounts" a Request:
@@ -42,11 +41,10 @@ Feature: Account features are working
     Then we receive a status OK_200 and exactly:
     """yaml
     id: 1
-    username: Maude Clonet
-    discriminator: 1324
+    displayName: Maude Clonet#1324
     ankamaName: ClonetMaude
     ankamaDiscriminator: 4321
-    twitchUrl: https://twitch.tv/clonetmaude
+    twitchUrl: https://www.twitch.tv/clonetmaude
     """
 
   Scenario Template: Errors - Check a bunch of errors

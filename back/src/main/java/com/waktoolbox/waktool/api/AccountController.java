@@ -46,7 +46,7 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ankama name is required");
         }
 
-        if (!Pattern.matches("/^[0-9a-zA-Z-]{3,29}$/", request.ankamaName())) {
+        if (!Pattern.matches("^[0-9a-zA-Z-]{3,29}$", request.ankamaName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ankama name is invalid");
         }
 
