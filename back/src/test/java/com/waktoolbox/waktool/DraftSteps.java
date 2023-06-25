@@ -146,7 +146,7 @@ public class DraftSteps implements DraftNotifier {
     }
 
     @Override
-    public void onAction(DraftAction action) {
+    public void onAction(DraftAction action, int index) {
 
     }
 

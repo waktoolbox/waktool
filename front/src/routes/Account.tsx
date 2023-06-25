@@ -39,7 +39,7 @@ export default function Account() {
             xs: 12, md: 8, sx: {p: 2},
             fieldName: "ankamaName", labelKey: "account.ankamaName",
             value: ankamaName, setter: setAnkamaName, required: true,
-            error: !ankamaName || ankamaName.length <= 0,
+            error: !ankamaName || ankamaName.length <= 0 || !ankamaName.match(/^[0-9a-zA-Z-]{3,29}$/),
             helperText: (error) => error ? 'error.ankamaName' : undefined
         },
         {
@@ -53,22 +53,31 @@ export default function Account() {
             xs: 12, sx: {p: 2},
             fieldName: "twitchUrl", labelKey: "account.twitchUrl",
             value: twitchUrl, setter: setTwitchUrl,
-            // error: twitchUrl !== undefined && !twitchUrl.match(/^(https?:\/\/)?(www\.)?twitch\.tv\/[a-zA-Z0-9_]{4,25}$/),
-            error: twitchUrl !== undefined && !twitchUrl.match(/^(https:\/\/)((www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\.)?twitch\.tv\/(?!directory|p|user\/legal|admin|login|signup|jobs)([\w+]{4,25})$/),
+            error: twitchUrl !== undefined && twitchUrl !== null && twitchUrl !== "" && !twitchUrl.match(/^(https:\/\/)((www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\.)?twitch\.tv\/(?!directory|p|user\/legal|admin|login|signup|jobs)([\w+]{4,25})$/),
             helperText: (error) => error ? 'error.twitchUrl' : undefined
         }
     ];
 
     return (
         <Grid container>
-            <Grid item xs={12} sx={{
+            <div style={{
                 backgroundColor: '#162834',
+                position: 'absolute',
+                left: 0,
+                width: '100%',
+                height: '150px',
+                zIndex: 0
+            }}/>
+
+            <Grid item xs={12} className="screenWideTitle" sx={{
                 height: '150px',
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                textTransform: "uppercase"
+                textTransform: "uppercase",
+                zIndex: 1
             }}>
+
                 <Typography variant="h4">
                     <Trans i18nKey="account.title" components={{span: <span className="blueWord"/>}}/>
                 </Typography>
@@ -90,7 +99,8 @@ export default function Account() {
                             </Grid>
                         ))}
                         <Grid item xs={12} sx={{p: 2, pt: 1}}>
-                            <Button type="submit" sx={{width: "100%"}}>{t('save')}</Button>
+                            <Button disabled={items.find(i => i.error) !== undefined} type="submit"
+                                    sx={{width: "100%"}}>{t('save')}</Button>
                         </Grid>
                     </Grid>
                 </Form>

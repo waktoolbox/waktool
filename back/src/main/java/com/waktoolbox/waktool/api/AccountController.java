@@ -46,6 +46,10 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ankama name is required");
         }
 
+        if (!Pattern.matches("/^[0-9a-zA-Z-]{3,29}$/", request.ankamaName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ankama name is invalid");
+        }
+
         if (request.ankamaDiscriminator() == null || request.ankamaDiscriminator().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ankama discriminator is required");
         }
@@ -59,7 +63,8 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Discriminator isn't valid");
         }
 
-        if (request.twitchUrl() != null && !Pattern.matches("^(https://)((www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\\.)?twitch\\.tv/(?!directory|p|user/legal|admin|login|signup|jobs)([\\w+]{4,25})$", request.twitchUrl())) {
+        String twitchUrl = request.twitchUrl() != null && !request.twitchUrl().isEmpty() ? request.twitchUrl() : null;
+        if (twitchUrl != null && !Pattern.matches("^(https://)((www|en-es|en-gb|secure|beta|ro|www-origin|en-ca|fr-ca|lt|zh-tw|he|id|ca|mk|lv|ma|tl|hi|ar|bg|vi|th)\\.)?twitch\\.tv/(?!directory|p|user/legal|admin|login|signup|jobs)([\\w+]{4,25})$", twitchUrl)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Twitch URL isn't valid");
         }
 

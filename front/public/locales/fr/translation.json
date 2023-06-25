@@ -1,4 +1,10 @@
 {
+  "account": {
+    "ankamaName": "Pseudo Ankama",
+    "ankamaDiscriminator": "Discriminant Ankama",
+    "title": "Gestion de <span>compte</span>",
+    "twitchUrl": "URL Twitch"
+  },
   "connect": "Connexion",
   "disconnect": "Déconnexion",
   "draft": {
@@ -31,6 +37,11 @@
     "template": "Modèle",
     "type": "Type"
   },
+  "error": {
+    "ankamaName": "Le pseudo Ankama est obligatoire et doit être valide",
+    "ankamaDiscriminator": "Le discriminant Ankama est obligatoire et doit être valide (sans le #)",
+    "twitchUrl": "L'URL Twitch doit être valide (format https://www.twitch.tv/<pseudo>"
+  },
   "footer": {
     "wakfu": "Wakfu est un MMORPG édité par Ankama Studio. Tous droits réservés.\nLe site internet “Waktool” est un fansite communautaire non-officiel du MMORPG Wakfu sans aucun lien avec Ankama.\n",
     "login": "Attention ! Ne communiquez jamais vos identifiants de jeu."
@@ -45,5 +56,6 @@
     },
     "tools": "Outils"
   },
+  "save": "Sauvegarder",
   "validate": "Valider"
 }

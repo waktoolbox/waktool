@@ -71,6 +71,7 @@ Feature: Account features are working
       | id | token     | name | discriminator | twitch                                                  | status           |
       | 1  |           | name | 134           | https://twitch.tv/maudeclonet                           | UNAUTHORIZED_401 |
       | 2  | {{token}} | name | 134           | https://twitch.tv/maudeclonet                           | FORBIDDEN_403    |
+      | 1  | {{token}} | n?me | 134           | https://twitch.tv/maudeclonet                           | BAD_REQUEST_400  |
       | 1  | {{token}} |      | 134           | https://twitch.tv/maudeclonet                           | BAD_REQUEST_400  |
       | 1  | {{token}} | name |               | https://twitch.tv/maudeclonet                           | BAD_REQUEST_400  |
       | 1  | {{token}} | name | 10000         | https://twitch.tv/maudeclonet                           | BAD_REQUEST_400  |
