@@ -27,7 +27,7 @@ FROM eclipse-temurin:20-jdk-alpine as build-jdk
 RUN jlink \
     --module-path /opt/java/openjdk/jmods \
     --compress=2 \
-    --add-modules java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management,java.naming,java.scripting,java.security.jgss,java.sql,java.xml,jdk.unsupported \
+    --add-modules java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management,java.naming,java.scripting,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported \
     --no-header-files \
     --no-man-pages \
     --output /opt/jdk
