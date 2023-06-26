@@ -34,6 +34,9 @@ RUN jlink \
 
 FROM alpine:3.18.2
 
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+RUN update-ca-certificates
+
 ENV JAVA_OPTS="-XX:+ShowCodeDetailsInExceptionMessages"
 
 WORKDIR /opt
