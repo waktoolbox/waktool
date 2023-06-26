@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:20-alpine as build-front
 WORKDIR /front
 
 COPY front/*.json ./
@@ -15,7 +15,7 @@ COPY front/public/ public/
 
 RUN npm run build
 
-FROM maven:3.9.2-eclipse-temurin-20 as build2
+FROM maven:3.9.2-eclipse-temurin-20 as build-back
 
 WORKDIR /back
 COPY back/pom.xml pom.xml
@@ -23,20 +23,28 @@ COPY back/src/ src/
 
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:20-jre
+FROM eclipse-temurin:20-jdk-alpine as build-jdk
+RUN jlink \
+    --module-path /opt/java/openjdk/jmods \
+    --compress=2 \
+    --add-modules java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management,java.naming,java.scripting,java.security.jgss,java.sql,java.xml,jdk.unsupported \
+    --no-header-files \
+    --no-man-pages \
+    --output /opt/jdk
+
+FROM alpine:3.18.2
 
 ENV JAVA_OPTS="-XX:+ShowCodeDetailsInExceptionMessages"
-
-RUN useradd waktool -U
 
 WORKDIR /opt
 
 RUN mkdir -p front/dist
 
-COPY --from=build /front/dist/** front/dist/
-COPY --from=build2 /back/target/back-*.jar app.jar
+COPY --from=build-front /front/dist/ front/dist/
+COPY --from=build-back /back/target/back-*.jar app.jar
+COPY --from=build-jdk /opt/jdk java
 
-RUN chown -R waktool:waktool /opt
+ENV JAVA_HOME=/opt/java
+ENV PATH="$PATH:$JAVA_HOME/bin"
 
-USER waktool:waktool
 ENTRYPOINT java $JAVA_OPTS -jar app.jar
