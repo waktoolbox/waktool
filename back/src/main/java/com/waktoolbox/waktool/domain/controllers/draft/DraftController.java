@@ -1,6 +1,6 @@
 package com.waktoolbox.waktool.domain.controllers.draft;
 
-import com.waktoolbox.waktool.domain.models.draft.*;
+import com.waktoolbox.waktool.domain.models.drafts.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;

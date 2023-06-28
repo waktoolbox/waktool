@@ -1,6 +1,6 @@
 package com.waktoolbox.waktool.domain.controllers.draft;
 
-import com.waktoolbox.waktool.domain.models.draft.*;
+import com.waktoolbox.waktool.domain.models.drafts.*;
 import com.waktoolbox.waktool.domain.repositories.DraftRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

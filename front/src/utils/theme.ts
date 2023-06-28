@@ -49,6 +49,14 @@ export default createTheme({
             }
         },
 
+        MuiCard: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: '#1f333a',
+                }
+            }
+        },
+
         MuiDivider: {
             styleOverrides: {
                 root: {

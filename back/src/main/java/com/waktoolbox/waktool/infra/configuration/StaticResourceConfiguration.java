@@ -16,6 +16,7 @@ public class StaticResourceConfiguration implements WebMvcConfigurer {
             "/",
             "/account", "/account/**",
             "/draft", "/draft/**",
+            "/tournament/**"
     };
 
     @Override

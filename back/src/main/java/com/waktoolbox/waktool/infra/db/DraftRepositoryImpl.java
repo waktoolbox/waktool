@@ -1,6 +1,6 @@
 package com.waktoolbox.waktool.infra.db;
 
-import com.waktoolbox.waktool.domain.models.draft.Draft;
+import com.waktoolbox.waktool.domain.models.drafts.Draft;
 import com.waktoolbox.waktool.domain.repositories.DraftRepository;
 import com.waktoolbox.waktool.infra.mappers.DraftEntityMapper;
 import lombok.RequiredArgsConstructor;

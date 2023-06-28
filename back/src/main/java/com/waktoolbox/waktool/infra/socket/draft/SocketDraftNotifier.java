@@ -1,9 +1,9 @@
 package com.waktoolbox.waktool.infra.socket.draft;
 
 import com.waktoolbox.waktool.domain.controllers.draft.DraftNotifier;
-import com.waktoolbox.waktool.domain.models.draft.DraftAction;
-import com.waktoolbox.waktool.domain.models.draft.DraftTeam;
-import com.waktoolbox.waktool.domain.models.draft.DraftUser;
+import com.waktoolbox.waktool.domain.models.drafts.DraftAction;
+import com.waktoolbox.waktool.domain.models.drafts.DraftTeam;
+import com.waktoolbox.waktool.domain.models.drafts.DraftUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 

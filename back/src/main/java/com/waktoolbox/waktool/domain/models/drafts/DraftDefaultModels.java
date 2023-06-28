@@ -1,9 +1,9 @@
-package com.waktoolbox.waktool.domain.models.draft;
+package com.waktoolbox.waktool.domain.models.drafts;
 
-import static com.waktoolbox.waktool.domain.models.draft.DraftActionType.BAN;
-import static com.waktoolbox.waktool.domain.models.draft.DraftActionType.PICK;
-import static com.waktoolbox.waktool.domain.models.draft.DraftTeam.TEAM_A;
-import static com.waktoolbox.waktool.domain.models.draft.DraftTeam.TEAM_B;
+import static com.waktoolbox.waktool.domain.models.drafts.DraftActionType.BAN;
+import static com.waktoolbox.waktool.domain.models.drafts.DraftActionType.PICK;
+import static com.waktoolbox.waktool.domain.models.drafts.DraftTeam.TEAM_A;
+import static com.waktoolbox.waktool.domain.models.drafts.DraftTeam.TEAM_B;
 
 public enum DraftDefaultModels {
     WAKFU_WARRIORS() {

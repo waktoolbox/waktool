@@ -57,5 +57,15 @@
     "tools": "Outils"
   },
   "save": "Sauvegarder",
+  "tournament": {
+    "display": {
+      "levelAndServer": "Niv. {{level}} / {{server}}"
+    },
+    "fromTo": "Du {{from, datetime}} au {{to, datetime}}",
+    "home": {
+      "featured.title": "<span>Tournoi</span> à l'honneur",
+      "waktool": "Planifier & simplifier la gestion de tournois sur <span>Wakfu</span>"
+    }
+  },
   "validate": "Valider"
 }

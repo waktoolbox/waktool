@@ -2,7 +2,7 @@ package com.waktoolbox.waktool;
 
 import com.waktoolbox.waktool.domain.controllers.draft.DraftController;
 import com.waktoolbox.waktool.domain.controllers.draft.DraftNotifier;
-import com.waktoolbox.waktool.domain.models.draft.*;
+import com.waktoolbox.waktool.domain.models.drafts.*;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.Transpose;
 import io.cucumber.java.en.Given;

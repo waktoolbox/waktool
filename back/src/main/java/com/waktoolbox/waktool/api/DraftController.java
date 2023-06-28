@@ -1,10 +1,10 @@
 package com.waktoolbox.waktool.api;
 
 import com.waktoolbox.waktool.domain.controllers.draft.DraftManager;
-import com.waktoolbox.waktool.domain.models.draft.Draft;
-import com.waktoolbox.waktool.domain.models.draft.DraftAction;
-import com.waktoolbox.waktool.domain.models.draft.DraftTeam;
-import com.waktoolbox.waktool.domain.models.draft.DraftUser;
+import com.waktoolbox.waktool.domain.models.drafts.Draft;
+import com.waktoolbox.waktool.domain.models.drafts.DraftAction;
+import com.waktoolbox.waktool.domain.models.drafts.DraftTeam;
+import com.waktoolbox.waktool.domain.models.drafts.DraftUser;
 import com.waktoolbox.waktool.domain.models.users.UserDisconnectedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;

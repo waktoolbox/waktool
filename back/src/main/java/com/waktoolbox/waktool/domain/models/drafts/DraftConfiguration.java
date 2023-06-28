@@ -1,4 +1,4 @@
-package com.waktoolbox.waktool.domain.models.draft;
+package com.waktoolbox.waktool.domain.models.drafts;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,9 +1,9 @@
 package com.waktoolbox.waktool.infra.db;
 
-import com.waktoolbox.waktool.domain.models.draft.DraftAction;
-import com.waktoolbox.waktool.domain.models.draft.DraftConfiguration;
-import com.waktoolbox.waktool.domain.models.draft.DraftTeamInfo;
-import com.waktoolbox.waktool.domain.models.draft.DraftUser;
+import com.waktoolbox.waktool.domain.models.drafts.DraftAction;
+import com.waktoolbox.waktool.domain.models.drafts.DraftConfiguration;
+import com.waktoolbox.waktool.domain.models.drafts.DraftTeamInfo;
+import com.waktoolbox.waktool.domain.models.drafts.DraftUser;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
