@@ -11,6 +11,13 @@ public class StaticResourceConfiguration implements WebMvcConfigurer {
     @Value("${waktool.resources-path}")
     private String resourcesPath;
 
+    // TODO find a better way than manual mapping...
+    private static final String[] PATHS = {
+            "/",
+            "/account", "/account/**",
+            "/draft", "/draft/**",
+    };
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**").addResourceLocations(resourcesPath);
@@ -18,7 +25,8 @@ public class StaticResourceConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/index.html");
-        registry.addViewController("/draft").setViewName("forward:/index.html");
+        for (String path : PATHS) {
+            registry.addViewController(path).setViewName("forward:/index.html");
+        }
     }
 }
