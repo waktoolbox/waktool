@@ -18,7 +18,7 @@ import {Trans, useTranslation} from "react-i18next";
 import {Link, useLoaderData, useParams} from "react-router-dom";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {useEffect, useState} from "react";
-import {getTournamentTeam} from "../../services/tournament.ts";
+import {applyToTeam, getMyTeamApplication, getTournamentTeam} from "../../services/tournament.ts";
 import {TournamentDefinition, TournamentMatchModel, TournamentTeamModel} from "../../chore/tournament.ts";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
@@ -46,6 +46,7 @@ export default function TournamentTeamView() {
     const {t} = useTranslation();
     const {id, teamId} = useParams();
     const [accounts, setAccounts] = useRecoilState(accountCacheState);
+    const [applyDisabled, setApplyDisabled] = useState(true);
     const me = useRecoilValue(loginIdState);
 
     const myTeam = useRecoilValue(myTournamentTeamState);
@@ -73,6 +74,12 @@ export default function TournamentTeamView() {
                 setAccounts(newCache);
             });
         })
+
+        if (!myTeam) {
+            getMyTeamApplication(id || "", teamId).then(response => {
+                setApplyDisabled(response.applied);
+            });
+        }
     }, [teamId])
 
     return (
@@ -142,9 +149,12 @@ export default function TournamentTeamView() {
                     {me && (Date.parse(tournament.startDate).toString() > Date.now().toString() || isAdmin) && (
                         <Card>
                             <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
-                                <Button sx={{width: '100%'}}
-                                        disabled={myTeam !== undefined && myTeam !== null}>{t('tournament.team.apply')}</Button>
-                                {((myTeam && myTeam.leader === me) || isAdmin) && (
+                                <Button sx={{width: '100%'}} onClick={() => {
+                                    applyToTeam(id || "", team.id || "")
+                                    setApplyDisabled(true)
+                                }}
+                                        disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled}>{t('tournament.team.apply')}</Button>
+                                {((myTeam && myTeam.leader === me && team.id === myTeam.id) || isAdmin) && (
                                     <Link to={`/tournament/${tournament.id}/tab/8/team/${team.id}`}>
                                         <Button sx={{width: '100%'}}>{t('tournament.team.manage')}</Button>
                                     </Link>

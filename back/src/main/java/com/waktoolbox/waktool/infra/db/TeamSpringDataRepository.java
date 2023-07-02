@@ -12,11 +12,18 @@ import java.util.Optional;
 public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, String> {
 
     @Query(value = """
-                        SELECT COUNT(*)
+                        SELECT COUNT(*) > 0
                         FROM teams t
                         WHERE id = :teamId AND t.content->>('leader') = :userId
             """, nativeQuery = true)
-    int isTeamLeader(String teamId, String userId);
+    boolean isTeamLeader(String teamId, String userId);
+
+    @Query(value = """
+                        SELECT COUNT(*) > 0
+                        FROM teams t
+                        WHERE t.content ->> ('tournament') = :tournamentId AND jsonb_exists_any(t.content->('validatedPlayers'), ARRAY[:userId])
+            """, nativeQuery = true)
+    boolean doesUserHasTeam(String tournamentId, String userId);
 
     @Query(value = """
                         SELECT *

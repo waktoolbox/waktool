@@ -3,7 +3,7 @@ package com.waktoolbox.waktool.domain.models.tournaments;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,9 +12,9 @@ public class Team {
     String name;
     String leader;
     String server;
-    Set<String> players;
+    List<String> players;
     String tournament;
     String catchPhrase;
     boolean displayOnTeamList;
-    Set<String> validatedPlayers;
+    List<String> validatedPlayers;
 }

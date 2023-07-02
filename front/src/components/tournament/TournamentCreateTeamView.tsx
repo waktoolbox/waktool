@@ -66,11 +66,10 @@ export default function TournamentCreateTeamView() {
     function validateTournamentTeam(team: TournamentTeamModel): string[] | undefined {
         const errors = [];
 
-        if (!team.name || team.name.length <= 0) errors.push("tournament.errors.missing.name");
-        if (team.name && team.name.length > 25) errors.push("tournament.errors.too.big.name");
-        if (team.players && team.players.length > 6) errors.push('tournament.errors.teamTooBig');
-        if (!servers.includes(team.server)) errors.push("tournament.errors.badServer");
-        if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("tournament.errors.too.big.catchPhrase");
+        if (!team.name || team.name.length <= 0) errors.push("error.missing.name");
+        if (team.name && team.name.length > 25) errors.push("error.too.big.name");
+        if (!servers.includes(team.server)) errors.push("error.badServer");
+        if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("error.too.big.catchPhrase");
 
         return errors.length <= 0 ? undefined : errors;
     }
@@ -89,7 +88,7 @@ export default function TournamentCreateTeamView() {
                     <Trans i18nKey="tournament.team.register.title" components={{span: <span className="blueWord"/>}}/>
                 </Typography>
             </Grid>
-            <Grid item lg={4} xs={0} sx={{justifyContent: "flex-end"}} display={{xs: 'none', md: 'flex'}}>
+            <Grid item lg={4} xs={0} sx={{justifyContent: "flex-end"}} display={{xs: 'none', lg: 'flex'}}>
                 <img src="/images/osamodas_registration.png" alt="Osamodas"/>
             </Grid>
             <Grid item lg={8} xs={12} sx={{textAlign: "start", pl: 4, pr: 4}}>
@@ -124,7 +123,7 @@ export default function TournamentCreateTeamView() {
                     </Grid>
                     <Grid item xs={12} sx={{p: 1}}>
                         {errors && errors.length > 0 && errors.map(error => (
-                            <Typography key={error}>{t(error)}</Typography>
+                            <Typography color="error" key={error}>{t(error)}</Typography>
                         ))}
                     </Grid>
                     <Grid item xs={12} sx={{p: 1}}>

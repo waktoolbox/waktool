@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface TeamRepository {
     boolean isTeamLeader(String id, String user);
 
+    boolean doesUserHasTeam(String tournamentId, String userId);
+
     Optional<Team> getUserTeam(String tournamentId, String userId);
 
     Optional<Team> getTeam(String teamId);
@@ -20,4 +22,6 @@ public interface TeamRepository {
     List<LightTeam> getPublicLightTournamentTeams(String tournamentId);
 
     Team createTeam(Team team);
+
+    void deleteTeam(String teamId);
 }

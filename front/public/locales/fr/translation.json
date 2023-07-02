@@ -40,7 +40,11 @@
   "error": {
     "ankamaName": "Le pseudo Ankama est obligatoire et doit être valide",
     "ankamaDiscriminator": "Le discriminant Ankama est obligatoire et doit être valide (sans le #)",
-    "twitchUrl": "L'URL Twitch doit être valide (format https://www.twitch.tv/<pseudo>"
+    "badServer": "Le serveur est invalide",
+    "missing.name": "Le nom est obligatoire",
+    "twitchUrl": "L'URL Twitch doit être valide (format https://www.twitch.tv/<pseudo>",
+    "too.big.catchPhrase": "La phrase d'accroche est trop longue (75 caractères maximum)",
+    "too.big.name": "Le nom est trop long (25 caractères maximum)"
   },
   "footer": {
     "wakfu": "Wakfu est un MMORPG édité par Ankama Studio. Tous droits réservés.\nLe site internet “Waktool” est un fansite communautaire non-officiel du MMORPG Wakfu sans aucun lien avec Ankama.\n",
@@ -83,6 +87,9 @@
     "streamers": "Streamers",
     "team": {
       "apply": "Postuler",
+      "appliants": "Postulant(s)",
+      "confirmDeletion": "Êtes-vous sûr de vouloir supprimer l'équipe ?",
+      "delete": "Supprimer l'équipe",
       "displayOnTeamList": "Afficher dans la liste des équipes",
       "goTo": "Voir l'équipe",
       "manage": "Gérer",

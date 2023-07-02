@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 public interface TournamentSpringDataRepository extends CrudRepository<TournamentEntity, String> {
 
     @Query(value = """
-                SELECT t.content->>('startDate') FROM tournaments t
+                SELECT coalesce(t.content->>('startDate'), '1970-01-01 00:00:01.000000')
+                FROM tournaments t
                 WHERE t.id = :id
             """, nativeQuery = true)
     String getRawTournamentStartDate(String id);

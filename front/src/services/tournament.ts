@@ -1,4 +1,4 @@
-import {gfetch, pfetch, putFetch} from "../utils/fetch-utils.ts";
+import {detch, gfetch, pfetch, putFetch} from "../utils/fetch-utils.ts";
 import {TournamentTeamModel} from "../chore/tournament.ts";
 
 
@@ -19,6 +19,22 @@ export async function getTeamApplications(tournamentId: string, teamId: string) 
     return await gfetch(`/api/tournaments/${tournamentId}/teams/${teamId}/applications`);
 }
 
+export async function acceptApplication(tournamentId: string, teamId: string, applicationId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/teams/${teamId}/applications/${applicationId}`, {});
+}
+
+export async function deleteApplication(tournamentId: string, teamId: string, applicationId: string) {
+    return await detch(`/api/tournaments/${tournamentId}/teams/${teamId}/applications/${applicationId}`);
+}
+
+export async function getMyTeamApplication(tournamentId: string, teamId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/teams/${teamId}/my-application`);
+}
+
+export async function applyToTeam(tournamentId: string, teamId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/teams/${teamId}/applications`, {});
+}
+
 export async function getTournamentTeams(tournamentId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/teams`);
 }
@@ -29,4 +45,12 @@ export async function postRegisterTeam(tournamentId: string, team: TournamentTea
 
 export async function putEditTeam(tournamentId: string, team: TournamentTeamModel) {
     return await putFetch(`/api/tournaments/${tournamentId}/teams/${team.id}`, team);
+}
+
+export async function deleteTeamPlayer(tournamentId: string, teamId: string, playerId: string) {
+    return await detch(`/api/tournaments/${tournamentId}/teams/${teamId}/players/${playerId}`);
+}
+
+export async function deleteTeam(tournamentId: string, teamId: string) {
+    return await detch(`/api/tournaments/${tournamentId}/teams/${teamId}`);
 }

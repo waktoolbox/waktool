@@ -19,7 +19,12 @@ public class TeamRepositoryImpl implements TeamRepository {
 
     @Override
     public boolean isTeamLeader(String id, String user) {
-        return _repository.isTeamLeader(id, user) > 0;
+        return _repository.isTeamLeader(id, user);
+    }
+
+    @Override
+    public boolean doesUserHasTeam(String tournamentId, String userId) {
+        return _repository.doesUserHasTeam(tournamentId, userId);
     }
 
     @Override
@@ -60,5 +65,10 @@ public class TeamRepositoryImpl implements TeamRepository {
         teamEntity.setCreatedAt(Instant.now());
         TeamEntity savedTeam = _repository.save(teamEntity);
         return savedTeam.getContent();
+    }
+
+    @Override
+    public void deleteTeam(String teamId) {
+        _repository.deleteById(teamId);
     }
 }
