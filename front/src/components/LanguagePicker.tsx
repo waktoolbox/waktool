@@ -19,9 +19,9 @@ export default function LanguagePicker(props: SelectProps) {
     const [language, setLanguage] = useState(resolvedLanguage)
 
     return (
-        <Select
-            value={language}
-            {...props}
+        <Select sx={{height: '100%'}}
+                value={language}
+                {...props}
         >
             {Object.keys(languages).map((lng) => (
                 <MenuItem className="languagePicker"
@@ -32,7 +32,7 @@ export default function LanguagePicker(props: SelectProps) {
                           }}
                           value={lng}
                 >
-                    <Icon>
+                    <Icon sx={{margin: 'auto', verticalAlign: 'middle'}}>
                         <img src={`/flags/${lng}.svg`} alt={`flag_${lng}`}/>
                     </Icon>
                 </MenuItem>

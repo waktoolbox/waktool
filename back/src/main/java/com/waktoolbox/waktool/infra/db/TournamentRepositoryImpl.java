@@ -7,12 +7,24 @@ import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
 public class TournamentRepositoryImpl implements TournamentRepository {
     private final TournamentSpringDataRepository _repository;
+
+    @Override
+    public boolean isTournamentStarted(String id) {
+        String tournamentStartDate = _repository.getRawTournamentStartDate(id);
+        return Instant.parse(tournamentStartDate).isBefore(Instant.now());
+    }
+
+    @Override
+    public boolean isAdmin(String id, String user) {
+        return _repository.isAdmin(id, user) > 0;
+    }
 
     @Override
     public LightTournament getFeaturedTournament() {

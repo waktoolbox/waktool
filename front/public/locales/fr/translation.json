@@ -57,6 +57,7 @@
     "tools": "Outils"
   },
   "save": "Sauvegarder",
+  "saved": "Sauvegardé",
   "tournament": {
     "admins": "Organisateurs",
     "description": "Description",
@@ -74,10 +75,46 @@
       "planning": "Planning",
       "results": "Résultats"
     },
+    "nbMatchesPlayed": "{{nb}} Match(s) joué(s)",
+    "nbVictories": "{{nb}} Victoire(s)",
     "referees": "Arbitres",
     "rewards": "Récompenses",
     "rules": "Règles",
-    "streamers": "Streamers"
+    "streamers": "Streamers",
+    "team": {
+      "apply": "Postuler",
+      "displayOnTeamList": "Afficher dans la liste des équipes",
+      "goTo": "Voir l'équipe",
+      "manage": "Gérer",
+      "manageMyRegistration": "Gérer mon inscription",
+      "manageMyTeam": "Gérer mon équipe",
+      "match": {
+        "incomingMatches": "<span>Matchs</span> à venir",
+        "noMatchResult": "Aucun résultat de match",
+        "noNextMatches": "Aucun match à venir",
+        "results": "Résultats",
+        "stats": {
+          "banned": "Banni(s)",
+          "death": "Mort(s)",
+          "played": "Joué(s)",
+          "killed": "Tué(s)",
+          "victories": "Victoire(s)"
+        }
+      },
+      "members": "Membres",
+      "myTeam": "Mon équipe",
+      "participating": "<span>Équipes</span> participantes",
+      "register": {
+        "button": "Inscrire l'équipe",
+        "catchPhrase": "Phrase d'accroche",
+        "editTitle": "Modifier l'<span>équipe</span>",
+        "name": "Nom de l'équipe",
+        "saveButton": "Enregistrer les modifications",
+        "server": "Serveur",
+        "title": "Inscription d'une <span>équipe</span>"
+      },
+      "startRegistration": "Inscrire une équipe"
+    }
   },
   "validate": "Valider"
 }

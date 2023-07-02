@@ -3,5 +3,5 @@ import {TournamentTeamModel} from "../chore/tournament.ts";
 
 export const myTournamentTeamState = atom<TournamentTeamModel>({
     key: "myTournamentTeamState",
-    default: {} as TournamentTeamModel
+    default: undefined as unknown as TournamentTeamModel
 })

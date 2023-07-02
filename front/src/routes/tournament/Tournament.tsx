@@ -18,6 +18,11 @@ import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
 import {getMyTournamentTeam} from "../../services/tournament.ts";
 import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
+import TournamentCreateTeamView from "../../components/tournament/TournamentCreateTeamView.tsx";
+import TournamentEditTeamView from "../../components/tournament/TournamentEditTeamView.tsx";
+import TournamentTeamView from "../../components/tournament/TournamentTeamView.tsx";
+import TournamentTeamListView from "../../components/tournament/TournamentTeamListView.tsx";
+import TournamentRegistrationView from "../../components/tournament/TournamentRegistrationView.tsx";
 
 const MenuButtonsStyle = {
     marginLeft: 3,
@@ -38,7 +43,10 @@ enum Tabs {
     PLANNING,
     MATCH,
     RESULTS,
-    TREE
+    TREE,
+    CREATE_TEAM,
+    EDIT_TEAM,
+    MANAGE_REGISTRATION
 }
 
 type LoaderResponse = {
@@ -72,6 +80,12 @@ export default function Tournament() {
         })
     }, []);
 
+    useEffect(() => {
+        if (!targetTab) return;
+        if (tab == +targetTab) return;
+        setTab(+targetTab);
+    }, [targetTab])
+
     const categories = [
         {
             tab: Tabs.HOME,
@@ -84,13 +98,15 @@ export default function Tournament() {
         {
             tab: Tabs.TEAMS,
             menu: true,
+            content: <TournamentTeamListView/>,
             icon: <Diversity3Icon sx={{color: (tab === Tabs.HOME ? "017d7f" : "8299a1"), mr: 1}}/>,
             label: t('tournament.menu.teams'),
-            disabled: Date.parse(tournament.startDate).toString() > Date.now().toString()
+            disabled: false
         },
         {
             tab: Tabs.SINGLE_TEAM,
-            menu: false
+            menu: false,
+            content: <TournamentTeamView/>
         },
         {
             tab: Tabs.PLANNING,
@@ -109,6 +125,25 @@ export default function Tournament() {
             icon: <EmojiEventsIcon sx={{color: (tab === Tabs.HOME ? "017d7f" : "8299a1"), mr: 1}}/>,
             label: t('tournament.menu.results'),
             disabled: Date.parse(tournament.startDate).toString() > Date.now().toString()
+        },
+        {
+            tab: Tabs.TREE,
+            menu: false
+        },
+        {
+            tab: Tabs.CREATE_TEAM,
+            menu: false,
+            content: <TournamentCreateTeamView/>,
+        },
+        {
+            tab: Tabs.EDIT_TEAM,
+            menu: false,
+            content: <TournamentEditTeamView/>,
+        },
+        {
+            tab: Tabs.MANAGE_REGISTRATION,
+            menu: false,
+            content: <TournamentRegistrationView/>,
         }
     ]
 

@@ -58,13 +58,13 @@ export default function TournamentInformationsView() {
             </Grid>
             <Grid item lg={4} xs={12} sx={{pl: 3, pr: 3}}>
                 <Stack spacing={2}>
-                    <Link to={`/tournament/${tournament.id}/register`}
+                    <Link to={`/tournament/${tournament.id}/tab/7`}
                           hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || (myTeam && myTeam.id !== undefined) || !me}>
                         <Button sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1
-                        }}>{t('tournament.display.register')}</Button>
+                        }}>{t('tournament.team.startRegistration')}</Button>
                     </Link>
                     <Link to={`/tournament/${tournament.id}/tab/2/team/${myTeam?.id}`}
                           hidden={!myTeam}>
@@ -72,23 +72,23 @@ export default function TournamentInformationsView() {
                             width: "100%",
                             pt: 1,
                             pb: 1
-                        }}>{t('tournament.display.myTeam')}</Button>
+                        }}>{t('tournament.team.myTeam')}</Button>
                     </Link>
-                    <Link to={`/tournament/${tournament.id}/register/${myTeam?.id}`}
-                          hidden={!myTeam || myTeam.leader !== me}>
+                    <Link to={`/tournament/${tournament.id}/tab/8/team/${myTeam?.id}`}
+                          hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || !myTeam || myTeam.leader !== me}>
                         <Button sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1
-                        }}>{t('tournament.display.manageMyTeam')}</Button>
+                        }}>{t('tournament.team.manageMyTeam')}</Button>
                     </Link>
-                    <Link to={`/tournament/${tournament.id}/register/${myTeam?.id}/validate`}
-                          hidden={!myTeam || myTeam.leader === me}>
+                    <Link to={`/tournament/${tournament.id}/tab/9`}
+                          hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || !myTeam || myTeam.leader === me}>
                         <Button sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1
-                        }}>{t('tournament.display.manageMyRegistration')}</Button>
+                        }}>{t('tournament.team.manageMyRegistration')}</Button>
                     </Link>
                     <Card>
                         <CardContent

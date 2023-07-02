@@ -104,8 +104,6 @@ export default createTheme({
         MuiSelect: {
             styleOverrides: {
                 select: {
-                    padding: '8px 0px 0px 8px',
-                    backgroundColor: '#172a30',
                     borderRadius: 4,
                     verticalAlign: 'middle',
                 },

@@ -23,3 +23,15 @@ export async function pfetch(url: string, body: any) {
         body: JSON.stringify(body),
     })).json();
 }
+
+export async function putFetch(url: string, body: any) {
+    return (await fetch(import.meta.env.VITE_BACKEND_URL + url, {
+        method: "PUT",
+        credentials: 'include',
+        headers: {
+            "Access-Control-Allow-Origin": import.meta.env.VITE_BACKEND_URL,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body),
+    })).json();
+}

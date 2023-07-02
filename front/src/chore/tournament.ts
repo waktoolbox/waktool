@@ -53,6 +53,7 @@ export interface TournamentTeamModel {
     players: string[];
     validatedPlayers: string[];
     catchPhrase: string;
+    displayOnTeamList: boolean;
     stats?: TournamentStatsModel;
 }
 
