@@ -44,6 +44,18 @@ export interface TournamentRoundDefinition {
     bo: number;
 }
 
+export interface TournamentTeamModel {
+    id?: string;
+    tournament: string;
+    name: string;
+    server: string;
+    leader: string;
+    players: string[];
+    validatedPlayers: string[];
+    catchPhrase: string;
+    stats?: TournamentStatsModel;
+}
+
 export interface TournamentStatsModel {
     played: number;
     victories: number;

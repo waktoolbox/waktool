@@ -48,7 +48,7 @@ export default function Draft() {
     }, [draftId]);
 
     return (
-        <Grid container direction="row" sx={{pt: 4, pb: 4, margin: "auto"}}>
+        <Grid container direction="row" sx={{width: {xs: '100%', md: '80%'}, pt: 4, pb: 4, margin: "auto"}}>
             {(!draftData || !draftData.id) && <DraftConfigurator/>}
             {draftData && draftData.id && <DraftViewer/>}
         </Grid>

@@ -1,8 +1,7 @@
 package com.waktoolbox.waktool.api;
 
 import com.waktoolbox.waktool.api.mappers.AccountMapper;
-import com.waktoolbox.waktool.api.models.AccountResponse;
-import com.waktoolbox.waktool.api.models.UpdateAccountRequest;
+import com.waktoolbox.waktool.api.models.*;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -29,6 +29,12 @@ public class AccountController {
                 .find(discordId.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized")))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
         return ResponseEntity.ok(_accountMapper.to(account));
+    }
+
+    @PostMapping("/accounts:search")
+    public ResponseEntity<AccountSearchResponse> searchAccounts(@RequestBody AccountSearchRequest request) {
+        List<LightAccountResponse> accounts = _accountRepository.find(request.ids()).stream().map(a -> new LightAccountResponse(a.getId(), a.getDisplayName())).toList();
+        return ResponseEntity.ok(new AccountSearchResponse(accounts));
     }
 
     @PostMapping("/accounts/{id}")

@@ -58,6 +58,8 @@
   },
   "save": "Sauvegarder",
   "tournament": {
+    "admins": "Organisateurs",
+    "description": "Description",
     "display": {
       "levelAndServer": "Niv. {{level}} / {{server}}"
     },
@@ -65,7 +67,17 @@
     "home": {
       "featured.title": "<span>Tournoi</span> à l'honneur",
       "waktool": "Planifier & simplifier la gestion de tournois sur <span>Wakfu</span>"
-    }
+    },
+    "menu": {
+      "home": "Informations",
+      "teams": "Équipes",
+      "planning": "Planning",
+      "results": "Résultats"
+    },
+    "referees": "Arbitres",
+    "rewards": "Récompenses",
+    "rules": "Règles",
+    "streamers": "Streamers"
   },
   "validate": "Valider"
 }

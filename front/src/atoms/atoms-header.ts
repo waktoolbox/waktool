@@ -25,3 +25,13 @@ export const loginState = atom({
         }
     })
 });
+
+export const loginIdState = atom({
+    key: 'loginIdState',
+    default: selector({
+        key: 'loginIdState/default',
+        get: async ({get}) => {
+            return get(loginState)?.id;
+        }
+    })
+});

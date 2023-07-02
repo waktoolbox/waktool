@@ -64,7 +64,7 @@ export default function HeaderBar() {
                         <MenuIcon/>
                     </IconButton>
 
-                    <a href="/"><img src="/logo.png" alt="logo"/></a>
+                    <a href="/"><img className="logo" src="/logo.png" alt="logo"/></a>
                 </Box>
 
                 <Box sx={{

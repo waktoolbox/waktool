@@ -1,10 +1,15 @@
 export async function gfetch(url: string) {
-    return (await fetch(import.meta.env.VITE_BACKEND_URL + url, {
+    const response = await fetch(import.meta.env.VITE_BACKEND_URL + url, {
         credentials: 'include',
         headers: {
             "Access-Control-Allow-Origin": import.meta.env.VITE_BACKEND_URL
         }
-    })).json();
+    });
+    try {
+        return await response.json();
+    } catch (e) {
+        return null;
+    }
 }
 
 export async function pfetch(url: string, body: any) {

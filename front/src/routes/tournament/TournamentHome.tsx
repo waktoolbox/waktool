@@ -21,7 +21,7 @@ export default function TournamentHome() {
 
     useEffect(() => {
         const fetch = async () => {
-            setHome(await gfetch('/api/tournament/home'));
+            setHome(await gfetch('/api/tournaments/home'));
         }
         fetch();
     }, [])
@@ -85,7 +85,7 @@ export default function TournamentHome() {
                 </div>
             </Grid>
 
-            <Grid container spacing={2} sx={{margin: 'auto'}}>
+            <Grid container spacing={2} sx={{width: {xs: '100%', md: '80%'}, margin: 'auto'}}>
                 <Grid item xl={4} xs={12} sx={{margin: 'auto', mb: 2}}>
                     <Typography sx={{mb: 2}} variant="h5">
                         <Trans i18nKey="tournament.home.featured.title"

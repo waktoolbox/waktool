@@ -24,3 +24,7 @@ export async function accountSaver({request}: ActionFunctionArgs) {
 
     return await pfetch(`/api/accounts/${form.get("id")}`, body);
 }
+
+export async function accountsLoader(accountIds: string[]) {
+    return await pfetch("/api/accounts:search", {ids: accountIds});
+}

@@ -33,6 +33,10 @@ h5 {
     color: #8299a1;
 }
 
+h6 {
+    color: #8299a1;
+}
+
 .firstWord {
     color: #fefffa;
 }
@@ -69,4 +73,10 @@ h5 {
 
 .ban {
     color: #e64b4b !important;
+}
+
+.logo {
+    position: relative;
+    top: 50%;
+    transform: translateY(10%);
 }

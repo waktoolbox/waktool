@@ -4,6 +4,8 @@ import Home from "../routes/Home.tsx";
 import App from "../App.tsx";
 import {accountLoader, accountSaver} from "../services/account.ts";
 import Draft from "../routes/Draft.tsx";
+import Tournament from "../routes/tournament/Tournament.tsx";
+import {tournamentLoader} from "../services/tournament.ts";
 
 export function createRouter() {
     return createBrowserRouter([
@@ -34,6 +36,21 @@ export function createRouter() {
                 {
                     path: "draft/:draftId",
                     element: <Draft/>
+                },
+                {
+                    path: "tournament/:id",
+                    element: <Tournament/>,
+                    loader: tournamentLoader,
+                    children: [
+                        {
+                            path: "tab/:targetTab",
+                            element: <Tournament/>,
+                        },
+                        {
+                            path: "tab/:targetTab/team/:teamId",
+                            element: <Tournament/>,
+                        }
+                    ]
                 }
             ]
         },

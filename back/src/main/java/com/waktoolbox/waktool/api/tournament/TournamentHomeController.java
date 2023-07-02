@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TournamentHomeController {
     private final TournamentRepository _tournamentRepository;
 
-    @GetMapping("/tournament/home")
+    @GetMapping("/tournaments/home")
     public TournamentHomeResponse getTournamentHome() {
         return new TournamentHomeResponse(_tournamentRepository.getFeaturedTournament());
     }

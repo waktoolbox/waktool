@@ -14,7 +14,7 @@ public class Tournament {
     int[] maps;
     String name;
     String level;
-    String rules;
+    Object rules;
     List<String> admins;
     List<TournamentPhase> phases;
     String server;

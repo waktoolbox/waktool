@@ -63,16 +63,9 @@ export default function Account() {
 
     return (
         <Grid container>
-            <div style={{
-                backgroundColor: '#162834',
-                position: 'absolute',
-                left: 0,
-                width: '100%',
-                height: '150px',
-                zIndex: 0
-            }}/>
-
             <Grid item xs={12} className="screenWideTitle" sx={{
+                backgroundColor: '#162834',
+                width: '100%',
                 height: '150px',
                 display: "flex",
                 alignItems: "center",
@@ -80,13 +73,12 @@ export default function Account() {
                 textTransform: "uppercase",
                 zIndex: 1
             }}>
-
                 <Typography variant="h4">
                     <Trans i18nKey="account.title" components={{span: <span className="blueWord"/>}}/>
                 </Typography>
             </Grid>
 
-            <Grid item xs={12} md={8} sx={{margin: "auto", pt: 3}}>
+            <Grid item xs={12} md={8} sx={{width: {xs: '100%', md: '80%'}, margin: 'auto', pt: 3}}>
                 <Form method="post">
                     <input type="hidden" name="id" value={account.id}/>
                     <Grid container>

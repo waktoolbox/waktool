@@ -7,6 +7,7 @@ import com.waktoolbox.waktool.infra.mappers.AccountEntityMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,5 +24,10 @@ public class AccountEntityRepositoryImpl implements AccountRepository {
     @Override
     public Optional<Account> find(String id) {
         return accountSpringDataRepository.findById(id).map(accountEntityMapper::to);
+    }
+
+    @Override
+    public List<Account> find(List<String> ids) {
+        return accountEntityMapper.to(accountSpringDataRepository.findAllByIdIn(ids));
     }
 }
