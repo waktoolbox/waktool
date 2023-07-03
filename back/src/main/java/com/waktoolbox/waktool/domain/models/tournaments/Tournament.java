@@ -19,11 +19,11 @@ public class Tournament {
     List<TournamentPhase> phases;
     String server;
     Instant endDate;
-    String rewards;
+    Object rewards;
     List<String> referees;
     String teamSize;
     Instant startDate;
     List<String> streamers;
     String teamNumber;
-    String description;
+    Object description;
 }

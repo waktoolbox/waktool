@@ -1,9 +1,11 @@
 import {$generateHtmlFromNodes} from "@lexical/html";
 import {LinkNode} from '@lexical/link';
+import {ListItemNode, ListNode} from '@lexical/list';
 import {LinkPlugin} from "@lexical/react/LexicalLinkPlugin";
 import {LexicalComposer} from "@lexical/react/LexicalComposer";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {useEffect, useState} from "react";
+import {ListPlugin} from "@lexical/react/LexicalListPlugin";
 
 type WaktoolRichTextProps = {
     namespace: string
@@ -25,7 +27,7 @@ function TextParser(props: WaktoolRichTextProps) {
         } catch (e) {
             console.debug(e)
         }
-    }, [])
+    }, [jsonText])
 
     return (
         <div dangerouslySetInnerHTML={{__html: htmlString}}/>
@@ -36,8 +38,17 @@ export default function WaktoolRichText(props: WaktoolRichTextProps) {
     const {namespace, jsonText} = props;
     return (
         <LexicalComposer
-            initialConfig={{namespace: namespace, onError: (error) => console.error(error), nodes: [LinkNode]}}>
+            initialConfig={{
+                namespace: namespace,
+                onError: (error) => console.error(error),
+                nodes: [
+                    LinkNode,
+                    ListNode,
+                    ListItemNode
+                ]
+            }}>
             <LinkPlugin/>
+            <ListPlugin/>
             <TextParser namespace={namespace} jsonText={jsonText}/>
         </LexicalComposer>
     )

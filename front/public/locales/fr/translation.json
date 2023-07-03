@@ -1,7 +1,7 @@
 {
   "account": {
     "ankamaName": "Pseudo Ankama",
-    "ankamaDiscriminator": "Discriminant Ankama",
+    "ankamaDiscriminator": "Tag Ankama",
     "title": "Gestion de <span>compte</span>",
     "twitchUrl": "URL Twitch"
   },

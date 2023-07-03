@@ -35,3 +35,8 @@ export const loginIdState = atom({
         }
     })
 });
+
+export const languageState = atom({
+    key: 'languageState',
+    default: 'en'
+})

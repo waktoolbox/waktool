@@ -11,8 +11,9 @@ import {useRecoilValue} from "recoil";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import WaktoolRichText from "../editor/WaktoolRichText.tsx";
 import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
-import {loginIdState} from "../../atoms/atoms-header.ts";
+import {languageState, loginIdState} from "../../atoms/atoms-header.ts";
 import Button from "@mui/material/Button";
+import {useEffect, useState} from "react";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -23,6 +24,17 @@ export default function TournamentInformationsView() {
     const accounts = useRecoilValue(accountCacheState);
     const myTeam = useRecoilValue(myTournamentTeamState);
     const me = useRecoilValue(loginIdState);
+    const language = useRecoilValue(languageState);
+
+    const [description, setDescription] = useState("{}");
+    const [rewards, setRewards] = useState("{}");
+    const [rules, setRules] = useState("{}");
+
+    useEffect(() => {
+        setDescription(tournament?.description[language as any])
+        setRewards(tournament?.rewards[language as any])
+        setRules(tournament?.rules[language as any])
+    }, [language])
 
     const tournament = (useLoaderData() as LoaderResponse).tournament;
 
@@ -33,27 +45,29 @@ export default function TournamentInformationsView() {
                 <Stack>
                     <Typography variant="h5" sx={{
                         color: '#8299a1',
-                        mb: 2
+                        mt: 1, mb: 2
                     }}>{t('tournament.description')}</Typography>
-                    <Typography sx={{mb: 2, whiteSpace: "pre-line"}}>
-                        <WaktoolRichText namespace="tournament.description" jsonText={tournament.description}/>
+                    <Typography sx={{mb: 1, whiteSpace: "pre-line"}}>
+                        <WaktoolRichText namespace="tournament.description" jsonText={description}/>
                     </Typography>
 
-                    <Divider sx={{ml: -1, pr: 10, mt: 2, mb: 2}} variant="middle" flexItem/>
+                    <Divider sx={{ml: 0, pr: 1, mt: 2, mb: 2}} variant="middle" flexItem/>
                     <Typography variant="h5" sx={{
                         color: '#8299a1',
-                        mb: 2
+                        mt: 1, mb: 2
                     }}>{t('tournament.rewards')}</Typography>
-                    <Typography sx={{mb: 2, whiteSpace: "pre-line"}}>
-                        <WaktoolRichText namespace="tournament.rewards" jsonText={tournament.rewards}/>
+                    <Typography sx={{mb: 1, whiteSpace: "pre-line"}}>
+                        <WaktoolRichText namespace="tournament.rewards" jsonText={rewards}/>
                     </Typography>
 
-                    <Divider sx={{ml: -1, mr: 3, mt: 2, mb: 2}} variant="middle" flexItem/>
+                    <Divider sx={{ml: 0, mr: 0, mt: 2, mb: 2}} variant="middle" flexItem/>
                     <Typography variant="h5" sx={{
                         color: '#8299a1',
-                        mb: 2
+                        mt: 1, mb: 2
                     }}>{t('tournament.rules')}</Typography>
-                    <WaktoolRichText namespace="tournament.rules" jsonText={tournament.rules}/>
+                    <Typography sx={{mb: 1, whiteSpace: "pre-line"}}>
+                        <WaktoolRichText namespace="tournament.rules" jsonText={rules}/>
+                    </Typography>
                 </Stack>
             </Grid>
             <Grid item lg={4} xs={12} sx={{pl: 3, pr: 3}}>
