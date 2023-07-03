@@ -13,4 +13,6 @@ public interface TournamentRepository {
     LightTournament getFeaturedTournament();
 
     Optional<Tournament> getTournament(String id);
+
+    Optional<String> getDiscordGuildId(String id);
 }

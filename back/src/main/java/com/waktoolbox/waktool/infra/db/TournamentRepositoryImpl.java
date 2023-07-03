@@ -35,4 +35,8 @@ public class TournamentRepositoryImpl implements TournamentRepository {
     public Optional<Tournament> getTournament(String id) {
         return _repository.findById(id).map(TournamentEntity::getContent);
     }
+
+    public Optional<String> getDiscordGuildId(String id) {
+        return _repository.getDiscordGuildId(id);
+    }
 }

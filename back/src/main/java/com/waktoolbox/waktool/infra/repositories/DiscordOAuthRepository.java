@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.OAuthResponse;
+import com.waktoolbox.waktool.domain.repositories.DiscordRepository;
 import com.waktoolbox.waktool.domain.repositories.OAuthRepository;
 import com.waktoolbox.waktool.infra.repositories.models.DiscordOAuthTokenResponse;
 import com.waktoolbox.waktool.infra.repositories.models.DiscordUserInformationResponse;
@@ -13,14 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
@@ -29,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DiscordOAuthRepository implements OAuthRepository {
+public class DiscordOAuthRepository implements DiscordRepository, OAuthRepository {
     private static final RestTemplate DEFAULT_REST_TEMPLATE = new RestTemplate();
 
     @Value("${oauth2.discord.token-uri}")
@@ -38,11 +37,17 @@ public class DiscordOAuthRepository implements OAuthRepository {
     @Value("${oauth2.discord.user-info-uri}")
     private String _userInfoUri;
 
+    @Value("${oauth2.discord.base-url}")
+    private String _baseUrl;
+
     @Value("${oauth2.discord.client-id}")
     private String _clientId;
 
     @Value("${oauth2.discord.client-secret}")
     private String _clientSecret;
+
+    @Value("${oauth2.discord.token}")
+    private String _botToken;
 
     @Value("${oauth2.discord.authorization-grant-type}")
     private String _authorizationGrantType;
@@ -113,6 +118,30 @@ public class DiscordOAuthRepository implements OAuthRepository {
         } catch (Exception e) {
             log.error("Unable to process GET on user information", e);
             return null;
+        }
+    }
+
+    private record GuildMember(String joinedAt) {
+    }
+
+    @Override
+    public boolean isGuildMember(String guildId, String userId) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format("Bot %s", _botToken));
+
+        try {
+            ResponseEntity<GuildMember> entity = _camelCaseMappingRestTemplate.exchange(
+                    _baseUrl + "/guilds/" + guildId + "/members/" + userId,
+                    HttpMethod.GET,
+                    new HttpEntity<>(httpHeaders),
+                    GuildMember.class
+            );
+            return entity.getStatusCode() == HttpStatus.OK;
+        } catch (HttpClientErrorException.NotFound e) {
+            return false; // normal 404
+        } catch (Exception e) {
+            log.error("Unable to fetch guild member " + userId + " of guild " + guildId, e);
+            return false;
         }
     }
 }

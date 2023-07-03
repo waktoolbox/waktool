@@ -1,11 +1,9 @@
 package com.waktoolbox.waktool.api.tournament;
 
-import com.waktoolbox.waktool.api.models.LightTeamListResponse;
-import com.waktoolbox.waktool.api.models.MyApplicationResponse;
-import com.waktoolbox.waktool.api.models.PendingApplicationsResponse;
-import com.waktoolbox.waktool.api.models.TeamResponse;
+import com.waktoolbox.waktool.api.models.*;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
 import com.waktoolbox.waktool.domain.repositories.ApplicationRepository;
+import com.waktoolbox.waktool.domain.repositories.DiscordRepository;
 import com.waktoolbox.waktool.domain.repositories.TeamRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +24,7 @@ import java.util.Optional;
 @Validated
 public class TournamentTeamController {
     private final ApplicationRepository _applicationRepository;
+    private final DiscordRepository _discordRepository;
     private final TeamRepository _teamRepository;
     private final TournamentRepository _tournamentRepository;
 
@@ -49,12 +48,19 @@ public class TournamentTeamController {
     }
 
     @PostMapping("/tournaments/{tournamentId}/teams")
-    public TeamResponse createTeam(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @RequestBody Team requestTeam) {
-        if (discordId.isEmpty()) return null;
-        if (tournamentId == null) return null;
+    public PostTeamResponse createTeam(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @RequestBody Team requestTeam) {
+        if (discordId.isEmpty()) return new PostTeamResponse(false, null, null);
+        if (tournamentId == null) return new PostTeamResponse(false, null, null);
         String leader = discordId.get();
-        if (_teamRepository.getUserTeam(tournamentId, leader).isPresent()) return null;
-        if (_tournamentRepository.isTournamentStarted(tournamentId)) return null;
+        if (_teamRepository.getUserTeam(tournamentId, leader).isPresent())
+            return new PostTeamResponse(false, null, null);
+        if (_tournamentRepository.isTournamentStarted(tournamentId)) return new PostTeamResponse(false, null, null);
+
+        Optional<String> discordGuildId = _tournamentRepository.getDiscordGuildId(tournamentId);
+        String userId = discordId.get();
+        if (discordGuildId.isPresent() && (!_discordRepository.isGuildMember(discordGuildId.get(), userId))) {
+            return new PostTeamResponse(false, "error.mustBeOnDiscordToCreateTeam", null);
+        }
 
         Team team = new Team();
         team.setTournament(tournamentId);
@@ -71,7 +77,7 @@ public class TournamentTeamController {
 
         _applicationRepository.deleteUserApplications(tournamentId, leader);
 
-        return new TeamResponse(createdTeam);
+        return new PostTeamResponse(true, null, createdTeam);
     }
 
     @PutMapping("/tournaments/{tournamentId}/teams/{teamId}")
@@ -131,14 +137,20 @@ public class TournamentTeamController {
     }
 
     @PostMapping("/tournaments/{tournamentId}/teams/{teamId}/applications")
-    public ResponseEntity<Void> createApplication(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String teamId) {
-        if (discordId.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        if (tournamentId == null) return ResponseEntity.badRequest().build();
-        if (teamId == null) return ResponseEntity.badRequest().build();
-        if (_tournamentRepository.isTournamentStarted(tournamentId)) return ResponseEntity.badRequest().build();
+    public PostApplicationResponse createApplication(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String teamId) {
+        if (discordId.isEmpty()) return new PostApplicationResponse(false, null);
+        if (tournamentId == null) return new PostApplicationResponse(false, null);
+        if (teamId == null) return new PostApplicationResponse(false, null);
+        if (_tournamentRepository.isTournamentStarted(tournamentId)) return new PostApplicationResponse(false, null);
 
-        _applicationRepository.saveApplication(tournamentId, teamId, discordId.get());
-        return ResponseEntity.ok().build();
+        Optional<String> discordGuildId = _tournamentRepository.getDiscordGuildId(tournamentId);
+        String userId = discordId.get();
+        if (discordGuildId.isPresent() && (!_discordRepository.isGuildMember(discordGuildId.get(), userId))) {
+            return new PostApplicationResponse(false, "error.mustBeOnDiscordToJoinTournament");
+        }
+
+        _applicationRepository.saveApplication(tournamentId, teamId, userId);
+        return new PostApplicationResponse(true, null);
     }
 
     @PostMapping("/tournaments/{tournamentId}/teams/{teamId}/applications/{applicationId}")

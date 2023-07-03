@@ -8,16 +8,18 @@ import {ChangeEvent, useState} from "react";
 import {TournamentTeamModel} from "../../chore/tournament.ts";
 import Button from "@mui/material/Button";
 import {postRegisterTeam} from "../../services/tournament.ts";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useSetRecoilState} from "recoil";
 import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import {snackState} from "../../atoms/atoms-snackbar.ts";
 
 export default function TournamentCreateTeamView() {
     const navigate = useNavigate();
     const {t} = useTranslation();
     const {id} = useParams();
     const [_, setMyTournamentTeam] = useRecoilState(myTournamentTeamState);
+    const setSnackValue = useSetRecoilState(snackState);
 
     const [pickedServer, setPickedServer] = useState('')
     const [errors, setErrors] = useState<string[]>();
@@ -57,6 +59,14 @@ export default function TournamentCreateTeamView() {
         const toSend = {...team};
 
         postRegisterTeam(id || "", toSend).then(response => {
+            if (!response.success) {
+                setSnackValue({
+                    severity: "error",
+                    message: t(response.error) as string,
+                    open: true,
+                })
+                return;
+            }
             setMyTournamentTeam(response.team)
             navigate(`/tournament/${id}/tab/2/team/${response.team.id}`)
         })

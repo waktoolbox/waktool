@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface TournamentSpringDataRepository extends CrudRepository<TournamentEntity, String> {
 
@@ -34,4 +36,6 @@ public interface TournamentSpringDataRepository extends CrudRepository<Tournamen
             """, nativeQuery = true)
     LightTournament getFeaturedTournamentLight();
 
+    @Query(value = "SELECT t.discordGuildId FROM TournamentEntity t WHERE t.id = :id")
+    Optional<String> getDiscordGuildId(String id);
 }

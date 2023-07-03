@@ -22,10 +22,12 @@ public class TournamentEntity {
 
     @Type(JsonBinaryType.class)
     @Column
-
     Tournament content;
 
     @Column
     boolean featured;
+
+    @Column
+    String discordGuildId;
 
 }

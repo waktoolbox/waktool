@@ -42,6 +42,8 @@
     "ankamaDiscriminator": "Le discriminant Ankama est obligatoire et doit être valide (sans le #)",
     "badServer": "Le serveur est invalide",
     "missing.name": "Le nom est obligatoire",
+    "mustBeOnDiscordToCreateTeam": "Vous devez être sur le serveur Discord du tournoi pour créer une équipe",
+    "mustBeOnDiscordToJoinTournament": "Vous devez être sur le serveur Discord du tournoi pour vous inscrire",
     "twitchUrl": "L'URL Twitch doit être valide (format https://www.twitch.tv/<pseudo>",
     "too.big.catchPhrase": "La phrase d'accroche est trop longue (75 caractères maximum)",
     "too.big.name": "Le nom est trop long (25 caractères maximum)"
