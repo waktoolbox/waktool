@@ -183,7 +183,7 @@ export default function TournamentEditTeamView() {
                 <img src="/images/osamodas_registration.png" alt="Osamodas"/>
             </Grid>
             <Grid item lg={8} xs={12} sx={{textAlign: "start", pl: 4, pr: 4}}>
-                <Grid container>
+                <Grid container sx={{alignItems: "center"}}>
                     <Grid item xs={6} sx={{p: 1}}>
                         <TextField sx={{width: '100%'}} label={t('tournament.team.register.name')}
                                    id="name" disabled={!isAdmin}
@@ -225,14 +225,8 @@ export default function TournamentEditTeamView() {
                                           displayOnTeamList: event.target.checked
                                       })}/>
                         } label={t('tournament.team.displayOnTeamList')}/>
-                        <Button onClick={save}
-                                sx={{
-                                    backgroundColor: "#4a7cb1", color: "#fefdff", display: "inline-block", width: 1,
-                                    '&.Mui-disabled': {
-                                        backgroundColor: "rgba(74,124,177,0.2)",
-                                        color: '#fefdff'
-                                    }
-                                }}
+                        <Button onClick={save} variant="contained"
+                                sx={{width: 1}}
                                 disabled={(errors && errors.length > 0) || !team.name}>{t("tournament.team.register.saveButton")}
                         </Button>
                     </Grid>

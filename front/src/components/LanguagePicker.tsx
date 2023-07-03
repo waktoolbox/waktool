@@ -33,7 +33,7 @@ export default function LanguagePicker(props: SelectProps) {
                           value={lng}
                 >
                     <Icon sx={{margin: 'auto', verticalAlign: 'middle'}}>
-                        <img src={`/flags/${lng}.svg`} alt={`flag_${lng}`}/>
+                        <img width={24} height={18} src={`/flags/${lng}.svg`} alt={`flag_${lng}`}/>
                     </Icon>
                 </MenuItem>
             ))}

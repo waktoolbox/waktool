@@ -4,8 +4,7 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import {SelectChangeEvent} from "@mui/material/Select/SelectInput";
+import TextField from "@mui/material/TextField";
 import {DraftAction, DraftActionType, DraftTeam, DraftTemplates} from "../../chore/draft.ts";
 import {useTranslation} from "react-i18next";
 import {DraftActionConfiguration} from "./DraftActionConfiguration.tsx";
@@ -47,27 +46,28 @@ function DraftConfigurator() {
     }
 
     return (
-        <Grid container className="darkBlueContainer">
-            <Grid item xs={6} md={3} order={{xs: 2, md: 1}}>
+        <Grid container className="darkBlueContainer" sx={{alignItems: "center", pt: 2}}>
+            <Grid item xs={6} md={3} order={{xs: 3, md: 1}}>
                 <Button variant="outlined" onClick={() => addAction()}>{t('draft.action.add')}</Button>
             </Grid>
-            <Grid item xs={12} md={6} sx={{mt: 1}} order={{xs: 1, md: 2}}>
-                <Select value={draftTemplate as unknown as string} label={t('draft.template')}
-                        sx={{p: 0}}
-                        onChange={(event: SelectChangeEvent) => {
-                            setDraftTemplate(+event.target.value || 0)
-                        }}>
+            <Grid item xs={12} md={5} order={{xs: 1, md: 2}}>
+                <TextField size="small" sx={{float: "right", mr: 1}} value={draftTemplate as unknown as string}
+                           label={t('draft.template')} select>
                     {DraftTemplates.map((template, index) => (
-                        <MenuItem key={index} value={index}>{template.name}</MenuItem>
+                        <MenuItem key={index} value={index}
+                                  onClick={() => setDraftTemplate(index)}>{template.name}</MenuItem>
                     ))}
-                </Select>
+                </TextField>
+            </Grid>
+            <Grid item xs={2} md={1} order={{xs: 2, md: 3}}>
                 <Button
                     onClick={() => setActions(DraftTemplates[draftTemplate].actions)}>{t('draft.importTemplate')}</Button>
             </Grid>
-            <Grid item xs={6} md={3} order={{xs: 3, md: 3}}>
-                <Button onClick={() => requestDraft()}>{t('draft.start')}</Button>
+            <Grid item xs={6} md={3} order={{xs: 4, md: 4}}>
+                <Button variant="contained" sx={{height: '100%'}}
+                        onClick={() => requestDraft()}>{t('draft.start')}</Button>
             </Grid>
-            <Grid item xs={12} order={{xs: 4, md: 4}}>
+            <Grid item xs={12} order={{xs: 5, md: 5}}>
                 <Divider sx={{m: 2}}/>
                 {actions && actions.map((action, index) => (
                     <DraftActionConfiguration

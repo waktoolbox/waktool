@@ -42,7 +42,7 @@ export function DraftTeamColumn(props: DraftTeamProps) {
             </Grid>
             <Grid item xs={12} sx={{p: 2}}>
                 {!teamReady && isMyTeam &&
-                    <Button sx={{width: "90%"}}
+                    <Button sx={{width: "90%"}} variant="contained"
                             onClick={() => send('draft::teamReady', {
                                 draftId: draftId,
                                 ready: true

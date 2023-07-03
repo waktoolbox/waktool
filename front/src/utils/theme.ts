@@ -33,12 +33,19 @@ export default createTheme({
 
         MuiButton: {
             styleOverrides: {
+                containedPrimary: {
+                    backgroundColor: "rgb(74, 124, 177)",
+
+                    "&.Mui-disabled": {
+                        color: '#8299a1'
+                    }
+                },
+
                 outlined: {
                     borderColor: '#00ead1 !important',
                     color: '#fefffa',
                     backgroundColor: '#213a41',
                     verticalAlign: "middle",
-                    paddingLeft: 8,
                     justifyContent: "center",
 
                     'svg': {
@@ -69,6 +76,18 @@ export default createTheme({
             styleOverrides: {
                 paper: {
                     backgroundColor: '#0d1518'
+                }
+            }
+        },
+
+        MuiFormLabel: {
+            styleOverrides: {
+                root: {
+                    color: '#8299a1',
+
+                    "&.Mui-focused": {
+                        color: '#fefffa'
+                    },
                 }
             }
         },
@@ -128,7 +147,6 @@ export default createTheme({
                     backgroundColor: "#172a30",
                     justifyContent: "center",
                     verticalAlign: "middle",
-
 
                     "&.Mui-selected": {
                         backgroundColor: "#213a41",

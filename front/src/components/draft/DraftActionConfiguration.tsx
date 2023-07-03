@@ -27,27 +27,27 @@ export function DraftActionConfiguration(props: DraftActionConfiguration) {
         <>
             <Grid container>
                 <Grid item xs={6} md={2}>
-                    <Select value={action.team as unknown as string} label={t('draft.team')}
+                    <Select value={action.team as unknown as string}
                             className={colorClass}
                             sx={{fontWeight: 'bold', m: 1}}
                             onChange={(event: SelectChangeEvent) => {
                                 setAction(a => a.team = event.target.value as unknown as DraftTeam || DraftTeam.TEAM_A)
                             }}>
-                        <MenuItem value={DraftTeam.TEAM_A} className={colorClass}>{t('draft.teamA')}</MenuItem>
-                        <MenuItem value={DraftTeam.TEAM_B} className={colorClass}>{t('draft.teamB')}</MenuItem>
+                        <MenuItem value={DraftTeam.TEAM_A} className="teamA">{t('draft.teamA')}</MenuItem>
+                        <MenuItem value={DraftTeam.TEAM_B} className="teamB">{t('draft.teamB')}</MenuItem>
                     </Select>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                    <Select value={action.type as unknown as string} label={t('draft.type')}
+                    <Select value={action.type as unknown as string}
                             className={actionColorClass}
                             sx={{fontWeight: 'bold', m: 1}}
                             onChange={(event: SelectChangeEvent) => {
                                 setAction(a => a.type = event.target.value as unknown as DraftActionType || DraftActionType.PICK);
                             }}>
-                        <MenuItem value={DraftActionType.PICK} className={actionColorClass}>
+                        <MenuItem value={DraftActionType.PICK} className="pick">
                             <Trans i18nKey={'draft.pick'} components={{span: <span/>}}/>
                         </MenuItem>
-                        <MenuItem value={DraftActionType.BAN} className={actionColorClass}>
+                        <MenuItem value={DraftActionType.BAN} className="ban">
                             <Trans i18nKey={'draft.ban'} components={{span: <span/>}}/>
                         </MenuItem>
                     </Select>

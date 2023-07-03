@@ -144,14 +144,8 @@ export default function TournamentCreateTeamView() {
                                           displayOnTeamList: event.target.checked
                                       })}/>
                         } label={t('tournament.team.displayOnTeamList')}/>
-                        <Button onClick={registerTeam}
-                                sx={{
-                                    backgroundColor: "#4a7cb1", color: "#fefdff", display: "inline-block", width: 1,
-                                    '&.Mui-disabled': {
-                                        backgroundColor: "rgba(74,124,177,0.2)",
-                                        color: '#fefdff'
-                                    }
-                                }}
+                        <Button onClick={registerTeam} variant="contained"
+                                sx={{width: 1}}
                                 disabled={(errors && errors.length > 0) || !team.name}>{t("tournament.team.register.button")}
                         </Button>
                     </Grid>

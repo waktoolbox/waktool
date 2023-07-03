@@ -314,7 +314,7 @@ function DraftViewer() {
                         }
                         {myTeam && !endReason &&
                             <Grid item xs={12}>
-                                <Button disabled={currentActionData?.team !== myTeam}
+                                <Button disabled={currentActionData?.team !== myTeam} variant="contained"
                                         sx={{width: "95%"}}
                                         onClick={() => {
                                             send('draft::action', {

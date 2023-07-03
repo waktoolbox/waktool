@@ -60,7 +60,7 @@ export default function TournamentInformationsView() {
                 <Stack spacing={2}>
                     <Link to={`/tournament/${tournament.id}/tab/7`}
                           hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || (myTeam && myTeam.id !== undefined) || !me}>
-                        <Button sx={{
+                        <Button variant="contained" sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1
@@ -68,7 +68,7 @@ export default function TournamentInformationsView() {
                     </Link>
                     <Link to={`/tournament/${tournament.id}/tab/2/team/${myTeam?.id}`}
                           hidden={!myTeam}>
-                        <Button sx={{
+                        <Button variant="contained" sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1
@@ -76,7 +76,7 @@ export default function TournamentInformationsView() {
                     </Link>
                     <Link to={`/tournament/${tournament.id}/tab/8/team/${myTeam?.id}`}
                           hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || !myTeam || myTeam.leader !== me}>
-                        <Button sx={{
+                        <Button variant="contained" sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1
@@ -84,7 +84,7 @@ export default function TournamentInformationsView() {
                     </Link>
                     <Link to={`/tournament/${tournament.id}/tab/9`}
                           hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || !myTeam || myTeam.leader === me}>
-                        <Button sx={{
+                        <Button variant="contained" sx={{
                             width: "100%",
                             pt: 1,
                             pb: 1

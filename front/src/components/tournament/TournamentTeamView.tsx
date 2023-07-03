@@ -168,11 +168,12 @@ export default function TournamentTeamView() {
                     {me && (Date.parse(tournament.startDate).toString() > Date.now().toString() || isAdmin) && (
                         <Card>
                             <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
-                                <Button sx={{width: '100%'}} onClick={() => doApplyToTeam()}
+                                <Button variant="contained" sx={{width: '100%', mb: 2}} onClick={() => doApplyToTeam()}
                                         disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled}>{t('tournament.team.apply')}</Button>
                                 {((myTeam && myTeam.leader === me && team.id === myTeam.id) || isAdmin) && (
                                     <Link to={`/tournament/${tournament.id}/tab/8/team/${team.id}`}>
-                                        <Button sx={{width: '100%'}}>{t('tournament.team.manage')}</Button>
+                                        <Button variant="contained"
+                                                sx={{width: '100%'}}>{t('tournament.team.manage')}</Button>
                                     </Link>
                                 )}
                             </CardContent>
