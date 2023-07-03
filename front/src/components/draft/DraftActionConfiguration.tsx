@@ -25,9 +25,9 @@ export function DraftActionConfiguration(props: DraftActionConfiguration) {
 
     return (
         <>
-            <Grid container>
+            <Grid container sx={{alignItems: "center"}}>
                 <Grid item xs={6} md={2}>
-                    <Select value={action.team as unknown as string}
+                    <Select size="small" value={action.team as unknown as string}
                             className={colorClass}
                             sx={{fontWeight: 'bold', m: 1}}
                             onChange={(event: SelectChangeEvent) => {
@@ -38,7 +38,7 @@ export function DraftActionConfiguration(props: DraftActionConfiguration) {
                     </Select>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                    <Select value={action.type as unknown as string}
+                    <Select size="small" value={action.type as unknown as string}
                             className={actionColorClass}
                             sx={{fontWeight: 'bold', m: 1}}
                             onChange={(event: SelectChangeEvent) => {
