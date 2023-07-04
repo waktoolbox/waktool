@@ -78,7 +78,7 @@ export default function Tournament() {
         getMyTournamentTeam(tournament.id || "").then(response => {
             setMyTournamentTeam(response.team);
         })
-    }, []);
+    }, [targetTab]);
 
     useEffect(() => {
         if (!targetTab) return;

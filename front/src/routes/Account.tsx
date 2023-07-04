@@ -5,9 +5,10 @@ import Typography from "@mui/material/Typography";
 import {Trans, useTranslation} from "react-i18next";
 import {Form, useActionData, useLoaderData} from 'react-router-dom'
 import {Account as AccountModel} from "../services/account.ts";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useSetRecoilState} from "recoil";
 import {loginStateUpdater} from "../atoms/atoms-header.ts";
+import {snackState} from "../atoms/atoms-snackbar.ts";
 
 type FormItem = {
     xs?: number,
@@ -28,14 +29,25 @@ export default function Account() {
     const account = useLoaderData() as AccountModel;
     const actionData = useActionData();
     const setLoginStateUpdater = useSetRecoilState(loginStateUpdater);
-
-    if (actionData) {
-        setLoginStateUpdater(1);
-    }
+    const setSnackValue = useSetRecoilState(snackState);
 
     const [ankamaName, setAnkamaName] = useState(account.ankamaName || "");
     const [ankamaDiscriminator, setAnkamaDiscriminator] = useState(account.ankamaDiscriminator || "");
     const [twitchUrl, setTwitchUrl] = useState(account.twitchUrl || "");
+    const [hasChanged, setHasChanged] = useState(false);
+
+    useEffect(() => {
+        if (!actionData) return;
+
+        setLoginStateUpdater(1);
+        setHasChanged(false)
+        setSnackValue({
+            severity: "success",
+            message: t('saved') as string,
+            open: true
+        })
+    }, [actionData])
+
 
     const items: FormItem[] = [
         {
@@ -86,7 +98,11 @@ export default function Account() {
                             <Grid key={item.fieldName} item xs={item.xs} md={item.md} sx={item.sx}>
                                 <TextField sx={{width: "100%"}} id={item.fieldName} name={item.fieldName}
                                            label={t(item.labelKey)}
-                                           value={item.value} onChange={e => item.setter(e.target.value)}
+                                           value={item.value}
+                                           onChange={e => {
+                                               item.setter(e.target.value)
+                                               setHasChanged(true)
+                                           }}
                                            type={item.type} required={item.required}
                                            error={item.error} autoComplete='off'
                                            helperText={item.helperText ? [item.helperText(item.error || false)].map(e => e ? t(e) : undefined) : undefined}
@@ -94,7 +110,8 @@ export default function Account() {
                             </Grid>
                         ))}
                         <Grid item xs={12} sx={{p: 2, pt: 1}}>
-                            <Button variant="contained" disabled={items.find(i => i.error) !== undefined} type="submit"
+                            <Button variant="contained" disabled={!hasChanged || items.find(i => i.error) !== undefined}
+                                    type="submit"
                                     sx={{width: "100%"}}>{t('save')}</Button>
                         </Grid>
                     </Grid>

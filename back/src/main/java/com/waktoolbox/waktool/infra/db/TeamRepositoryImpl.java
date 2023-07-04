@@ -33,8 +33,8 @@ public class TeamRepositoryImpl implements TeamRepository {
     }
 
     @Override
-    public List<LightTeam> getPublicLightTournamentTeams(String tournamentId) {
-        return _repository.getPublicLightTournamentTeams(tournamentId);
+    public List<LightTeam> getPublicLightTournamentTeams(String tournamentId, boolean displayHidden) {
+        return displayHidden ? _repository.getAllLightTournamentTeams(tournamentId) : _repository.getPublicLightTournamentTeams(tournamentId);
     }
 
     @Override

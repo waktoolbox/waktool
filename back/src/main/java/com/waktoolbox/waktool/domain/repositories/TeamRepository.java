@@ -19,7 +19,7 @@ public interface TeamRepository {
 
     Optional<String> getTeamLeader(String teamId);
 
-    List<LightTeam> getPublicLightTournamentTeams(String tournamentId);
+    List<LightTeam> getPublicLightTournamentTeams(String tournamentId, boolean displayHidden);
 
     Team createTeam(Team team);
 

@@ -48,4 +48,16 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
                     WHERE content->>('tournament') = :tournamentId AND content->>('displayOnTeamList') = 'true'
             """, nativeQuery = true)
     List<LightTeam> getPublicLightTournamentTeams(String tournamentId);
+
+    @Query(value = """
+                SELECT 
+                    id,
+                    content->>('name') as name,
+                    content->>('server') as server,
+                    content->('stats')->>('played') as played,
+                    content->('stats')->>('victories') as victories
+                    FROM teams
+                    WHERE content->>('tournament') = :tournamentId
+            """, nativeQuery = true)
+    List<LightTeam> getAllLightTournamentTeams(String tournamentId);
 }
