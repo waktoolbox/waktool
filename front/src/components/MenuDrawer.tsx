@@ -4,6 +4,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
@@ -73,15 +74,14 @@ function MenuDrawer() {
                             <Stack>
                                 <ListItemText primary={t(category.translationKey)}/>
                                 <List>
-                                    {category.items && category.items.map((item) => (
-                                        <ListItem key={item.key} sx={{color: '#9da5a8', '&:hover': {color: '#10e9d6'}}}>
-                                            {item.link && (
-                                                <Link to={item.link}>
-                                                    {t(item.translationKey)}
-                                                </Link>
-                                            )}
-                                            {!item.link && <ListItemText primary={t(item.translationKey)}/>}
-                                        </ListItem>
+                                    {category.items && category.items.filter(i => i.link).map((item) => (
+                                        <Link to={item.link || ""}>
+                                            <ListItem key={item.key}
+                                                      sx={{color: '#9da5a8', '&:hover': {color: '#10e9d6'}}}>
+                                                <Typography>{t(item.translationKey)}</Typography>
+                                                {!item.link && <ListItemText primary={t(item.translationKey)}/>}
+                                            </ListItem>
+                                        </Link>
                                     ))}
                                 </List>
                             </Stack>

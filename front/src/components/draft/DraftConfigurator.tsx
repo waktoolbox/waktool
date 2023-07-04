@@ -11,7 +11,7 @@ import {DraftActionConfiguration} from "./DraftActionConfiguration.tsx";
 
 function DraftConfigurator() {
     const {t} = useTranslation();
-    const [actions, setActions] = useState<DraftAction[]>(DraftTemplates[0].actions);
+    const [actions, setActions] = useState<DraftAction[]>([...DraftTemplates[0].actions]);
     const [draftTemplate, setDraftTemplate] = useState(0);
 
 
@@ -61,7 +61,7 @@ function DraftConfigurator() {
             </Grid>
             <Grid item xs={2} md={1} order={{xs: 2, md: 3}}>
                 <Button
-                    onClick={() => setActions(DraftTemplates[draftTemplate].actions)}>{t('draft.importTemplate')}</Button>
+                    onClick={() => setActions([...DraftTemplates[draftTemplate].actions])}>{t('draft.importTemplate')}</Button>
             </Grid>
             <Grid item xs={6} md={3} order={{xs: 4, md: 4}}>
                 <Button variant="contained" sx={{height: '100%'}}

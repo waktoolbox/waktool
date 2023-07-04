@@ -242,7 +242,7 @@ export default function TournamentEditTeamView() {
                     {team && team.validatedPlayers && team.validatedPlayers.map((player, index) => (
                         <Grid container alignItems="center">
                             <Grid item xs={9} key={index}>
-                                {accounts.get(player) || player}
+                                <Typography>{accounts.get(player) || player}</Typography>
                             </Grid>
                             <Grid item xs={3}>
                                 <Button color="error" disabled={me === player}
@@ -261,7 +261,7 @@ export default function TournamentEditTeamView() {
                     {applications && applications.map((application, index) => (
                         <Grid container alignItems="center">
                             <Grid item xs={6} key={index}>
-                                {application.username}
+                                <Typography>{application.username}</Typography>
                             </Grid>
                             <Grid item xs={3}>
                                 <Button color="success"

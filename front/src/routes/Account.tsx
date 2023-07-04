@@ -88,13 +88,13 @@ export default function Account() {
                                            label={t(item.labelKey)}
                                            value={item.value} onChange={e => item.setter(e.target.value)}
                                            type={item.type} required={item.required}
-                                           error={item.error}
+                                           error={item.error} autoComplete='off'
                                            helperText={item.helperText ? [item.helperText(item.error || false)].map(e => e ? t(e) : undefined) : undefined}
                                 />
                             </Grid>
                         ))}
                         <Grid item xs={12} sx={{p: 2, pt: 1}}>
-                            <Button disabled={items.find(i => i.error) !== undefined} type="submit"
+                            <Button variant="contained" disabled={items.find(i => i.error) !== undefined} type="submit"
                                     sx={{width: "100%"}}>{t('save')}</Button>
                         </Grid>
                     </Grid>

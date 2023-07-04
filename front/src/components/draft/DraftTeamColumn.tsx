@@ -67,10 +67,8 @@ export function DraftTeamColumn(props: DraftTeamProps) {
                                 <Trans sx={{position: "relative", top: "0px", left: "0px"}}
                                        i18nKey={e.type === DraftActionType.PICK ? "draft.pick" : "draft.ban"}
                                        components={{
-                                           span: <span className={e.type === DraftActionType.PICK ? "pick" : "ban"}
-                                                       style={{
-                                                           fontWeight: "bold"
-                                                       }}/>
+                                           span: <Typography
+                                               className={e.type === DraftActionType.PICK ? "pick" : "ban"}/>
                                        }}/>
                             </Grid>
                         ))}

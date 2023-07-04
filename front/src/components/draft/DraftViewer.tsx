@@ -289,7 +289,7 @@ function DraftViewer() {
                                     {BreedsArray.map(breed => (
                                         <Grid item key={breed} xs={2}>
                                             <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`}
-                                                 style={{width: "95%"}}
+                                                 style={{width: "95%", borderRadius: 15}}
                                                  className={`draftImage 
                                              ${isClassLockedForCurrentAction(breed) ? 'draftImageDisabled' : ''} 
                                              ${breed === pickedBreed ? "draftImagePicked" : ""}
