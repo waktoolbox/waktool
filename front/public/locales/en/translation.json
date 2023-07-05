@@ -1,7 +1,129 @@
 {
-  "connect": "Connect",
+  "account": {
+    "ankamaName": "Ankama tag",
+    "ankamaDiscriminator": "Ankama nickname",
+    "title": "<span>Account</span> management",
+    "twitchUrl": "Twitch URL"
+  },
+  "connect": "Sign in",
+  "disconnect": "Log out",
+  "draft": {
+    "action": {
+      "add": "Add action"
+    },
+    "assignToA": "Assign to team A",
+    "assignToB": "Assign to team B",
+    "ban": "<span>Ban</span>",
+    "banDesc": "must <span>ban</span>",
+    "currentAction": "Current action",
+    "ended": "Draft ended",
+    "importTemplate": "Import",
+    "link": "Draft",
+    "lockForBothDesc": "a class and locks it for both teams",
+    "lockForNoneDesc": "a class",
+    "lockForPicking": "and locks the class for it team",
+    "lockForOpponent": "and locks the class for other team",
+    "lockForOpponentDesc": "a class and locks it for opponent team",
+    "lockForOwnDesc": "a class and locks it for its team",
+    "noUserToAssign": "Nobody to assign",
+    "pick": "<span>Pick</span>",
+    "pickDesc": "must <span>pick</span>",
+    "start": "Start draft",
+    "setTeamNotReady": "My team isn't ready",
+    "setTeamReady": "My team is ready",
+    "team": "Team",
+    "teamA": "Team A",
+    "teamB": "Team B",
+    "template": "Draft template",
+    "type": "Type"
+  },
+  "error": {
+    "ankamaName": "Ankama nickname is mandatory and must be valid",
+    "ankamaDiscriminator": "Ankama tag is mandatory and must be valid (without #)",
+    "badServer": "Invalid server",
+    "missing.name": "Name is mandatory",
+    "mustBeOnDiscordToCreateTeam": "You must be on tournament's Discord to create a team",
+    "mustBeOnDiscordToJoinTournament": "You must be on tournament's Discord to register",
+    "twitchUrl": "Twitch URL must be valid (formatted as https://www.twitch.tv/<pseudo>)",
+    "too.big.catchPhrase": "Too long catch phrase (75 characters maximum)",
+    "too.big.name": "Too long name (25 characters maximum)"
+  },
   "footer": {
     "wakfu": "Wakfu is a MMORPG published by Ankama Studio. All rights reserved.\nThe \"Waktool\" website is an unofficial community fansite of the MMORPG Wakfu without any link to Ankama.",
     "login": "Please note! The Waktool team will never ask your login details."
-  }
+  },
+  "menu": {
+    "account": "Account",
+    "draft": {
+      "link": "Draft"
+    },
+    "profile": {
+      "link": "My profile"
+    },
+    "tools": "Tools"
+  },
+  "save": "Save",
+  "saved": "Saved",
+  "tournament": {
+    "admins": "Organizers",
+    "description": "Description",
+    "display": {
+      "levelAndServer": "Lvl. {{level}} / {{server}}"
+    },
+    "fromTo": "From {{from, datetime}} to {{to, datetime}}",
+    "home": {
+      "featured.title": "Featured <span>tournament</span>",
+      "waktool": "Plan & simplify your tourney management in <span>Wakfu</span>"
+    },
+    "menu": {
+      "home": "Informations",
+      "teams": "Teams",
+      "planning": "Planning",
+      "results": "Results"
+    },
+    "nbMatchesPlayed": "{{nb}} Matches played",
+    "nbVictories": "{{nb}} Victories",
+    "referees": "Referees",
+    "rewards": "Prizees",
+    "rules": "Rules",
+    "streamers": "Streamers",
+    "team": {
+      "apply": "Apply",
+      "appliants": "Applier(s)",
+      "confirmDeletion": "Do you confirm team deletion?",
+      "delete": "Delete team",
+      "displayOnTeamList": "Display team on teams list",
+      "goTo": "Open team",
+      "manage": "Manage",
+      "manageMyRegistration": "Manage my registration",
+      "manageMyTeam": "Manage my team",
+      "match": {
+        "incomingMatches": "Upcoming <span>matches</span>",
+        "noMatchResult": "No match results",
+        "noNextMatches": "No next matches",
+        "results": "Results",
+        "stats": {
+          "banned": "Banned",
+          "death": "Dead",
+          "killed": "Killed",
+          "played": "Played",
+          "victories": "Victories"
+        }
+      },
+      "members": "Members",
+      "myTeam": "My team",
+      "participating": "Participating <span>teams</span>",
+      "register": {
+        "button": "Register team",
+        "catchPhrase": "Catch phrase",
+        "editTitle": "Update the <span>team</span>",
+        "name": "Team name",
+        "saveButton": "Register modifications",
+        "server": "Server",
+        "title": "Register a <span>team</span>"
+      },
+      "startRegistration": "Register a team"
+    }
+  },
+  "validate": "Validate"
 }
