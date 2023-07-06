@@ -37,7 +37,6 @@ public class TournamentTeamController {
 
     @GetMapping("/tournaments/{tournamentId}/teams/{teamId}")
     public TeamResponse getTeam(@RequestAttribute Optional<String> discordId, @PathVariable String teamId) {
-        if (discordId.isEmpty()) return null;
         if (teamId == null) return null;
         return new TeamResponse(_teamRepository.getTeam(teamId).orElse(null));
     }
@@ -204,11 +203,13 @@ public class TournamentTeamController {
         Optional<Team> optTeam = _teamRepository.getTeam(teamId);
         if (optTeam.isEmpty()) return ResponseEntity.badRequest().build();
 
+        Team team = optTeam.get();
+        if (team.getLeader().equals(playerId)) return ResponseEntity.badRequest().build();
+
         String userId = discordId.get();
-        if (!_teamRepository.isTeamLeader(teamId, userId) && !_tournamentRepository.isAdmin(tournamentId, userId))
+        if (!team.getLeader().equals(userId) && !userId.equals(playerId) && !_tournamentRepository.isAdmin(tournamentId, userId))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        Team team = optTeam.get();
         team.getValidatedPlayers().remove(playerId);
         _teamRepository.saveTeam(team);
 

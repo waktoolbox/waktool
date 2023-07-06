@@ -96,15 +96,6 @@ export default function TournamentInformationsView() {
                             pb: 1
                         }}>{t('tournament.team.manageMyTeam')}</Button>
                     </Link>
-                    <Link to={`/tournament/${tournament.id}/tab/9`}
-                        // hidden={Date.parse(tournament.startDate).toString() < Date.now().toString() || (myTeam && myTeam.leader === me)}>
-                          hidden={true}>
-                        <Button variant="contained" sx={{
-                            width: "100%",
-                            pt: 1,
-                            pb: 1
-                        }}>{t('tournament.team.manageMyRegistration')}</Button>
-                    </Link>
                     <Card>
                         <CardContent
                             sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>

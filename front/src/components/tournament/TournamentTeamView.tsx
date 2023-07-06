@@ -18,7 +18,7 @@ import {Trans, useTranslation} from "react-i18next";
 import {Link, useLoaderData, useParams} from "react-router-dom";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {useEffect, useState} from "react";
-import {applyToTeam, getMyTeamApplication, getTournamentTeam} from "../../services/tournament.ts";
+import {applyToTeam, deleteTeamPlayer, getMyTeamApplication, getTournamentTeam} from "../../services/tournament.ts";
 import {TournamentDefinition, TournamentMatchModel, TournamentTeamModel} from "../../chore/tournament.ts";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
@@ -52,7 +52,7 @@ export default function TournamentTeamView() {
 
     const me = useRecoilValue(loginIdState);
 
-    const myTeam = useRecoilValue(myTournamentTeamState);
+    const [myTeam, setMyTeam] = useRecoilState(myTournamentTeamState);
     const tournament = (useLoaderData() as LoaderResponse).tournament;
     const isAdmin = tournament.admins.includes(me);
 
@@ -98,6 +98,14 @@ export default function TournamentTeamView() {
                 return;
             }
             setApplyDisabled(true)
+        })
+    }
+
+    function leaveTeam() {
+        deleteTeamPlayer(id || "", team.id || "", me).then(() => {
+            setMyTeam(undefined);
+            setTeam({...team, validatedPlayers: team.validatedPlayers.filter(p => p !== me)});
+            setApplyDisabled(false)
         })
     }
 
@@ -168,14 +176,26 @@ export default function TournamentTeamView() {
                     {me && (Date.parse(tournament.startDate).toString() > Date.now().toString() || isAdmin) && (
                         <Card>
                             <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
-                                <Button variant="contained" sx={{width: '100%', mb: 2}} onClick={() => doApplyToTeam()}
+                                <Button variant="contained" sx={{width: '100%'}} onClick={() => doApplyToTeam()}
                                         disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled}>{t('tournament.team.apply')}</Button>
                                 {((myTeam && myTeam.leader === me && team.id === myTeam.id) || isAdmin) && (
                                     <Link to={`/tournament/${tournament.id}/tab/8/team/${team.id}`}>
                                         <Button variant="contained"
-                                                sx={{width: '100%'}}>{t('tournament.team.manage')}</Button>
+                                                sx={{width: '100%', mt: 2}}>{t('tournament.team.manage')}</Button>
                                     </Link>
                                 )}
+                                {myTeam && myTeam.leader !== me &&
+                                    <Button variant="contained" color="error"
+                                            hidden={!myTeam || myTeam.leader === me}
+                                            onClick={() => leaveTeam()}
+                                            sx={{
+                                                width: "100%",
+                                                mt: 2,
+                                                pt: 1,
+                                                pb: 1
+                                            }}>{t('tournament.team.leaveTeam')}
+                                    </Button>
+                                }
                             </CardContent>
                         </Card>
                     )}

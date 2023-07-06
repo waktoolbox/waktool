@@ -11,6 +11,7 @@ export interface LightTournament {
 export interface TournamentDefinition {
     id?: string;
     name: string;
+    discordLink?: string;
     logo: string;
     server: string;
     startDate: string;

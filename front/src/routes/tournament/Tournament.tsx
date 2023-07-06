@@ -22,7 +22,7 @@ import TournamentCreateTeamView from "../../components/tournament/TournamentCrea
 import TournamentEditTeamView from "../../components/tournament/TournamentEditTeamView.tsx";
 import TournamentTeamView from "../../components/tournament/TournamentTeamView.tsx";
 import TournamentTeamListView from "../../components/tournament/TournamentTeamListView.tsx";
-import TournamentRegistrationView from "../../components/tournament/TournamentRegistrationView.tsx";
+import Icon from "@mui/material/Icon";
 
 const MenuButtonsStyle = {
     marginLeft: 3,
@@ -45,8 +45,7 @@ enum Tabs {
     RESULTS,
     TREE,
     CREATE_TEAM,
-    EDIT_TEAM,
-    MANAGE_REGISTRATION
+    EDIT_TEAM
 }
 
 type LoaderResponse = {
@@ -139,11 +138,6 @@ export default function Tournament() {
             tab: Tabs.EDIT_TEAM,
             menu: false,
             content: <TournamentEditTeamView/>,
-        },
-        {
-            tab: Tabs.MANAGE_REGISTRATION,
-            menu: false,
-            content: <TournamentRegistrationView/>,
         }
     ]
 
@@ -191,18 +185,41 @@ export default function Tournament() {
                                     to: new Date(Date.parse(tournament.endDate))
                                 })}
                             </Typography>
-                            <Typography sx={{
-                                ml: 3, mt: 2, mb: 3,
-                                borderRadius: 3, backgroundColor: "#017d7f",
-                                width: "150px", height: "40px",
-                                pl: 2, pr: 2,
-                                display: "flex", flexDirection: "column", justifyContent: "center"
-                            }}>
-                                <b>{t('tournament.display.levelAndServer', {
-                                    level: tournament.level,
-                                    server: tournament.server
-                                })}</b>
-                            </Typography>
+                            <Grid container sx={{ml: 3, mt: 2, mb: 3,}}>
+                                <Grid item xs={12} sx={{display: 'flex', alignItems: 'center'}}>
+                                    <Typography sx={{
+                                        borderRadius: 3, backgroundColor: "#017d7f",
+                                        width: "150px", height: "40px", lineHeight: "40px",
+                                        pl: 2, pr: 2
+                                    }}>
+                                        <b>{t('tournament.display.levelAndServer', {
+                                            level: tournament.level,
+                                            server: tournament.server
+                                        })}</b>
+                                    </Typography>
+
+                                    {tournament && tournament.discordLink &&
+                                        <a href={tournament.discordLink} target="_blank" rel="noreferrer">
+                                            <Button sx={{
+                                                backgroundColor: "#5865F2",
+                                                p: 0,
+                                                pl: 1,
+                                                pr: 1,
+                                                borderRadius: 3,
+                                                ml: 1
+                                            }}>
+                                                <Icon sx={{width: '100px', height: '40px'}}>
+                                                    <img style={{textAlign: 'center'}} src="/images/full_discord.svg"
+                                                         alt="Discord logo"/>
+                                                </Icon>
+                                            </Button>
+                                        </a>
+                                    }
+                                </Grid>
+                                <Grid item xs={6}>
+                                </Grid>
+                            </Grid>
+
                         </Stack>
                     </Grid>
 

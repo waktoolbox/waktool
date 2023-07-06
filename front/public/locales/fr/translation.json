@@ -122,7 +122,8 @@
         "server": "Serveur",
         "title": "Inscription d'une <span>équipe</span>"
       },
-      "startRegistration": "Inscrire une équipe"
+      "startRegistration": "Inscrire une équipe",
+      "leaveTeam": "Quitter l'équipe"
     }
   },
   "validate": "Valider"

@@ -13,6 +13,7 @@ public class Tournament {
     String logo;
     int[] maps;
     String name;
+    String discordLink;
     String level;
     Object rules;
     List<String> admins;

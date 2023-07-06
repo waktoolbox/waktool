@@ -1,7 +1,7 @@
 {
   "account": {
-    "ankamaName": "Ankama tag",
-    "ankamaDiscriminator": "Ankama nickname",
+    "ankamaName": "Ankama nickname",
+    "ankamaDiscriminator": "Ankama tag",
     "title": "<span>Account</span> management",
     "twitchUrl": "Twitch URL"
   },
@@ -122,7 +122,8 @@
         "server": "Server",
         "title": "Register a <span>team</span>"
       },
-      "startRegistration": "Register a team"
+      "startRegistration": "Register a team",
+      "leaveTeam": "Leave team"
     }
   },
   "validate": "Validate"
