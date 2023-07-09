@@ -2,6 +2,8 @@ import {Stomp} from "@stomp/stompjs";
 
 console.log("Initiating Stomp configuration")
 const client = Stomp.client(import.meta.env.VITE_SOCKET_URL);
+client.heartbeatIncoming = 0;
+client.heartbeatOutgoing = 0;
 type StompPendingFunction = () => void;
 const pending: StompPendingFunction[] = [];
 
@@ -11,9 +13,12 @@ client.onConnect = () => {
         pendingFunc();
     }
 }
-client.connect({}, () => {
-}, () => {
-})
+client.connect({},
+    () => {
+    },
+    () => {
+    }
+)
 
 const subscriptionPrefix = "/user/topic/";
 const subscriptions = new Set<string>();
