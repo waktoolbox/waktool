@@ -11,4 +11,9 @@ internal_port = 8080
 force_https = true
 auto_stop_machines = false
 auto_start_machines = true
-min_machines_running = 0
+min_machines_running = 1
+
+[services.concurrency]
+type = "requests"
+hard_limit = 99999
+soft_limit = 99999
