@@ -16,6 +16,11 @@ export default function Draft() {
     const [whoAmI, setWhoAmI] = useRecoilState(socketWhoAmIState);
 
     useEffect(() => {
+        subscribe("whoami", (response: { id: string }) => {
+            setWhoAmI(response.id)
+            unsubscribe("whoami")
+        });
+
         subscribe("draft::data", (data: DraftData) => {
             if (!data) {
                 navigate("/draft")
@@ -28,17 +33,12 @@ export default function Draft() {
             navigate("/draft/" + response.id)
         });
 
-        subscribe("whoami", (response: { id: string }) => {
-            setWhoAmI(response.id)
-            unsubscribe("whoami")
-        });
+        if (!whoAmI) {
+            send("whoami", {});
+        }
 
         if (draftId) {
             send("draft::get", {id: draftId});
-        }
-
-        if (!whoAmI) {
-            send("whoami", {});
         }
 
         return () => {

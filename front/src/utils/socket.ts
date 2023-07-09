@@ -5,26 +5,41 @@ const client = Stomp.client(import.meta.env.VITE_SOCKET_URL);
 client.heartbeatIncoming = 0;
 client.heartbeatOutgoing = 0;
 type StompPendingFunction = () => void;
-const pending: StompPendingFunction[] = [];
+let pending: StompPendingFunction[] | undefined = [];
 
 client.onConnect = () => {
+    if (!pending) return;
     console.log("Running " + pending.length + " pending functions ")
     for (const pendingFunc of pending) {
         pendingFunc();
     }
+    pending = undefined;
 }
-client.connect({},
-    () => {
-    },
-    () => {
-    }
-)
+
+client.onDisconnect = () => {
+    if (!pending) pending = []
+    console.log("Stomp disconnected");
+}
+
+function doConnect() {
+    client.connect({},
+        () => {
+            console.log("Stomp connected");
+        },
+        () => {
+            if (!pending) pending = []
+            console.log("Stomp connection lost");
+        }
+    )
+}
+
+doConnect();
 
 const subscriptionPrefix = "/user/topic/";
 const subscriptions = new Set<string>();
 
 function executeOrSchedule(func: () => void) {
-    if (client.connected) {
+    if (!pending || client.connected) {
         func();
         return;
     }
