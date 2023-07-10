@@ -56,6 +56,8 @@ export interface TournamentTeamModel {
     catchPhrase: string;
     displayOnTeamList: boolean;
     stats?: TournamentStatsModel;
+    victories?: number; // light view
+    played?: number; // light view
 }
 
 export interface TournamentStatsModel {
