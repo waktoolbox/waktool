@@ -6,6 +6,7 @@
     "twitchUrl": "URL Twitch"
   },
   "connect": "Connexion",
+  "date": "{{date, datetime}}",
   "disconnect": "Déconnexion",
   "draft": {
     "action": {
@@ -52,6 +53,17 @@
     "wakfu": "Wakfu est un MMORPG édité par Ankama Studio. Tous droits réservés.\nLe site internet “Waktool” est un fansite communautaire non-officiel du MMORPG Wakfu sans aucun lien avec Ankama.\n",
     "login": "Attention ! Ne communiquez jamais vos identifiants de jeu."
   },
+  "maps": {
+    "968": "Forêt flottante",
+    "969": "Cascades en cascades",
+    "970": "Piton de la foutaise",
+    "971": "Jungle en vitesse",
+    "972": "Dalle blanche",
+    "973": "Couvent dôme",
+    "974": "Mine trouée",
+    "975": "Bassin Mi-Chaud",
+    "976": "Baie Max"
+  },
   "menu": {
     "account": "Compte",
     "draft": {
@@ -75,6 +87,26 @@
       "featured.title": "<span>Tournoi</span> à l'honneur",
       "waktool": "Planifier & simplifier la gestion de tournois sur <span>Wakfu</span>"
     },
+    "match": {
+      "allMatches": "Tous les matchs",
+      "arbitration": "Arbitrage",
+      "bo": "BO {{nb}}",
+      "draft": {
+        "teamA": "Équipe A"
+      },
+      "fightTurns": "{{nb}} tours",
+      "live": "Live",
+      "matchNb": "Combat {{nb}}",
+      "more": "En savoir plus",
+      "noDate": "Pas de date",
+      "noMatchPlanned": "Aucun match à afficher",
+      "noReferee": "Pas d'arbitre",
+      "noStreamer": "Pas de streamer",
+      "pool": "Poule {{pool}}",
+      "round": "Round {{round}}",
+      "roundRobinPhaseTitle": "<span>Étape</span> {{nb}}",
+      "watchStream": "Regarder le stream"
+    },
     "menu": {
       "home": "Informations",
       "teams": "Équipes",
@@ -83,6 +115,7 @@
     },
     "nbMatchesPlayed": "{{nb}} Match(s) joué(s)",
     "nbVictories": "{{nb}} Victoire(s)",
+    "phase": "Phase {{phase}}",
     "referees": "Arbitres",
     "rewards": "Récompenses",
     "rules": "Règles",

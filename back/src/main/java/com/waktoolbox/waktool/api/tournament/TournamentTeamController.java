@@ -48,6 +48,11 @@ public class TournamentTeamController {
         return new LightTeamListResponse(_teamRepository.getPublicLightTournamentTeams(tournamentId, displayHidden));
     }
 
+    @PostMapping("/tournaments/{tournamentId}/teams:search")
+    public LightTeamListResponse getTeamList(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @RequestBody PostTeamsSearch request) {
+        return new LightTeamListResponse(_teamRepository.getTeamsNames(tournamentId, request.ids()));
+    }
+
     @PostMapping("/tournaments/{tournamentId}/teams")
     public PostTeamResponse createTeam(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @RequestBody Team requestTeam) {
         if (discordId.isEmpty()) return new PostTeamResponse(false, null, null);

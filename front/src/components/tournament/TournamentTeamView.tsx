@@ -18,13 +18,21 @@ import {Trans, useTranslation} from "react-i18next";
 import {Link, useLoaderData, useParams} from "react-router-dom";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {useEffect, useState} from "react";
-import {applyToTeam, deleteTeamPlayer, getMyTeamApplication, getTournamentTeam} from "../../services/tournament.ts";
+import {
+    applyToTeam,
+    deleteTeamPlayer,
+    getMyTeamApplication,
+    getTeamMatches,
+    getTournamentTeam,
+    teamSearch
+} from "../../services/tournament.ts";
 import {TournamentDefinition, TournamentMatchModel, TournamentTeamModel} from "../../chore/tournament.ts";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
-import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
+import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournament.ts";
 import {loginIdState} from "../../atoms/atoms-header.ts";
 import {snackState} from "../../atoms/atoms-snackbar.ts";
+import TournamentMatchInlinedView from "./TournamentMatchInlinedView.tsx";
 
 const defaultTeam = {
     name: "",
@@ -49,6 +57,7 @@ export default function TournamentTeamView() {
     const [accounts, setAccounts] = useRecoilState(accountCacheState);
     const [applyDisabled, setApplyDisabled] = useState(true);
     const setSnackValue = useSetRecoilState(snackState);
+    const [teamCache, setTeamCache] = useRecoilState(teamCacheState);
 
     const me = useRecoilValue(loginIdState);
 
@@ -57,7 +66,7 @@ export default function TournamentTeamView() {
     const isAdmin = tournament.admins.includes(me);
 
     const [team, setTeam] = useState<TournamentTeamModel>(defaultTeam);
-    const [teamMatches, _] = useState<TournamentMatchModel[]>([]);
+    const [teamMatches, setTeamMatches] = useState<TournamentMatchModel[]>([]);
 
     useEffect(() => {
         if (!teamId) return;
@@ -65,6 +74,26 @@ export default function TournamentTeamView() {
             setTeam(response.team || defaultTeam);
 
             if (!response.team || !response.team.validatedPlayers) return;
+
+            getTeamMatches(id || "", teamId).then(response => {
+                setTeamMatches(response.matches);
+                if (response.matches) {
+                    const toLoad = []
+                    for (const match of response.matches) {
+                        if (!teamCache.get(match.teamA)) toLoad.push(match.teamA);
+                        if (!teamCache.get(match.teamB)) toLoad.push(match.teamB);
+                    }
+                    if (toLoad.length > 0) {
+                        teamSearch(id || "", toLoad).then(response => {
+                            const ltc = new Map(teamCache);
+                            for (const team of response.teams) {
+                                ltc.set(team.id, team.name);
+                            }
+                            setTeamCache(ltc);
+                        })
+                    }
+                }
+            })
 
             const toLoad = [...response.team.validatedPlayers];
             const accountsToRequest = toLoad.filter(accountId => !accounts.get(accountId));
@@ -138,13 +167,12 @@ export default function TournamentTeamView() {
                                                             span: <span className="firstWord"/>
                                                         }}/></Typography>
 
-                        {/*{teamMatches && teamMatches.filter(m => !m.done).map(match => (*/}
-                        {/*    <TournamentTeamMatchView key={match.id} tournamentId={id || ""}*/}
-                        {/*                             match={match}*/}
-                        {/*                             displayedTeam={team.id}*/}
-                        {/*                             otherTeamName={teamsNamesPersistence.get(match.teamA === team.id ? match.teamB : match.teamA) || ""}*/}
-                        {/*                             goToMatch={() => loadMatch(match.id, true)}/>*/}
-                        {/*))}*/}
+                        {teamMatches && teamMatches.filter(m => !m.done).map(match => (
+                            <TournamentMatchInlinedView key={match.id} backgroundColor="#162329"
+                                                        match={match}
+                                                        displayedTeam={team.id}
+                            />
+                        ))}
 
                         {teamMatches && teamMatches.filter(m => !m.done).length <= 0 &&
                             <Typography sx={{ml: 2, mt: 2}}
@@ -156,13 +184,12 @@ export default function TournamentTeamView() {
                         <Typography variant="h5"
                                     sx={{color: "#fefffa"}}>{t('tournament.team.match.results')}</Typography>
 
-                        {/*{teamMatches && teamMatches.length > 0 && teamMatches.filter(m => m.done).map(match => (*/}
-                        {/*    <TournamentTeamMatchView key={match.id} tournamentId={id || ""}*/}
-                        {/*                             match={match}*/}
-                        {/*                             displayedTeam={team.id}*/}
-                        {/*                             otherTeamName={teamsNamesPersistence.get(match.teamA === team.id ? match.teamB : match.teamA) || ""}*/}
-                        {/*                             goToMatch={() => loadMatch(match.id, true)}/>*/}
-                        {/*))}*/}
+                        {teamMatches && teamMatches.length > 0 && teamMatches.filter(m => m.done).map(match => (
+                            <TournamentMatchInlinedView key={match.id} backgroundColor="#162329"
+                                                        match={match}
+                                                        displayedTeam={team.id}
+                            />
+                        ))}
 
                         {teamMatches && teamMatches.filter(m => m.done).length <= 0 &&
                             <Typography sx={{ml: 2, mt: 2}}

@@ -50,7 +50,7 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
     List<LightTeam> getPublicLightTournamentTeams(String tournamentId);
 
     @Query(value = """
-                SELECT 
+                SELECT
                     id,
                     content->>('name') as name,
                     content->>('server') as server,
@@ -60,4 +60,14 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
                     WHERE content->>('tournament') = :tournamentId
             """, nativeQuery = true)
     List<LightTeam> getAllLightTournamentTeams(String tournamentId);
+
+    @Query(value = """
+                SELECT
+                    id,
+                    content->>('name') as name
+                    FROM teams
+                    WHERE content->>('tournament') = :tournamentId
+                    AND id IN :teamIds
+            """, nativeQuery = true)
+    List<LightTeam> getTeamsNames(String tournamentId, List<String> teamIds);
 }

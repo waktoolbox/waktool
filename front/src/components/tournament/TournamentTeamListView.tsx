@@ -13,6 +13,8 @@ import {Link, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getTournamentTeams} from "../../services/tournament.ts";
 import {TournamentTeamModel} from "../../chore/tournament.ts";
+import {useRecoilState} from "recoil";
+import {teamCacheState} from "../../atoms/atoms-tournament.ts";
 
 
 // TODO clean this view
@@ -20,10 +22,19 @@ export default function TournamentTeamListView() {
     const {t} = useTranslation();
     const {id} = useParams();
     const [teams, setTeams] = useState<TournamentTeamModel[]>([])
+    const [teamCache, setTeamCache] = useRecoilState(teamCacheState);
 
     useEffect(() => {
         getTournamentTeams(id || "").then(response => {
             setTeams(response.teams || []);
+
+            if (response.teams) {
+                const ltc = new Map(teamCache);
+                for (const team of response.teams) {
+                    ltc.set(team.id, team.name);
+                }
+                setTeamCache(ltc);
+            }
         })
     }, [])
 

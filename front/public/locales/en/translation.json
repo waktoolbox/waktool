@@ -6,6 +6,7 @@
     "twitchUrl": "Twitch URL"
   },
   "connect": "Sign in",
+  "date": "{{date, datetime}}",
   "disconnect": "Log out",
   "draft": {
     "action": {
@@ -52,6 +53,17 @@
     "wakfu": "Wakfu is a MMORPG published by Ankama Studio. All rights reserved.\nThe \"Waktool\" website is an unofficial community fansite of the MMORPG Wakfu without any link to Ankama.",
     "login": "Please note! The Waktool team will never ask your login details."
   },
+  "maps": {
+    "968": "Floating Forest",
+    "969": "Waterfall Chase",
+    "970": "Garbage Peak",
+    "971": "Quick Jungle",
+    "972": "White Slab",
+    "973": "Monastery Dome",
+    "974": "Holey Mine",
+    "975": "Lukewarm Basin",
+    "976": "Max Bay"
+  },
   "menu": {
     "account": "Account",
     "draft": {
@@ -75,6 +87,26 @@
       "featured.title": "Featured <span>tournament</span>",
       "waktool": "Plan & simplify your tourney management in <span>Wakfu</span>"
     },
+    "match": {
+      "allMatches": "All matches",
+      "arbitration": "Arbitration",
+      "bo": "BO {{nb}}",
+      "draft": {
+        "teamA": "Team A"
+      },
+      "fightTurns": "{{nb}} turns",
+      "live": "Live",
+      "matchNb": "Fight {{nb}}",
+      "more": "Learn more",
+      "noDate": "No date",
+      "noMatchPlanned": "No matches to display",
+      "noReferee": "No referee",
+      "noStreamer": "No streamer",
+      "pool": "Pool {{pool}}",
+      "round": "Round {{round}}",
+      "roundRobinPhaseTitle": "<span>Step</span> {{nb}}",
+      "watchStream": "Watch stream"
+    },
     "menu": {
       "home": "Informations",
       "teams": "Teams",
@@ -83,6 +115,7 @@
     },
     "nbMatchesPlayed": "{{nb}} Matches played",
     "nbVictories": "{{nb}} Victories",
+    "phase": "Phase {{phase}}",
     "referees": "Referees",
     "rewards": "Prizees",
     "rules": "Rules",

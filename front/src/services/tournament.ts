@@ -39,6 +39,10 @@ export async function getTournamentTeams(tournamentId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/teams`);
 }
 
+export async function teamSearch(tournamentId: string, teamIds: string[]) {
+    return await pfetch(`/api/tournaments/${tournamentId}/teams:search`, {ids: teamIds});
+}
+
 export async function postRegisterTeam(tournamentId: string, team: TournamentTeamModel) {
     return await pfetch(`/api/tournaments/${tournamentId}/teams`, team);
 }
@@ -53,4 +57,25 @@ export async function deleteTeamPlayer(tournamentId: string, teamId: string, pla
 
 export async function deleteTeam(tournamentId: string, teamId: string) {
     return await detch(`/api/tournaments/${tournamentId}/teams/${teamId}`);
+}
+
+export async function getPhases(tournamentId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/phases`);
+}
+
+export type PostMatchesSearchParameters = {
+    type: "PLANNING" | "RESULTS"
+    phase: number
+}
+
+export async function postMatchesSearch(tournamentId: string, searchParameters: PostMatchesSearchParameters) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches-search`, searchParameters);
+}
+
+export async function getMatch(tournamentId: string, matchId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/matches/${matchId}`);
+}
+
+export async function getTeamMatches(tournamentId: string, teamId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/teams/${teamId}/matches`);
 }

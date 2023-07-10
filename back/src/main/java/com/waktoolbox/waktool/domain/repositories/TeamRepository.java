@@ -21,6 +21,8 @@ public interface TeamRepository {
 
     List<LightTeam> getPublicLightTournamentTeams(String tournamentId, boolean displayHidden);
 
+    List<LightTeam> getTeamsNames(String tournamentId, List<String> teamIds);
+
     Team createTeam(Team team);
 
     void deleteTeam(String teamId);

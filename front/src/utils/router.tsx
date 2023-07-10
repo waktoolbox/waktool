@@ -49,6 +49,10 @@ export function createRouter() {
                         {
                             path: "tab/:targetTab/team/:teamId",
                             element: <Tournament/>,
+                        },
+                        {
+                            path: "tab/:targetTab/match/:matchId",
+                            element: <Tournament/>,
                         }
                     ]
                 }

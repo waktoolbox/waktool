@@ -75,7 +75,7 @@ function MenuDrawer() {
                                 <ListItemText primary={t(category.translationKey)}/>
                                 <List>
                                     {category.items && category.items.filter(i => i.link).map((item) => (
-                                        <Link to={item.link || ""}>
+                                        <Link key={item.key} to={item.link || ""}>
                                             <ListItem key={item.key}
                                                       sx={{color: '#9da5a8', '&:hover': {color: '#10e9d6'}}}>
                                                 <Typography>{t(item.translationKey)}</Typography>

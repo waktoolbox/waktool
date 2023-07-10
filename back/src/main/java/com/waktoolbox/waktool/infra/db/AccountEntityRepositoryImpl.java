@@ -2,6 +2,7 @@ package com.waktoolbox.waktool.infra.db;
 
 
 import com.waktoolbox.waktool.domain.models.Account;
+import com.waktoolbox.waktool.domain.models.users.Streamer;
 import com.waktoolbox.waktool.domain.repositories.AccountRepository;
 import com.waktoolbox.waktool.infra.mappers.AccountEntityMapper;
 import lombok.AllArgsConstructor;
@@ -29,5 +30,10 @@ public class AccountEntityRepositoryImpl implements AccountRepository {
     @Override
     public List<Account> find(List<String> ids) {
         return accountEntityMapper.to(accountSpringDataRepository.findAllByIdIn(ids));
+    }
+
+    @Override
+    public List<Streamer> findStreamers(List<String> ids) {
+        return accountSpringDataRepository.findAllStreamersByIdIn(ids);
     }
 }

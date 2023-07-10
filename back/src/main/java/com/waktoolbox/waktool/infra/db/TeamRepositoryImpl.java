@@ -38,6 +38,11 @@ public class TeamRepositoryImpl implements TeamRepository {
     }
 
     @Override
+    public List<LightTeam> getTeamsNames(String tournamentId, List<String> teamIds) {
+        return _repository.getTeamsNames(tournamentId, teamIds);
+    }
+
+    @Override
     public Optional<Team> getTeam(String teamId) {
         return _repository.findById(teamId).map(TeamEntity::getContent);
     }

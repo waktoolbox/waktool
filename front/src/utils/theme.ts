@@ -160,6 +160,33 @@ export default createTheme({
                     },
                 }
             },
+        },
+
+        MuiTab: {
+            styleOverrides: {
+                root: {
+                    color: '#8299a1',
+
+                    '&.Mui-focusVisible': {
+                        backgroundColor: '#03c8be',
+                    },
+
+                    '&.Mui-selected': {
+                        color: '#03c8be',
+                        backgroundColor: '#0d1518',
+                        borderTopLeftRadius: 5,
+                        borderTopRightRadius: 5
+                    },
+                }
+            }
+        },
+
+        MuiTabs: {
+            styleOverrides: {
+                indicator: {
+                    backgroundColor: '#03c8be'
+                }
+            }
         }
     }
 })

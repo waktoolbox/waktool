@@ -28,3 +28,7 @@ export async function accountSaver({request}: ActionFunctionArgs) {
 export async function accountsLoader(accountIds: string[]) {
     return await pfetch("/api/accounts:search", {ids: accountIds});
 }
+
+export async function streamersLoader(accountIds: string[]) {
+    return await pfetch("/api/streamers:search", {ids: accountIds});
+}

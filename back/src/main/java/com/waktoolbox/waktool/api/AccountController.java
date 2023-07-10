@@ -37,6 +37,11 @@ public class AccountController {
         return ResponseEntity.ok(new AccountSearchResponse(accounts));
     }
 
+    @PostMapping("/streamers:search")
+    public ResponseEntity<StreamerSearchResponse> searchStreamers(@RequestBody AccountSearchRequest request) {
+        return ResponseEntity.ok(new StreamerSearchResponse(_accountRepository.findStreamers(request.ids())));
+    }
+
     @PostMapping("/accounts/{id}")
     public ResponseEntity<AccountResponse> updateAccount(@RequestAttribute Optional<String> discordId, @PathVariable String id, @RequestBody UpdateAccountRequest request) {
         if (discordId.isEmpty()) {

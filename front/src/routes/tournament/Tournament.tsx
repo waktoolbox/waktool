@@ -23,6 +23,8 @@ import TournamentEditTeamView from "../../components/tournament/TournamentEditTe
 import TournamentTeamView from "../../components/tournament/TournamentTeamView.tsx";
 import TournamentTeamListView from "../../components/tournament/TournamentTeamListView.tsx";
 import Icon from "@mui/material/Icon";
+import TournamentMatchListView from "../../components/tournament/TournamentMatchListView.tsx";
+import TournamentMatchView from "../../components/tournament/TournamentMatchView.tsx";
 
 const MenuButtonsStyle = {
     marginLeft: 3,
@@ -75,7 +77,7 @@ export default function Tournament() {
         });
 
         getMyTournamentTeam(tournament.id || "").then(response => {
-            setMyTournamentTeam(response.team);
+            setMyTournamentTeam(response?.team);
         })
     }, [targetTab]);
 
@@ -98,7 +100,7 @@ export default function Tournament() {
             tab: Tabs.TEAMS,
             menu: true,
             content: <TournamentTeamListView/>,
-            icon: <Diversity3Icon sx={{color: (tab === Tabs.HOME ? "017d7f" : "8299a1"), mr: 1}}/>,
+            icon: <Diversity3Icon sx={{color: (tab === Tabs.TEAMS ? "017d7f" : "8299a1"), mr: 1}}/>,
             label: t('tournament.menu.teams'),
             disabled: false
         },
@@ -110,18 +112,21 @@ export default function Tournament() {
         {
             tab: Tabs.PLANNING,
             menu: true,
-            icon: <CalendarMonthIcon sx={{color: (tab === Tabs.HOME ? "017d7f" : "8299a1"), mr: 1}}/>,
+            content: <TournamentMatchListView tab="PLANNING"/>,
+            icon: <CalendarMonthIcon sx={{color: (tab === Tabs.PLANNING ? "017d7f" : "8299a1"), mr: 1}}/>,
             label: t('tournament.menu.planning'),
             disabled: Date.parse(tournament.startDate).toString() > Date.now().toString()
         },
         {
             tab: Tabs.MATCH,
-            menu: false
+            menu: false,
+            content: <TournamentMatchView/>
         },
         {
             tab: Tabs.RESULTS,
             menu: true,
-            icon: <EmojiEventsIcon sx={{color: (tab === Tabs.HOME ? "017d7f" : "8299a1"), mr: 1}}/>,
+            content: <TournamentMatchListView tab="RESULTS"/>,
+            icon: <EmojiEventsIcon sx={{color: (tab === Tabs.RESULTS ? "017d7f" : "8299a1"), mr: 1}}/>,
             label: t('tournament.menu.results'),
             disabled: Date.parse(tournament.startDate).toString() > Date.now().toString()
         },
