@@ -7,24 +7,16 @@ client.heartbeatOutgoing = 2000;
 type StompPendingFunction = () => void;
 let pending: StompPendingFunction[] | undefined = [];
 
-client.onConnect = () => {
-    if (!pending) return;
-    console.log("Running " + pending.length + " pending functions ")
-    for (const pendingFunc of pending) {
-        pendingFunc();
-    }
-    pending = undefined;
-}
-
-client.onDisconnect = () => {
-    if (!pending) pending = []
-    console.log("Stomp disconnected");
-}
-
 function doConnect() {
     client.connect({},
         () => {
             console.log("Stomp connected");
+            if (!pending) return;
+            console.log("Running " + pending.length + " pending functions ")
+            for (const pendingFunc of pending) {
+                pendingFunc();
+            }
+            pending = undefined;
         },
         () => {
             if (!pending) pending = []
