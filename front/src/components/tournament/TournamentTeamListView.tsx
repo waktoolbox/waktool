@@ -78,7 +78,7 @@ export default function TournamentTeamListView() {
                                             verticalAlign: "middle",
                                             mr: 1,
                                             mb: '3px'
-                                        }}/>{t('tournament.nbVictories', {nb: team?.stats?.victories || 0})}
+                                        }}/>{t('tournament.nbVictories', {nb: team?.victories || 0})}
                                     </Typography>
                                     <Typography display="inline"
                                                 sx={{color: "#8299a1", mr: 2}}><ListAltIcon
@@ -86,7 +86,7 @@ export default function TournamentTeamListView() {
                                             verticalAlign: "middle",
                                             mr: 1,
                                             mb: '3px'
-                                        }}/>{t('tournament.nbMatchesPlayed', {nb: team?.stats?.played || 0})}
+                                        }}/>{t('tournament.nbMatchesPlayed', {nb: team?.played || 0})}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} lg={2}>
