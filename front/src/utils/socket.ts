@@ -2,8 +2,8 @@ import {Stomp} from "@stomp/stompjs";
 
 console.log("Initiating Stomp configuration")
 const client = Stomp.client(import.meta.env.VITE_SOCKET_URL);
-client.heartbeatIncoming = 0;
-client.heartbeatOutgoing = 0;
+client.heartbeatIncoming = 30000;
+client.heartbeatOutgoing = 2000;
 type StompPendingFunction = () => void;
 let pending: StompPendingFunction[] | undefined = [];
 
