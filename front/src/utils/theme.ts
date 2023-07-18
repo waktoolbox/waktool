@@ -72,6 +72,14 @@ export default createTheme({
             },
         },
 
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: '#1f333a',
+                }
+            }
+        },
+
         MuiDrawer: {
             styleOverrides: {
                 paper: {

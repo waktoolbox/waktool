@@ -79,3 +79,7 @@ export async function getMatch(tournamentId: string, matchId: string) {
 export async function getTeamMatches(tournamentId: string, teamId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/teams/${teamId}/matches`);
 }
+
+export async function postGoToNextPhase(tournamentId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/admin-go-to-next-phase`, {});
+}

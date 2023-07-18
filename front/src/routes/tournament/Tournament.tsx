@@ -13,7 +13,7 @@ import Stack from "@mui/material/Stack";
 import {useEffect, useState} from "react";
 import Button from "@mui/material/Button";
 import TournamentInformationsView from "../../components/tournament/TournamentInformationsView.tsx";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
 import {getMyTournamentTeam} from "../../services/tournament.ts";
@@ -25,6 +25,10 @@ import TournamentTeamListView from "../../components/tournament/TournamentTeamLi
 import Icon from "@mui/material/Icon";
 import TournamentMatchListView from "../../components/tournament/TournamentMatchListView.tsx";
 import TournamentMatchView from "../../components/tournament/TournamentMatchView.tsx";
+import TournamentHomeAdmin from "../../components/tournament/admin/TournamentHomeAdmin.tsx";
+import {loginIdState} from "../../atoms/atoms-header.ts";
+import TournamentAdminDialog from "../../components/tournament/admin/TournamentAdminDialog.tsx";
+import TournamentMatchAdmin from "../../components/tournament/admin/TournamentMatchAdmin.tsx";
 
 const MenuButtonsStyle = {
     marginLeft: 3,
@@ -60,6 +64,7 @@ export default function Tournament() {
     const {id, targetTab} = useParams();
     const [accountsCache, setAccounts] = useRecoilState(accountCacheState);
     const [_, setMyTournamentTeam] = useRecoilState(myTournamentTeamState);
+    const me = useRecoilValue(loginIdState);
 
     const [tab, setTab] = useState(targetTab ? +targetTab : Tabs.HOME);
     const tournament = (useLoaderData() as LoaderResponse).tournament;
@@ -94,7 +99,9 @@ export default function Tournament() {
             content: <TournamentInformationsView/>,
             icon: <BookmarksIcon sx={{color: (tab === Tabs.HOME ? "017d7f" : "8299a1"), mr: 1}}/>,
             label: t('tournament.menu.home'),
-            disabled: false
+            disabled: false,
+            isAdmin: me && tournament.admins?.find(admin => admin === me),
+            admin: <TournamentHomeAdmin/>
         },
         {
             tab: Tabs.TEAMS,
@@ -120,7 +127,9 @@ export default function Tournament() {
         {
             tab: Tabs.MATCH,
             menu: false,
-            content: <TournamentMatchView/>
+            content: <TournamentMatchView/>,
+            isAdmin: true,
+            admin: <TournamentMatchAdmin/>
         },
         {
             tab: Tabs.RESULTS,
@@ -251,6 +260,10 @@ export default function Tournament() {
                 </Grid>
 
             </Grid>
+
+            <div hidden={!categories[tab].isAdmin} style={{position: 'fixed', bottom: 3, right: 3}}>
+                <TournamentAdminDialog component={categories[tab].admin}/>
+            </div>
         </Grid>
     );
 }
