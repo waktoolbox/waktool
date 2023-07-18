@@ -19,6 +19,7 @@ public class Account {
     String ankamaName;
     String ankamaDiscriminator;
     String twitchUrl;
+    String locale;
 
     @JsonIgnore
     public String getDisplayName() {

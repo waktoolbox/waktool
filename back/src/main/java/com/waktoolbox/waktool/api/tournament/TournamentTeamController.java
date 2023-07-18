@@ -2,11 +2,10 @@ package com.waktoolbox.waktool.api.tournament;
 
 import com.waktoolbox.waktool.api.models.*;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
-import com.waktoolbox.waktool.domain.repositories.ApplicationRepository;
-import com.waktoolbox.waktool.domain.repositories.DiscordRepository;
-import com.waktoolbox.waktool.domain.repositories.TeamRepository;
-import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
+import com.waktoolbox.waktool.domain.repositories.*;
+import com.waktoolbox.waktool.utils.TranslatorKey;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,10 +22,15 @@ import java.util.Optional;
 @RequestMapping("/api")
 @Validated
 public class TournamentTeamController {
+    @Value("${waktool.base-url}")
+    private String BASE_URL;
+    private static final String TEAM_URL = "%s/tournament/wakfu-warriors/tab/8/team/%s";
+
     private final ApplicationRepository _applicationRepository;
     private final DiscordRepository _discordRepository;
     private final TeamRepository _teamRepository;
     private final TournamentRepository _tournamentRepository;
+    private final NotificationRepository _notifier;
 
     @GetMapping("/tournaments/{tournamentId}/my-team")
     public TeamResponse getMyTeam(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId) {
@@ -155,7 +159,13 @@ public class TournamentTeamController {
             return new PostApplicationResponse(false, "error.mustBeOnDiscordToJoinTournament");
         }
 
+        Optional<Team> optTeam = _teamRepository.getTeam(teamId);
+        if (optTeam.isEmpty()) return new PostApplicationResponse(false, null);
+
         _applicationRepository.saveApplication(tournamentId, teamId, userId);
+
+        Team team = optTeam.get();
+        _notifier.notifyUser(team.getLeader(), TranslatorKey.TOURNAMENT_USER_APPLIED, String.format(TEAM_URL, BASE_URL, teamId));
         return new PostApplicationResponse(true, null);
     }
 
@@ -180,6 +190,7 @@ public class TournamentTeamController {
         team.getValidatedPlayers().add(applicationUserId.get());
         _teamRepository.saveTeam(team);
         _applicationRepository.deleteApplication(tournamentId, teamId, applicationId);
+        _notifier.notifyUser(applicationUserId.get(), TranslatorKey.TOURNAMENT_USER_APPLICATION_ACCEPTED, team.getName());
         return ResponseEntity.ok().build();
     }
 
