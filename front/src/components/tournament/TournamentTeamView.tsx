@@ -242,7 +242,7 @@ export default function TournamentTeamView() {
                                     verticalAlign: "middle",
                                     mr: 1,
                                     mb: '3px'
-                                }}/>{t('tournament.nbVictories', {nb: team?.stats?.played || 0})}
+                                }}/>{t('tournament.nbVictories', {nb: team?.stats?.victories || 0})}
                             </Typography>
                         </CardContent>
                     </Card>

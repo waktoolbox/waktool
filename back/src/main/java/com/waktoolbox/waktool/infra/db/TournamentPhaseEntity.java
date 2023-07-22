@@ -28,6 +28,7 @@ public class TournamentPhaseEntity {
     @Embeddable
     @EqualsAndHashCode
     @Getter
+    @Setter
     public static class TournamentPhaseId implements Serializable {
         String tournamentId;
         int phase;

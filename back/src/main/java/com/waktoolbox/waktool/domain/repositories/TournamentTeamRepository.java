@@ -6,7 +6,7 @@ import com.waktoolbox.waktool.domain.models.tournaments.Team;
 import java.util.List;
 import java.util.Optional;
 
-public interface TeamRepository {
+public interface TournamentTeamRepository {
     boolean isTeamLeader(String id, String user);
 
     boolean doesUserHasTeam(String tournamentId, String userId);
@@ -14,6 +14,10 @@ public interface TeamRepository {
     Optional<Team> getUserTeam(String tournamentId, String userId);
 
     Optional<Team> getTeam(String teamId);
+
+    List<Team> getTeamsByTournamentId(String tournamentId);
+
+    List<Team> getTeamsWithIds(List<String> teamIds);
 
     void saveTeam(Team team);
 
@@ -26,4 +30,5 @@ public interface TeamRepository {
     Team createTeam(Team team);
 
     void deleteTeam(String teamId);
+
 }

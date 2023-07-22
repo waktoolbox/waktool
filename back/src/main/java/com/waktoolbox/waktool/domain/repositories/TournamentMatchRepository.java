@@ -12,4 +12,8 @@ public interface TournamentMatchRepository {
     List<TournamentMatch> getTeamMatches(String tournamentId, String teamId);
 
     TournamentMatch getMatch(String matchId);
+
+    boolean isAllMatchesDone(String tournamentId, int phase, int round);
+
+    void saveAll(String tournamentId, List<TournamentMatch> matchesToSave);
 }

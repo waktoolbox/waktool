@@ -64,11 +64,13 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
 
     useEffect(() => {
         if (displayedPhase <= 0) return;
-        switch (tournament.phases[(displayedPhase || 1) - 1].phaseType) {
+        const phaseType = tournament.phases[(displayedPhase || 1) - 1].phaseType;
+        switch (phaseType) {
             case TournamentPhaseType.WAKFU_WARRIORS_ROUND_ROBIN:
                 setTournamentPhaseComponent(<TournamentRoundRobinListView matches={matchesToDisplay}/>)
                 break;
             case TournamentPhaseType.WAKFU_WARRIORS_BRACKET_TOURNAMENT:
+            case TournamentPhaseType.WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT:
                 setTournamentPhaseComponent(<TournamentRawListView matches={matchesToDisplay}/>)
                 break;
         }

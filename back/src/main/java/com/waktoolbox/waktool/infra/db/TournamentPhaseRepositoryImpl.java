@@ -13,6 +13,19 @@ public class TournamentPhaseRepositoryImpl implements TournamentPhaseRepository 
     private final TournamentPhaseSpringDataRepository _repository;
 
     @Override
+    public void save(TournamentData tournamentData) {
+        TournamentPhaseEntity.TournamentPhaseId id = new TournamentPhaseEntity.TournamentPhaseId();
+        id.setTournamentId(tournamentData.getTournamentId());
+        id.setPhase(tournamentData.getPhase());
+
+        TournamentPhaseEntity entity = new TournamentPhaseEntity();
+        entity.setId(id);
+        entity.setContent(tournamentData.getContent());
+
+        _repository.save(entity);
+    }
+
+    @Override
     public List<TournamentData> getTournamentData(String tournamentId) {
         return _repository.findAllByIdTournamentId(tournamentId).stream()
                 .map(entity -> TournamentData.builder()

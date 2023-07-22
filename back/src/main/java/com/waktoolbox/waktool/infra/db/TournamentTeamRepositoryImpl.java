@@ -3,7 +3,7 @@ package com.waktoolbox.waktool.infra.db;
 
 import com.waktoolbox.waktool.domain.models.tournaments.LightTeam;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
-import com.waktoolbox.waktool.domain.repositories.TeamRepository;
+import com.waktoolbox.waktool.domain.repositories.TournamentTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
-public class TeamRepositoryImpl implements TeamRepository {
+public class TournamentTeamRepositoryImpl implements TournamentTeamRepository {
     private final TeamSpringDataRepository _repository;
 
     @Override
@@ -45,6 +45,16 @@ public class TeamRepositoryImpl implements TeamRepository {
     @Override
     public Optional<Team> getTeam(String teamId) {
         return _repository.findById(teamId).map(TeamEntity::getContent);
+    }
+
+    @Override
+    public List<Team> getTeamsByTournamentId(String tournamentId) {
+        return _repository.getTeamsByTournamentId(tournamentId).stream().map(TeamEntity::getContent).toList();
+    }
+
+    @Override
+    public List<Team> getTeamsWithIds(List<String> teamIds) {
+        return _repository.findAllByIdIn(teamIds).stream().map(TeamEntity::getContent).toList();
     }
 
     @Override

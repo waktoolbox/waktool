@@ -42,4 +42,21 @@ public class TournamentMatchRepositoryImpl implements TournamentMatchRepository 
     public TournamentMatch getMatch(String matchId) {
         return _repository.findById(matchId).map(TournamentMatchEntity::getContent).orElse(null);
     }
+
+    @Override
+    public boolean isAllMatchesDone(String tournamentId, int phase, int round) {
+        return _repository.countAllNotDoneMatchesByTournamentIdAndPhaseAndRound(tournamentId, phase, String.valueOf(round)) == 0;
+    }
+
+    @Override
+    public void saveAll(String tournamentId, List<TournamentMatch> matchesToSave) {
+        _repository.saveAll(matchesToSave.stream().map(match -> {
+            TournamentMatchEntity entity = new TournamentMatchEntity();
+            entity.setId(match.getId());
+            entity.setTournamentId(tournamentId);
+            entity.setPhase(match.getPhase());
+            entity.setContent(match);
+            return entity;
+        }).toList());
+    }
 }

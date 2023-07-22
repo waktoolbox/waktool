@@ -79,7 +79,7 @@ export default function TournamentMatchView() {
     function matchText() {
         if (!match || !tournament) return;
         const result: string[] = [];
-        if (match.pool !== undefined) {
+        if (match.pool) {
             // TODO later : clean this
             result.push(t('tournament.match.pool', {pool: match.pool + (match.phase === 1 ? 1 : 0)}))
         }

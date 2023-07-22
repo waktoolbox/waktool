@@ -12,9 +12,9 @@ public class TournamentMatch {
     String id;
     Instant date;
     boolean done;
-    int pool;
-    int phase;
-    int round;
+    Integer pool;
+    Integer phase;
+    Integer round;
     String teamA;
     String teamB;
     List<TournamentMatchRound> rounds;
