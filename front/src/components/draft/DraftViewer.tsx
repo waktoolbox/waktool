@@ -1,9 +1,9 @@
 import {DraftAction, DraftData, DraftTeam, DraftTeamInfo, DraftUser} from "../../chore/draft.ts";
 import {useEffect, useState} from "react";
 import {send, subscribeWithoutUserPrefix, unsubscribe} from "../../utils/socket.ts";
-import {useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {draftDataState} from "../../atoms/atoms-draft.ts";
-import {useParams} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -60,8 +60,9 @@ let controller: DataController;
 function DraftViewer() {
     const {t} = useTranslation();
     const {draftId} = useParams();
-    const draftData = useRecoilValue(draftDataState);
+    const [draftData, setDraftData] = useRecoilState(draftDataState);
     const whoAmI = useRecoilValue(socketWhoAmIState);
+    const location = useLocation();
 
     // Remote data
     const [users, setUsers] = useState<DraftUser[]>([]);
@@ -82,6 +83,12 @@ function DraftViewer() {
     const [pickedBreed, setPickedBreed] = useState<Breeds | undefined>(undefined);
     const [hoveredBreed, setHoveredBreed] = useState<Breeds | undefined>(undefined);
     const [usersToAssign, setUsersToAssign] = useState<DraftUser[]>([]);
+
+    useEffect(() => {
+        if (location.pathname !== "/draft/" + draftId) {
+            setDraftData(undefined)
+        }
+    }, [location.pathname]);
 
     useEffect(() => {
         if (!draftData) return;
