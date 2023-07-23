@@ -2,6 +2,7 @@ package com.waktoolbox.waktool.api.tournament;
 
 import com.waktoolbox.waktool.api.models.AdminMatchDateRequest;
 import com.waktoolbox.waktool.api.models.SuccessResponse;
+import com.waktoolbox.waktool.domain.controllers.draft.DraftManager;
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseController;
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseControllerFactory;
 import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
@@ -28,6 +29,7 @@ import java.util.Optional;
 public class TournamentAdminController {
     private static final SecureRandom RANDOM = new SecureRandom();
 
+    private final DraftManager _draftManager;
     private final DraftRepository _draftRepository;
     private final TournamentRepository _tournamentRepository;
     private final TournamentMatchRepository _tournamentMatchRepository;
@@ -143,10 +145,12 @@ public class TournamentAdminController {
         if (optMatchRound.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
 
         TournamentMatchRound matchRound = optMatchRound.get();
+        matchRound.setDraftDate(null);
         matchRound.setTeamADraft(null);
         matchRound.setTeamBDraft(null);
 
         _draftRepository.delete(matchRound.getDraftId());
+        _draftManager.removeDraft(matchRound.getDraftId());
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }

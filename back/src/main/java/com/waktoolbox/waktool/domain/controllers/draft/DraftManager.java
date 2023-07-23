@@ -29,6 +29,10 @@ public class DraftManager {
         return Optional.ofNullable(_users.get(id));
     }
 
+    public boolean hasDraft(String id) {
+        return _currentDrafts.containsKey(id) || _draftRepository.exists(id);
+    }
+
     public Draft userRequestDraft(DraftUser user, String draftId) {
         if (this._currentDrafts.containsKey(draftId)) {
             return joinDraft(user, draftId);
@@ -59,6 +63,12 @@ public class DraftManager {
         DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
         _currentDrafts.put(draft.getId(), controller);
         return joinDraft(user, draft.getId());
+    }
+
+    public void createDraftByServer(Draft draft) {
+        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        _currentDrafts.put(draft.getId(), controller);
+        saveDraft(controller);
     }
 
     private Draft joinDraft(DraftUser user, String draftId) {
@@ -124,5 +134,12 @@ public class DraftManager {
         if (!user.hasDrafts()) {
             _users.remove(user.getId());
         }
+    }
+
+    public void removeDraft(String draftId) {
+        if (!_currentDrafts.containsKey(draftId)) return;
+
+        DraftController removed = _currentDrafts.remove(draftId);
+        removed.getDraft().getUsers().forEach(user -> user.removeDraft(draftId));
     }
 }

@@ -104,7 +104,11 @@
       "arbitration": "Arbitrage",
       "bo": "BO {{nb}}",
       "draft": {
-        "teamA": "Équipe A"
+        "teamA": "Équipe A",
+        "goTo": "Rejoindre la draft",
+        "goToDraftTeamA": "Rejoindre en tant qu'équipe A",
+        "goToDraftTeamB": "Rejoindre en tant qu'équipe B",
+        "notStartedYet": "La draft n'a pas encore commencé"
       },
       "fightTurns": "{{nb}} tours",
       "live": "Live",

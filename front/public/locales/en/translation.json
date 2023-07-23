@@ -104,7 +104,11 @@
       "arbitration": "Arbitration",
       "bo": "BO {{nb}}",
       "draft": {
-        "teamA": "Team A"
+        "teamA": "Team A",
+        "goTo": "Join draft",
+        "goToDraftTeamA": "Join draft as Team A",
+        "goToDraftTeamB": "Join draft as Team B",
+        "notStartedYet": "Draft has not started yet"
       },
       "fightTurns": "{{nb}} turns",
       "live": "Live",

@@ -28,7 +28,7 @@ public class DraftController {
      * Call only once to initialize the draft after loading from database
      */
     public void restore() {
-        _draft.getHistory().forEach(this::processAction);
+        _draft.getHistory().forEach(this::computeAction);
     }
 
     /**
@@ -75,7 +75,7 @@ public class DraftController {
 
         int currentAction = _draft.getCurrentAction();
 
-        processAction(action);
+        doProcessAction(action);
         _notifier.onAction(action, currentAction);
         return true;
     }
@@ -155,7 +155,13 @@ public class DraftController {
                 });
     }
 
-    private void processAction(DraftAction action) {
+    private void doProcessAction(DraftAction action) {
+        computeAction(action);
+        _draft.getHistory().add(action);
+        _draft.setCurrentAction(_draft.getCurrentAction() + 1);
+    }
+
+    private void computeAction(DraftAction action) {
         switch (action.getType()) {
             case PICK -> {
                 lockForAppropriateTeam(action);
@@ -168,8 +174,6 @@ public class DraftController {
             case BAN -> lockForAppropriateTeam(action);
             default -> throw new IllegalStateException("Unexpected action type: " + action.getType());
         }
-        _draft.getHistory().add(action);
-        _draft.setCurrentAction(_draft.getCurrentAction() + 1);
     }
 
     private void lockForAppropriateTeam(DraftAction action) {

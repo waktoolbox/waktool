@@ -1,5 +1,6 @@
 import {detch, gfetch, pfetch, putFetch} from "../utils/fetch-utils.ts";
 import {TournamentTeamModel} from "../chore/tournament.ts";
+import {DraftTeam} from "../chore/draft.ts";
 
 
 export async function tournamentLoader({params}: { params: { id?: string } }) {
@@ -106,4 +107,8 @@ export async function refereeRoundRerollMap(tournamentId: string, matchId: strin
 
 export async function refereeRoundResetDraft(tournamentId: string, matchId: string, round: number) {
     return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/referee-reset-draft`, {});
+}
+
+export async function userStartDraft(tournamentId: string, matchId: string, round: number, team: DraftTeam | undefined) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/user-start-draft`, {team: team});
 }

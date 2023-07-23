@@ -15,7 +15,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LooksOneIcon from '@mui/icons-material/LooksOne';
 
-import {Link, useLoaderData, useParams} from "react-router-dom";
+import {Link, useLoaderData, useNavigate, useParams} from "react-router-dom";
 import {SyntheticEvent, useEffect, useState} from "react";
 import {
     getMatch,
@@ -25,7 +25,8 @@ import {
     refereeSetMeAsReferee,
     streamerRemoveStreamer,
     streamerSetMeAsStreamer,
-    teamSearch
+    teamSearch,
+    userStartDraft
 } from "../../services/tournament.ts";
 import {TournamentDefinition, TournamentMatchModel, TournamentMatchRoundModel} from "../../chore/tournament.ts";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
@@ -44,6 +45,7 @@ type LoaderResponse = {
 }
 
 export default function TournamentMatchView() {
+    const navigate = useNavigate();
     const {t} = useTranslation();
     const {id, matchId} = useParams();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
@@ -118,8 +120,14 @@ export default function TournamentMatchView() {
         setTab(newTab);
     }
 
-    function startDraft(_: DraftTeam | undefined) {
-        // TODO maybe be to this here
+    function startDraft(draftTeam: DraftTeam | undefined) {
+        userStartDraft(id || "", matchId || "", tab, draftTeam).then(response => {
+            if (!response.id) {
+                // TODO manage error
+                return;
+            }
+            navigate(`/draft/${response.id}`)
+        })
     }
 
     function notificationPopup(response: { success: boolean }) {
@@ -166,10 +174,10 @@ export default function TournamentMatchView() {
         });
     }
 
-    function setAdminMatchDate(newDate: Dayjs) {
+    function setAdminMatchDate(newDate: Dayjs | null) {
         setMatch({
             ...match,
-            date: newDate.toISOString()
+            date: newDate?.toISOString()
         } as TournamentMatchModel)
     }
 
@@ -336,33 +344,32 @@ export default function TournamentMatchView() {
                                 {/*TODO v2 bind draft link & draft results & winner */}
                                 <Grid container>
                                     <Grid item xs={12}>
-                                        {((!fight.teamADraft && fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString() && (!fight.draftFirstPicker && (match.teamA === myTeam?.id || match.teamB === myTeam?.id))) || (fight.draftId && !fight.teamADraft)) &&
-                                            <Button sx={{width: "50%", pt: 2, pb: 2}} disabled={!fight.draftDate}
+                                        {!match.done && match.date && !fight.teamADraft && !fight.draftFirstPicker && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && (fight.draftDate || (match.teamA === myTeam?.id || match.teamB === myTeam?.id)) &&
+                                            <Button sx={{width: "50%", pt: 2, pb: 2}} variant="contained"
                                                     onClick={() => startDraft(undefined)}>
-                                                {t('tournament.match.goToDraft')}
+                                                {t('tournament.match.draft.goTo')}
                                             </Button>
                                         }
-                                        {fight.draftFirstPicker && !fight.draftId && !fight.teamADraft && fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString() && fight.draftFirstPicker === myTeam?.id &&
+                                        {!match.done && match.date && !fight.teamADraft && fight.draftFirstPicker && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && fight.draftFirstPicker === myTeam?.id &&
                                             <>
                                                 <Button sx={{width: "40%", pt: 2, pb: 2, mr: 1}}
                                                         disabled={!fight.draftDate}
                                                         onClick={() => startDraft(DraftTeam.TEAM_A)}>
-                                                    {t('tournament.match.goToDraftTeamA')}
+                                                    {t('tournament.match.draft.goToDraftTeamA')}
                                                 </Button>
                                                 <Button sx={{width: "40%", pt: 2, pb: 2, ml: 1}}
                                                         disabled={!fight.draftDate}
                                                         onClick={() => startDraft(DraftTeam.TEAM_B)}>
-                                                    {t('tournament.match.goToDraftTeamB')}
+                                                    {t('tournament.match.draft.goToDraftTeamB')}
                                                 </Button>
                                             </>
                                         }
-                                        {!fight.teamADraft && ((fight.draftDate && !fight.draftId && ((match.teamA !== myTeam?.id && match.teamB !== myTeam?.id && !fight.draftFirstPicker)
-                                                || (fight.draftFirstPicker && fight.draftFirstPicker !== myTeam?.id)))) &&
+                                        {!match.done && !fight.teamADraft && !fight.draftDate &&
                                             <Typography
-                                                variant="h5">{t('tournament.display.match.draftNotStartedYet')}</Typography>
+                                                variant="h5">{t('tournament.match.draft.notStartedYet')}</Typography>
                                         }
-                                        {!fight.teamADraft && fight.draftDate && Date.parse(fight.draftDate).toString() > Date.now().toString() &&
-                                            <Typography variant="h5">{t('tournament.display.match.draftDate', {
+                                        {!match.done && !fight.teamADraft && fight.draftDate && Date.parse(fight.draftDate).toString() > Date.now().toString() &&
+                                            <Typography variant="h5">{t('date', {
                                                 date: Date.parse(fight.draftDate),
                                                 formatParams: dateFormat
                                             })}</Typography>
