@@ -28,6 +28,11 @@ public class DraftController {
      * Call only once to initialize the draft after loading from database
      */
     public void restore() {
+        _draft.getUsers().forEach(user -> user.setPresent(false));
+        _draft.getTeamA().forEach(user -> user.setPresent(false));
+        _draft.getTeamB().forEach(user -> user.setPresent(false));
+        _draft.setTeamAReady(false);
+        _draft.setTeamBReady(false);
         _draft.getHistory().forEach(this::computeAction);
     }
 
@@ -108,7 +113,6 @@ public class DraftController {
         final Byte[] banned = _draft.getHistory().stream()
                 .filter(a -> a.getTeam() == team && a.getType() == DraftActionType.BAN)
                 .map(DraftAction::getBreed)
-                .distinct()
                 .toArray(Byte[]::new);
 
         return new DraftTeamResult(picked, banned);

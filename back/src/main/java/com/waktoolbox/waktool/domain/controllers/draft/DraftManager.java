@@ -1,7 +1,11 @@
 package com.waktoolbox.waktool.domain.controllers.draft;
 
 import com.waktoolbox.waktool.domain.models.drafts.*;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchAndTournamentId;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 import com.waktoolbox.waktool.domain.repositories.DraftRepository;
+import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ public class DraftManager {
     private final Map<String, DraftUser> _users = new HashMap<>();
     private final DraftRepository _draftRepository;
     private final DraftNotifierFactory _draftNotifierFactory;
+    private final TournamentMatchRepository _matchRepository;
 
     @Scheduled(fixedDelay = 60 * 1000)
     private void cleanup() {
@@ -94,8 +99,7 @@ public class DraftManager {
         }
 
         if (draft.isEnded()) {
-            // TODO implement me
-            // saveDraftEnd(draft)
+            saveDraftEnd(draft);
             _currentDrafts.remove(draftId);
             draft.getDraft().getUsers().forEach(u -> removeDraftFromUser(u, draftId));
         }
@@ -127,6 +131,31 @@ public class DraftManager {
 
     private void saveDraft(DraftController draft) {
         _draftRepository.save(draft.getDraft());
+    }
+
+    private void saveDraftEnd(DraftController controller) {
+        Draft draft = controller.getDraft();
+        if (!draft.getConfiguration().isProvidedByServer()) return;
+
+        String[] matchIdAndRound = draft.getId().split("_");
+        String matchId = matchIdAndRound[0];
+        TournamentMatchAndTournamentId matchAndTournamentId = _matchRepository.getMatchAndTournamentId(matchId);
+        TournamentMatch match = matchAndTournamentId.match();
+        if (match == null) return;
+
+        int round = Integer.parseInt(matchIdAndRound[1]);
+        Optional<TournamentMatchRound> optMatchRound = match.getRounds().stream().filter(r -> r.getRound() == round).findFirst();
+        if (optMatchRound.isEmpty()) return;
+        TournamentMatchRound matchRound = optMatchRound.get();
+
+        DraftTeamResult draftTeamAResult = controller.computeDraftResult(DraftTeam.TEAM_A);
+        DraftTeamResult draftTeamBResult = controller.computeDraftResult(DraftTeam.TEAM_B);
+
+        boolean teamAIsDraftTeamA = match.getTeamA().equals(draft.getTeamAInfo().getId());
+        matchRound.setDraftTeamA(draft.getTeamAInfo().getId());
+        matchRound.setTeamADraft(teamAIsDraftTeamA ? draftTeamAResult : draftTeamBResult);
+        matchRound.setTeamBDraft(teamAIsDraftTeamA ? draftTeamBResult : draftTeamAResult);
+        _matchRepository.save(matchAndTournamentId.tournamentId(), match);
     }
 
     private void removeDraftFromUser(DraftUser user, String draftId) {

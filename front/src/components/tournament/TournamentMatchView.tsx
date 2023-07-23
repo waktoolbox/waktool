@@ -344,7 +344,7 @@ export default function TournamentMatchView() {
                                 {/*TODO v2 bind draft link & draft results & winner */}
                                 <Grid container>
                                     <Grid item xs={12}>
-                                        {!match.done && match.date && fight.draftFirstPicker &&
+                                        {!match.done && match.date && fight.draftFirstPicker && !fight.teamADraft &&
                                             <Typography sx={{mb: 2}}
                                                         variant="h5">{t('tournament.match.draft.teamHasPriority', {team: teams.get(fight.draftFirstPicker)})}</Typography>
                                         }

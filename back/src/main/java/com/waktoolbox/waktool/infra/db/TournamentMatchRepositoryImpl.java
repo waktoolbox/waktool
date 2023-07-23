@@ -3,6 +3,7 @@ package com.waktoolbox.waktool.infra.db;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.MatchesSearchParameters;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.MatchesSearchType;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchAndTournamentId;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -41,6 +42,11 @@ public class TournamentMatchRepositoryImpl implements TournamentMatchRepository 
     @Override
     public TournamentMatch getMatch(String matchId) {
         return _repository.findById(matchId).map(TournamentMatchEntity::getContent).orElse(null);
+    }
+
+    @Override
+    public TournamentMatchAndTournamentId getMatchAndTournamentId(String matchId) {
+        return _repository.findById(matchId).map(e -> new TournamentMatchAndTournamentId(e.content, e.tournamentId)).orElse(null);
     }
 
     @Override
