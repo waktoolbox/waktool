@@ -76,7 +76,7 @@ function DraftViewer() {
     const [currentActionData, setCurrentActionData] = useState<DraftAction>({} as DraftAction)
 
     // Computed data
-    const [endReason, setEndReason] = useState(undefined)
+    const [endReason, setEndReason] = useState<string | undefined>(undefined)
     const [imDraftLeader, setImDraftLeader] = useState(false)
     const [myTeam, setMyTeam] = useState<DraftTeam | undefined>(undefined);
     const [pickedBreed, setPickedBreed] = useState<Breeds | undefined>(undefined);
@@ -146,6 +146,10 @@ function DraftViewer() {
                     controller.currentAction = (controller?.currentAction || 0) + 1;
                     setCurrentActionData(controller.data?.configuration?.actions[controller.currentAction] || undefined)
                     setCurrentAction(controller.currentAction)
+
+                    if (controller.currentAction >= controller.data?.configuration?.actions?.length) {
+                        setEndReason("draft.ended");
+                    }
                     break;
                 }
                 case "draft::teamReady": {
@@ -281,6 +285,11 @@ function DraftViewer() {
                             <Grid item xs={12} sx={{mt: 1}}>
                                 <Typography variant="h5">{t('draft.currentAction')}</Typography>
                                 {currentActionData && <DraftActionView action={currentActionData}/>}
+                            </Grid>
+                        }
+                        {endReason &&
+                            <Grid item xs={12} sx={{mt: 1}}>
+                                <Typography variant="h5">{t(endReason)}</Typography>
                             </Grid>
                         }
                         {currentActionData &&
