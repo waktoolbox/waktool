@@ -85,11 +85,14 @@ public class TournamentMatchController {
             if (!firstPickerTeam.getValidatedPlayers().contains(discordId.get()))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
+            Team otherTeam = _teamRepository.getTeam(match.getTeamA().equals(draftFirstPicker) ? match.getTeamB() : match.getTeamA()).orElse(null);
+            if (otherTeam == null) return ResponseEntity.badRequest().build();
+
             if (userStartDraftRequest.team() == DraftTeam.TEAM_A) {
                 teamA = firstPickerTeam;
-                teamB = _teamRepository.getTeam(match.getTeamB()).orElse(null);
+                teamB = otherTeam;
             } else {
-                teamA = _teamRepository.getTeam(match.getTeamA()).orElse(null);
+                teamA = otherTeam;
                 teamB = firstPickerTeam;
             }
         } else {

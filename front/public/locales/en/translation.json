@@ -108,7 +108,8 @@
         "goTo": "Join draft",
         "goToDraftTeamA": "Join draft as Team A",
         "goToDraftTeamB": "Join draft as Team B",
-        "notStartedYet": "Draft has not started yet"
+        "notStartedYet": "Draft has not started yet",
+        "teamHasPriority": "Team {{team}} can choose a side"
       },
       "fightTurns": "{{nb}} turns",
       "live": "Live",

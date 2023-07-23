@@ -344,29 +344,31 @@ export default function TournamentMatchView() {
                                 {/*TODO v2 bind draft link & draft results & winner */}
                                 <Grid container>
                                     <Grid item xs={12}>
-                                        {!match.done && match.date && !fight.teamADraft && !fight.draftFirstPicker && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && (fight.draftDate || (match.teamA === myTeam?.id || match.teamB === myTeam?.id)) &&
+                                        {!match.done && match.date && fight.draftFirstPicker &&
+                                            <Typography sx={{mb: 2}}
+                                                        variant="h5">{t('tournament.match.draft.teamHasPriority', {team: teams.get(fight.draftFirstPicker)})}</Typography>
+                                        }
+                                        {!match.done && match.date && !fight.teamADraft && (!fight.draftFirstPicker || fight.draftDate) && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && (fight.draftDate || (match.teamA === myTeam?.id || match.teamB === myTeam?.id)) &&
                                             <Button sx={{width: "50%", pt: 2, pb: 2}} variant="contained"
                                                     onClick={() => startDraft(undefined)}>
                                                 {t('tournament.match.draft.goTo')}
                                             </Button>
                                         }
-                                        {!match.done && match.date && !fight.teamADraft && fight.draftFirstPicker && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && fight.draftFirstPicker === myTeam?.id &&
+                                        {!match.done && match.date && !fight.teamADraft && fight.draftFirstPicker && !fight.draftDate && fight.draftFirstPicker === myTeam?.id &&
                                             <>
-                                                <Button sx={{width: "40%", pt: 2, pb: 2, mr: 1}}
-                                                        disabled={!fight.draftDate}
+                                                <Button sx={{width: "40%", pt: 2, pb: 2, mr: 1}} variant="contained"
                                                         onClick={() => startDraft(DraftTeam.TEAM_A)}>
                                                     {t('tournament.match.draft.goToDraftTeamA')}
                                                 </Button>
-                                                <Button sx={{width: "40%", pt: 2, pb: 2, ml: 1}}
-                                                        disabled={!fight.draftDate}
+                                                <Button sx={{width: "40%", pt: 2, pb: 2, ml: 1}} variant="contained"
                                                         onClick={() => startDraft(DraftTeam.TEAM_B)}>
                                                     {t('tournament.match.draft.goToDraftTeamB')}
                                                 </Button>
                                             </>
                                         }
                                         {!match.done && !fight.teamADraft && !fight.draftDate &&
-                                            <Typography
-                                                variant="h5">{t('tournament.match.draft.notStartedYet')}</Typography>
+                                            <Typography sx={{mt: 2}}
+                                                        variant="h5">{t('tournament.match.draft.notStartedYet')}</Typography>
                                         }
                                         {!match.done && !fight.teamADraft && fight.draftDate && Date.parse(fight.draftDate).toString() > Date.now().toString() &&
                                             <Typography variant="h5">{t('date', {
