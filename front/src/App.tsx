@@ -1,4 +1,6 @@
 import './App.css'
+import {LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
 import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import theme from "./utils/theme.ts";
 import Footer from "./components/Footer.tsx";
@@ -12,11 +14,13 @@ function App() {
         <div className="App">
             <RecoilRoot>
                 <Suspense fallback={<div>Loading...</div>}>
-                    <ThemeProvider theme={theme}>
-                        <HeaderBar/>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <ThemeProvider theme={theme}>
+                            <HeaderBar/>
                             <Outlet/>
-                        <Footer/>
-                    </ThemeProvider>
+                            <Footer/>
+                        </ThemeProvider>
+                    </LocalizationProvider>
                 </Suspense>
             </RecoilRoot>
         </div>

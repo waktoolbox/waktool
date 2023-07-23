@@ -1,6 +1,9 @@
+import dayjs, {Dayjs} from 'dayjs';
+
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
 import Tab from "@mui/material/Tab";
@@ -14,15 +17,27 @@ import LooksOneIcon from '@mui/icons-material/LooksOne';
 
 import {Link, useLoaderData, useParams} from "react-router-dom";
 import {SyntheticEvent, useEffect, useState} from "react";
-import {getMatch, teamSearch} from "../../services/tournament.ts";
+import {
+    getMatch,
+    refereeRoundRerollMap,
+    refereeRoundResetDraft,
+    refereeSetMatchDate,
+    refereeSetMeAsReferee,
+    streamerRemoveStreamer,
+    streamerSetMeAsStreamer,
+    teamSearch
+} from "../../services/tournament.ts";
 import {TournamentDefinition, TournamentMatchModel, TournamentMatchRoundModel} from "../../chore/tournament.ts";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournament.ts";
 import {useTranslation} from "react-i18next";
 import {dateFormat} from "../../utils/date.ts";
 import {accountCacheState, streamerCacheState} from "../../atoms/atoms-accounts.ts";
 import {DraftTeam} from "../../chore/draft.ts";
 import {streamersLoader} from "../../services/account.ts";
+import TournamentAdminDialog from "./admin/TournamentAdminDialog.tsx";
+import {loginIdState} from "../../atoms/atoms-header.ts";
+import {snackState} from "../../atoms/atoms-snackbar.ts";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -37,6 +52,8 @@ export default function TournamentMatchView() {
     const myTeam = useRecoilValue(myTournamentTeamState);
     const [teams, setTeamsCache] = useRecoilState(teamCacheState);
     const [streamerCache, setStreamerCache] = useRecoilState(streamerCacheState);
+    const setSnackValue = useSetRecoilState(snackState);
+    const me = useRecoilValue(loginIdState);
 
     const [tab, setTab] = useState(0);
     const [match, setMatch] = useState<TournamentMatchModel | undefined>(undefined);
@@ -103,6 +120,75 @@ export default function TournamentMatchView() {
 
     function startDraft(_: DraftTeam | undefined) {
         // TODO maybe be to this here
+    }
+
+    function notificationPopup(response: { success: boolean }) {
+        setSnackValue({
+            severity: response.success ? "info" : "error",
+            message: t(response.success ? "success" : "failure") as string,
+            open: true,
+        })
+    }
+
+    function setMeAsReferee() {
+        refereeSetMeAsReferee(id || "", matchId || "").then(response => {
+            if (response.success) {
+                setMatch({
+                    ...match,
+                    referee: me
+                } as TournamentMatchModel)
+            }
+            notificationPopup(response)
+        });
+    }
+
+    function setMeAsStreamer() {
+        streamerSetMeAsStreamer(id || "", matchId || "").then(response => {
+            if (response.success) {
+                setMatch({
+                    ...match,
+                    streamer: me
+                } as TournamentMatchModel)
+            }
+            notificationPopup(response)
+        });
+    }
+
+    function removeStreamer() {
+        streamerRemoveStreamer(id || "", matchId || "").then(response => {
+            if (response.success) {
+                setMatch({
+                    ...match,
+                    streamer: undefined
+                } as TournamentMatchModel)
+            }
+            notificationPopup(response)
+        });
+    }
+
+    function setAdminMatchDate(newDate: Dayjs) {
+        setMatch({
+            ...match,
+            date: newDate.toISOString()
+        } as TournamentMatchModel)
+    }
+
+    function validateMatchDate() {
+        refereeSetMatchDate(id || "", matchId || "", match?.date || "").then(notificationPopup);
+    }
+
+    function roundRerollMap() {
+        refereeRoundRerollMap(id || "", matchId || "", tab).then(response => {
+            notificationPopup(response);
+            window.location.reload();
+        });
+    }
+
+    function roundResetDraft() {
+        refereeRoundResetDraft(id || "", matchId || "", tab).then(response => {
+            notificationPopup(response);
+            window.location.reload();
+        });
     }
 
 
@@ -343,6 +429,15 @@ export default function TournamentMatchView() {
                                                 </Button>
                                             </a>
                                         }
+                                        {!match.streamer && me && tournament.streamers?.find(streamer => streamer === me) && (
+                                            <Button sx={{backgroundColor: "#6441A5", width: "100%", color: "#fefffa"}}
+                                                    onClick={() => setMeAsStreamer()}>{t('tournament.admin.setMeAsStreamer')}</Button>
+                                        )}
+                                        {match.streamer && me && match?.streamer === me && (
+                                            <Button sx={{width: "100%", color: "#fefffa"}} color="error"
+                                                    variant="contained"
+                                                    onClick={() => removeStreamer()}>{t('tournament.admin.removeMeAsStreamer')}</Button>
+                                        )}
                                     </CardContent>
                                 </Card>
                                 <Card sx={{backgroundColor: '#213943', borderRadius: 3, textAlign: "start", mb: 2}}>
@@ -362,6 +457,59 @@ export default function TournamentMatchView() {
                     </Grid>
                 </>
             }
+
+            <div hidden={!(me && tournament.referees?.find(referee => referee === me))}
+                 style={{position: 'fixed', bottom: 3, right: 3}}>
+                <TournamentAdminDialog buttonText={t('tournament.admin.matchAdmin')}
+                                       title={t('tournament.admin.matchAdmin')}>
+                    <Card>
+                        <CardContent>
+                            <Grid container sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, mb: 1}}>
+                                <Grid item xs={6}>
+                                    <Button variant="outlined" sx={{m: 1}}
+                                            onClick={() => setMeAsReferee()}>{t('tournament.admin.setMeAsReferee')}</Button>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Button variant="contained" sx={{m: 1}} color="error"
+                                            onClick={() => removeStreamer()}>{t('tournament.admin.removeStreamer')}</Button>
+                                </Grid>
+                                <Grid item xs={6} hidden={match?.referee !== me}>
+                                    <DateTimePicker label={t('tournament.admin.matchDate')} value={dayjs(match?.date)}
+                                                    onChange={(newDate) => setAdminMatchDate(newDate)}
+                                                    views={['year', 'day', 'hours', 'minutes', 'seconds']}/>
+                                </Grid>
+                                <Grid item xs={6} hidden={match?.referee !== me}>
+                                    <Button variant="outlined" sx={{m: 1}}
+                                            onClick={() => validateMatchDate()}>{t('tournament.admin.validateMatchDate')}</Button>
+                                </Grid>
+                            </Grid>
+
+
+                            <Grid container sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3}}
+                                  hidden={match?.referee !== me}>
+                                <Grid item xs={12}>
+                                    <Tabs value={tab} onChange={onTabChange}>
+                                        {match && match.rounds && match.rounds.map((_, index) => (
+                                            <Tab key={index} label={t('tournament.match.matchNb', {nb: index + 1})}/>
+                                        ))}
+                                    </Tabs>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                    <Button variant="contained" sx={{m: 1}} color="error"
+                                            onClick={() => roundRerollMap()}>{t('tournament.admin.rerollMap')}</Button>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Button variant="contained" sx={{m: 1}} color="error"
+                                            onClick={() => roundResetDraft()}>{t('tournament.admin.resetDraft')}</Button>
+                                </Grid>
+                            </Grid>
+
+
+                        </CardContent>
+                    </Card>
+                </TournamentAdminDialog>
+            </div>
         </Grid>
     )
 }

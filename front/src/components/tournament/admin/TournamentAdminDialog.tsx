@@ -4,19 +4,21 @@ import DialogTitle from "@mui/material/DialogTitle";
 import {ReactComponentElement, useState} from "react";
 
 type TournamentAdminDialogProps = {
-    component: ReactComponentElement<any> | undefined
+    buttonText: string
+    title: string
+    children: ReactComponentElement<any> | undefined
 }
 export default function TournamentAdminDialog(props: TournamentAdminDialogProps) {
-    const {component} = props
+    const {buttonText, title, children} = props
     const [open, setOpen] = useState(false);
     return (
         <div>
             <Button variant="outlined" onClick={() => setOpen(true)}>
-                Open admin
+                {buttonText}
             </Button>
             <Dialog onClose={() => setOpen(false)} open={open}>
-                <DialogTitle>Tournament admin</DialogTitle>
-                {component}
+                <DialogTitle>{title}</DialogTitle>
+                {children}
             </Dialog>
         </div>
     )

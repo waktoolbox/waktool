@@ -15,5 +15,7 @@ public interface TournamentMatchRepository {
 
     boolean isAllMatchesDone(String tournamentId, int phase, int round);
 
+    void save(String tournamentId, TournamentMatch match);
+
     void saveAll(String tournamentId, List<TournamentMatch> matchesToSave);
 }

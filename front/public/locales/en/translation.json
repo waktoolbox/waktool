@@ -49,6 +49,7 @@
     "too.big.catchPhrase": "Too long catch phrase (75 characters maximum)",
     "too.big.name": "Too long name (25 characters maximum)"
   },
+  "failure": "Failure",
   "footer": {
     "wakfu": "Wakfu is a MMORPG published by Ankama Studio. All rights reserved.\nThe \"Waktool\" website is an unofficial community fansite of the MMORPG Wakfu without any link to Ankama.",
     "login": "Please note! The Waktool team will never ask your login details."
@@ -77,6 +78,17 @@
   "save": "Save",
   "saved": "Saved",
   "tournament": {
+    "admin": {
+      "setMeAsReferee": "Set me as referee",
+      "setMeAsStreamer": "Set me as streamer",
+      "matchAdmin": "Match admin",
+      "matchDate": "Match date",
+      "removeMeAsStreamer": "Remove me",
+      "removeStreamer": "Remove streamer",
+      "rerollMap": "Reroll map",
+      "resetDraft": "Reset draft",
+      "validateMatchDate": "Validate match date"
+    },
     "admins": "Organizers",
     "description": "Description",
     "display": {
@@ -159,5 +171,6 @@
       "leaveTeam": "Leave team"
     }
   },
-  "validate": "Validate"
+  "validate": "Validate",
+  "success": "Success"
 }

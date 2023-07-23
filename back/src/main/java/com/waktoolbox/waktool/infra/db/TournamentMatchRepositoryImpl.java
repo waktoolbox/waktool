@@ -49,6 +49,16 @@ public class TournamentMatchRepositoryImpl implements TournamentMatchRepository 
     }
 
     @Override
+    public void save(String tournamentId, TournamentMatch match) {
+        TournamentMatchEntity entity = new TournamentMatchEntity();
+        entity.setId(match.getId());
+        entity.setTournamentId(tournamentId);
+        entity.setPhase(match.getPhase());
+        entity.setContent(match);
+        _repository.save(entity);
+    }
+
+    @Override
     public void saveAll(String tournamentId, List<TournamentMatch> matchesToSave) {
         _repository.saveAll(matchesToSave.stream().map(match -> {
             TournamentMatchEntity entity = new TournamentMatchEntity();

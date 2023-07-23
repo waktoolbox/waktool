@@ -18,10 +18,22 @@ public interface TournamentSpringDataRepository extends CrudRepository<Tournamen
     String getRawTournamentStartDate(String id);
 
     @Query(value = """
-                SELECT COUNT(*) FROM tournaments t
+                SELECT COUNT(*) > 0 FROM tournaments t
                 WHERE t.id = :id AND jsonb_exists_any(t.content->('admins'), ARRAY[:user])
             """, nativeQuery = true)
-    int isAdmin(String id, String user);
+    boolean isAdmin(String id, String user);
+
+    @Query(value = """
+                SELECT COUNT(*) > 0 FROM tournaments t
+                WHERE t.id = :id AND jsonb_exists_any(t.content->('streamers'), ARRAY[:user])
+            """, nativeQuery = true)
+    boolean isStreamer(String id, String user);
+
+    @Query(value = """
+                SELECT COUNT(*) > 0 FROM tournaments t
+                WHERE t.id = :id AND jsonb_exists_any(t.content->('referees'), ARRAY[:user])
+            """, nativeQuery = true)
+    boolean isReferee(String id, String user);
 
     @Query(value = """
                         SELECT id as id,

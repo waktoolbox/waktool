@@ -154,6 +154,10 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         for (int round = 0; round < roundsCount; round++) {
             TournamentMatchRound matchRound = new TournamentMatchRound();
 
+            if (round == 0) {
+                matchRound.setDraftFirstPicker(tournamentMatch.getTeamA());
+            }
+
             matchRound.setMap(rollMap());
             matchRound.setRound(round);
             matchRound.setDraftId(tournamentMatch.getId() + "_" + round);
@@ -170,8 +174,9 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
 
             if (round == 0) {
                 matchRound.setWinner(noLoss.getId());
+            } else if (round == 1) {
+                matchRound.setDraftFirstPicker(RANDOM.nextInt(2) == 0 ? noLoss.getId() : oneLoss.getId());
             }
-            // TODO priority on draft on round 1/2 for team with 1 loss ?
             matchRound.setMap(rollMap());
             matchRound.setRound(round);
             matchRound.setDraftId(tournamentMatch.getId() + "_" + round);

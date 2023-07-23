@@ -29,6 +29,11 @@ public class DraftRepositoryImpl implements DraftRepository {
     }
 
     @Override
+    public void delete(String id) {
+        _draftRepository.deleteById(id);
+    }
+
+    @Override
     public Draft load(String id) {
         return _draftRepository
                 .findById(id)

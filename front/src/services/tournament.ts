@@ -83,3 +83,27 @@ export async function getTeamMatches(tournamentId: string, teamId: string) {
 export async function postGoToNextPhase(tournamentId: string) {
     return await pfetch(`/api/tournaments/${tournamentId}/admin-go-to-next-phase`, {});
 }
+
+export async function streamerSetMeAsStreamer(tournamentId: string, matchId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/set-me-as-streamer`, {});
+}
+
+export async function streamerRemoveStreamer(tournamentId: string, matchId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/remove-streamer`, {});
+}
+
+export async function refereeSetMeAsReferee(tournamentId: string, matchId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/set-me-as-referee`, {});
+}
+
+export async function refereeSetMatchDate(tournamentId: string, matchId: string, date: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/referee-set-match-date`, {date: date});
+}
+
+export async function refereeRoundRerollMap(tournamentId: string, matchId: string, round: number) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/referee-reroll-map`, {});
+}
+
+export async function refereeRoundResetDraft(tournamentId: string, matchId: string, round: number) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/referee-reset-draft`, {});
+}

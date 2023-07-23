@@ -10,6 +10,10 @@ public interface TournamentRepository {
 
     boolean isAdmin(String id, String user);
 
+    boolean isStreamer(String id, String user);
+
+    boolean isReferee(String id, String user);
+
     LightTournament getFeaturedTournament();
 
     Optional<Tournament> getTournament(String id);
