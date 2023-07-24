@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -127,6 +124,10 @@ public class DraftManager {
         if (!_users.containsKey(id)) return;
         DraftUser user = _users.remove(id);
         user.setPresent(false);
+        user.getDrafts().stream()
+                .map(_currentDrafts::get)
+                .filter(Objects::nonNull)
+                .forEach(d -> d.onUserDisconnected(user));
     }
 
     private void saveDraft(DraftController draft) {

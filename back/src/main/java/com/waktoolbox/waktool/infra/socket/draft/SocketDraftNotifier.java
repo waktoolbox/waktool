@@ -36,6 +36,11 @@ public class SocketDraftNotifier implements DraftNotifier {
     }
 
     @Override
+    public void onUserLeave(DraftUser user) {
+        send(new DraftNotificationWrapper("draft::userLeft", user.getId()));
+    }
+
+    @Override
     public void onUserAssigned(DraftUser user, DraftTeam team) {
         send(new DraftNotificationWrapper("draft::userAssigned", new DraftUserAssigned(user, team)));
     }

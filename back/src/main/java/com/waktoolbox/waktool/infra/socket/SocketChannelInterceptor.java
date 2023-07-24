@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import static com.waktoolbox.waktool.utils.JwtHelper.DISCORD_ID;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class SocketChannelInterceptor implements ChannelInterceptor {
         if (optAttributes.isEmpty()) return new User(UserType.ANONYMOUS_USER, WRAPPER_TO_SIMP_ID.apply(wrapper));
         return optAttributes.filter(ConcurrentHashMap.class::isInstance)
                 .map(a -> (ConcurrentHashMap<?, ?>) a)
-                .map(a -> a.get("discordId"))
+                .map(a -> a.get(DISCORD_ID))
                 .filter(a -> a instanceof Optional b && b.isPresent())
                 .map(a -> (Optional<String>) a)
                 .map(Optional::get)

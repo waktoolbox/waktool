@@ -43,10 +43,27 @@ public class DraftController {
      */
     public void onUserJoin(DraftUser user) {
         if (!_draft.getUsers().contains(user)) _draft.getUsers().add(user);
+        else
+            _draft.getUsers().stream().filter(u -> Objects.equals(u.getId(), user.getId())).findFirst().ifPresent(u -> u.setPresent(true));
+
+        if (_draft.getTeamA().contains(user))
+            _draft.getTeamA().stream().filter(u -> Objects.equals(u.getId(), user.getId())).findFirst().ifPresent(u -> u.setPresent(true));
+        if (_draft.getTeamB().contains(user))
+            _draft.getTeamB().stream().filter(u -> Objects.equals(u.getId(), user.getId())).findFirst().ifPresent(u -> u.setPresent(true));
+
         _notifier.onUserJoin(user);
 
         DraftTeam userTeam = getUserTeam(user.getId());
         if (userTeam != DraftTeam.NONE) onUserAssigned(user, userTeam);
+    }
+
+    public void onUserDisconnected(DraftUser user) {
+        if (!_draft.isTeamAReady() || !_draft.isTeamBReady()
+                || _draft.getTeamA().stream().anyMatch(u -> Objects.equals(u.getId(), user.getId()))
+                || _draft.getTeamB().stream().anyMatch(u -> Objects.equals(u.getId(), user.getId()))
+        ) {
+            _notifier.onUserLeave(user);
+        }
     }
 
     /**
