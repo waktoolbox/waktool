@@ -1,10 +1,7 @@
 package com.waktoolbox.waktool.domain.controllers.tournaments.phases;
 
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseControllerContext;
-import com.waktoolbox.waktool.domain.models.tournaments.Team;
-import com.waktoolbox.waktool.domain.models.tournaments.TournamentData;
-import com.waktoolbox.waktool.domain.models.tournaments.TournamentPhaseData;
-import com.waktoolbox.waktool.domain.models.tournaments.TournamentPhaseDataTeam;
+import com.waktoolbox.waktool.domain.models.tournaments.*;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 
@@ -76,6 +73,13 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         if (teams.size() <= 4) {
             if (phaseData.getCurrentRound() == 1) {
                 processMatchesCreationBeforeFinals(phaseData, teams);
+                context.getTournamentPhaseRepository().save(tournamentData);
+                return true;
+            }
+
+            if (phaseData.getCurrentRound() == 2) {
+                processMatchesCreationBeforeFinals(phaseData, teams.stream().filter(team -> team.getLost() == 1).toList());
+                context.getTournamentPhaseRepository().save(tournamentData);
                 return true;
             }
 
@@ -124,9 +128,11 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
                 if (teamA == null) {
                     tournamentMatch.setWinner(teamB.getId());
                     tournamentMatch.setDone(true);
+                    addAWinTo(teamB.getId());
                 } else if (teamB == null) {
                     tournamentMatch.setWinner(teamA.getId());
                     tournamentMatch.setDone(true);
+                    addAWinTo(teamA.getId());
                 }
 
                 tournamentMatch.setRounds(createRoundsBeforeFinals(teams, tournamentMatch));
@@ -150,7 +156,9 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
 
     private List<TournamentMatchRound> createRoundsBeforeFinals(List<TournamentPhaseDataTeam> teams, TournamentMatch tournamentMatch) {
         List<TournamentMatchRound> rounds = new ArrayList<>();
-        int roundsCount = teams.size() <= 8 ? 3 : 1;
+        // TODO late: use config
+        int lowerTeamSizeRoundCount = teams.size() <= 4 ? 5 : 3;
+        int roundsCount = teams.size() <= 8 ? lowerTeamSizeRoundCount : 1;
         for (int round = 0; round < roundsCount; round++) {
             TournamentMatchRound matchRound = new TournamentMatchRound();
 
@@ -199,5 +207,17 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
             lostCount.put(team.getId(), team.getStats().getPlayed() - team.getStats().getVictories());
         }
         teamsToUpdate.forEach(team -> team.setLost(lostCount.get(team.getId())));
+    }
+
+    private void addAWinTo(String teamId) {
+        context.getTournamentTeamRepository().getTeam(teamId).ifPresent(team -> {
+            if (team.getStats() == null) {
+                team.setStats(new TeamStats());
+            }
+            TeamStats stats = team.getStats();
+            stats.setPlayed(Optional.ofNullable(stats.getPlayed()).orElse(0) + 1);
+            stats.setVictories(Optional.ofNullable(stats.getVictories()).orElse(0) + 1);
+            context.getTournamentTeamRepository().saveTeam(team);
+        });
     }
 }

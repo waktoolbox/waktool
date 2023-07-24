@@ -52,7 +52,7 @@ public class TournamentPhaseController {
     public boolean startNextRound() {
         int currentMaxPhase = getCurrentPhase();
         context.setPhase(currentMaxPhase);
-        TournamentPhase phase = context.getTournament().getPhases().get(currentMaxPhase);
+        TournamentPhase phase = context.getTournament().getPhases().get(Math.max(0, currentMaxPhase - 1));
         PhaseTypeController phaseTypeController = createPhaseTypeController(phase);
         return phaseTypeController.startNextRound();
     }
