@@ -64,12 +64,43 @@ export default createTheme({
             }
         },
 
+        MuiDayCalendar: {
+            styleOverrides: {
+                weekContainer: {
+                    color: '#fefffa',
+                    backgroundColor: '#213a41',
+                },
+
+                weekDayLabel: {
+                    color: '#fefffa',
+                    backgroundColor: '#213a41',
+                }
+            }
+        },
+
+        MuiDayCalendarHeader: {
+            styleOverrides: {
+                root: {
+                    color: '#fefffa',
+                    backgroundColor: '#213a41',
+                }
+            }
+        },
+
         MuiDivider: {
             styleOverrides: {
                 root: {
                     borderColor: '#284e51'
                 }
             },
+        },
+
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: '#1f333a',
+                }
+            }
         },
 
         MuiDrawer: {
@@ -88,6 +119,45 @@ export default createTheme({
                     "&.Mui-focused": {
                         color: '#fefffa'
                     },
+                }
+            }
+        },
+
+        MuiPickersArrowSwitcher: {
+            styleOverrides: {
+                button: {
+                    color: '#fefffa',
+                }
+            }
+        },
+
+        MuiPickersCalendarHeader: {
+            styleOverrides: {
+                root: {
+                    color: '#fefffa',
+                    backgroundColor: '#213a41',
+                },
+
+                switchViewIcon: {
+                    color: '#fefffa',
+                }
+            }
+        },
+
+        MuiPickersDay: {
+            styleOverrides: {
+                root: {
+                    color: '#fefffa',
+                    backgroundColor: '#1f333a',
+                }
+            }
+        },
+
+        MuiPickersPopper: {
+            styleOverrides: {
+                paper: {
+                    color: '#fefffa',
+                    backgroundColor: '#213a41',
                 }
             }
         },

@@ -3,6 +3,7 @@ package com.waktoolbox.waktool.infra.db;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.MatchesSearchParameters;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.MatchesSearchType;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchAndTournamentId;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -41,5 +42,37 @@ public class TournamentMatchRepositoryImpl implements TournamentMatchRepository 
     @Override
     public TournamentMatch getMatch(String matchId) {
         return _repository.findById(matchId).map(TournamentMatchEntity::getContent).orElse(null);
+    }
+
+    @Override
+    public TournamentMatchAndTournamentId getMatchAndTournamentId(String matchId) {
+        return _repository.findById(matchId).map(e -> new TournamentMatchAndTournamentId(e.content, e.tournamentId)).orElse(null);
+    }
+
+    @Override
+    public boolean isAllMatchesDone(String tournamentId, int phase, int round) {
+        return _repository.countAllNotDoneMatchesByTournamentIdAndPhaseAndRound(tournamentId, phase, String.valueOf(round)) == 0;
+    }
+
+    @Override
+    public void save(String tournamentId, TournamentMatch match) {
+        TournamentMatchEntity entity = new TournamentMatchEntity();
+        entity.setId(match.getId());
+        entity.setTournamentId(tournamentId);
+        entity.setPhase(match.getPhase());
+        entity.setContent(match);
+        _repository.save(entity);
+    }
+
+    @Override
+    public void saveAll(String tournamentId, List<TournamentMatch> matchesToSave) {
+        _repository.saveAll(matchesToSave.stream().map(match -> {
+            TournamentMatchEntity entity = new TournamentMatchEntity();
+            entity.setId(match.getId());
+            entity.setTournamentId(tournamentId);
+            entity.setPhase(match.getPhase());
+            entity.setContent(match);
+            return entity;
+        }).toList());
     }
 }

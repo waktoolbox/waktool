@@ -7,6 +7,8 @@ import com.waktoolbox.waktool.domain.models.drafts.DraftUser;
 public interface DraftNotifier {
     void onUserJoin(DraftUser user);
 
+    void onUserLeave(DraftUser user);
+
     void onUserAssigned(DraftUser user, DraftTeam team);
 
     void onAction(DraftAction action, int index);

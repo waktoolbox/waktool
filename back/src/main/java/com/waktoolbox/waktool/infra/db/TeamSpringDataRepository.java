@@ -70,4 +70,13 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
                     AND id IN :teamIds
             """, nativeQuery = true)
     List<LightTeam> getTeamsNames(String tournamentId, List<String> teamIds);
+
+    @Query(value = """
+                SELECT *
+                FROM teams
+                WHERE content->>('tournament') = :tournamentId
+            """, nativeQuery = true)
+    List<TeamEntity> getTeamsByTournamentId(String tournamentId);
+
+    List<TeamEntity> findAllByIdIn(List<String> teamIds);
 }

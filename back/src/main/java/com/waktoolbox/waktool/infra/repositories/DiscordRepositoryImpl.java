@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.OAuthResponse;
+import com.waktoolbox.waktool.domain.repositories.AccountRepository;
 import com.waktoolbox.waktool.domain.repositories.DiscordRepository;
+import com.waktoolbox.waktool.domain.repositories.NotificationRepository;
 import com.waktoolbox.waktool.domain.repositories.OAuthRepository;
-import com.waktoolbox.waktool.infra.repositories.models.DiscordOAuthTokenResponse;
-import com.waktoolbox.waktool.infra.repositories.models.DiscordUserInformationResponse;
+import com.waktoolbox.waktool.infra.repositories.models.*;
+import com.waktoolbox.waktool.utils.Translator;
+import com.waktoolbox.waktool.utils.TranslatorKey;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +27,17 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DiscordOAuthRepository implements DiscordRepository, OAuthRepository {
+public class DiscordRepositoryImpl implements DiscordRepository, NotificationRepository, OAuthRepository {
     private static final RestTemplate DEFAULT_REST_TEMPLATE = new RestTemplate();
+
+    private final AccountRepository _accountRepository;
+    private final Translator _translator;
 
     @Value("${oauth2.discord.token-uri}")
     private String _tokenUri;
@@ -143,5 +151,44 @@ public class DiscordOAuthRepository implements DiscordRepository, OAuthRepositor
             log.error("Unable to fetch guild member " + userId + " of guild " + guildId, e);
             return false;
         }
+    }
+
+    @Override
+    public void notifyUser(String userId, TranslatorKey key, Object... args) {
+        notifyUser(userId, key.getKey(), args);
+    }
+
+    @Override
+    public void notifyUser(String userId, String key, Object... args) {
+        _accountRepository.find(userId).ifPresent(account -> {
+            Locale locale = Optional.ofNullable(account.getLocale()).map(Locale::forLanguageTag).orElse(Locale.ENGLISH);
+            String message = _translator.get(key, locale, args);
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("Authorization", String.format("Bot %s", _botToken));
+
+            try {
+                DiscordDMChannel channel = _camelCaseMappingRestTemplate.exchange(
+                        _baseUrl + "/users/@me/channels",
+                        HttpMethod.POST,
+                        new HttpEntity<>(new DiscordCreateDM(userId), httpHeaders),
+                        DiscordDMChannel.class
+                ).getBody();
+
+                if (channel == null) {
+                    log.error("Can't find channel for user {}", userId);
+                    return;
+                }
+
+                _camelCaseMappingRestTemplate.exchange(
+                        _baseUrl + "/channels/" + channel.id() + "/messages",
+                        HttpMethod.POST,
+                        new HttpEntity<>(new DiscordMessage(message), httpHeaders),
+                        Void.class
+                );
+            } catch (Exception e) {
+                log.error("Unable to send message to user " + userId, e);
+            }
+        });
     }
 }

@@ -56,6 +56,8 @@ export interface TournamentTeamModel {
     catchPhrase: string;
     displayOnTeamList: boolean;
     stats?: TournamentStatsModel;
+    victories?: number; // light view
+    played?: number; // light view
 }
 
 export interface TournamentStatsModel {
@@ -99,8 +101,21 @@ export interface TournamentMatchRoundModel {
     teamAStats?: TournamentFightStatsModel;
     teamBDraft?: TournamentDraftResultModel;
     teamBStats?: TournamentFightStatsModel;
+    history?: TournamentMatchHistory;
     map?: number;
     winner?: string;
+}
+
+export interface TournamentMatchHistory {
+    turns: number;
+    players: string[];
+    entries: TournamentMatchHistoryEntry[];
+}
+
+export interface TournamentMatchHistoryEntry {
+    team?: string;
+    source?: number;
+    target?: number;
 }
 
 export interface TournamentDraftResultModel {
@@ -117,5 +132,6 @@ export interface TournamentFightStatsModel {
 export enum TournamentPhaseType {
     NONE,
     WAKFU_WARRIORS_ROUND_ROBIN,
-    WAKFU_WARRIORS_BRACKET_TOURNAMENT
+    WAKFU_WARRIORS_BRACKET_TOURNAMENT,
+    WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT
 }

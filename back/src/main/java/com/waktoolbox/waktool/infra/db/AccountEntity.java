@@ -37,4 +37,7 @@ public class AccountEntity {
 
     @Column
     String twitchUrl;
+
+    @Column
+    String locale;
 }

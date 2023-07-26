@@ -49,6 +49,7 @@
     "too.big.catchPhrase": "Too long catch phrase (75 characters maximum)",
     "too.big.name": "Too long name (25 characters maximum)"
   },
+  "failure": "Failure",
   "footer": {
     "wakfu": "Wakfu is a MMORPG published by Ankama Studio. All rights reserved.\nThe \"Waktool\" website is an unofficial community fansite of the MMORPG Wakfu without any link to Ankama.",
     "login": "Please note! The Waktool team will never ask your login details."
@@ -77,6 +78,27 @@
   "save": "Save",
   "saved": "Saved",
   "tournament": {
+    "admin": {
+      "draftFirstPickTeamA": "Team A choose it draft side",
+      "draftFirstPickTeamB": "Team B choose it draft side",
+      "draftFirstPickNone": "None choose it draft side",
+      "setMeAsReferee": "Set me as referee",
+      "setMeAsStreamer": "Set me as streamer",
+      "matchAdmin": "Match admin",
+      "matchDate": "Match date",
+      "matchWinnerTeamA": "Team A win match",
+      "matchWinnerTeamB": "Team B win match",
+      "removeMeAsStreamer": "Remove me",
+      "removeStreamer": "Remove streamer",
+      "rerollMap": "Reroll map",
+      "resetDraft": "Reset draft",
+      "roundTurnNumber": "Turn number",
+      "roundWinnerTeamA": "Team A win round",
+      "roundWinnerTeamB": "Team B win round",
+      "sendFightStats": "Send fight stats",
+      "validateMatchAndSendStats": "Validate match and compute stats",
+      "validateMatchDate": "Validate match date"
+    },
     "admins": "Organizers",
     "description": "Description",
     "display": {
@@ -92,7 +114,12 @@
       "arbitration": "Arbitration",
       "bo": "BO {{nb}}",
       "draft": {
-        "teamA": "Team A"
+        "teamA": "Team A",
+        "goTo": "Join draft",
+        "goToDraftTeamA": "Join draft as Team A",
+        "goToDraftTeamB": "Join draft as Team B",
+        "notStartedYet": "Draft has not started yet",
+        "teamHasPriority": "Team {{team}} can choose a side"
       },
       "fightTurns": "{{nb}} turns",
       "live": "Live",
@@ -159,5 +186,6 @@
       "leaveTeam": "Leave team"
     }
   },
-  "validate": "Validate"
+  "validate": "Validate",
+  "success": "Success"
 }

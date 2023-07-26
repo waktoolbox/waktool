@@ -5,7 +5,9 @@ import com.waktoolbox.waktool.domain.models.OAuthResponse;
 import com.waktoolbox.waktool.domain.repositories.AccountRepository;
 import com.waktoolbox.waktool.domain.repositories.OAuthRepository;
 import com.waktoolbox.waktool.utils.JwtHelper;
+import com.waktoolbox.waktool.utils.SpringLocaleResolver;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -33,17 +35,22 @@ public class OAuthController {
     private final AccountRepository _accountRepository;
     private final OAuthRepository _oAuthRepository;
     private final JwtHelper _jwtHelper;
+    private final SpringLocaleResolver _localeResolver;
 
     @GetMapping("/oauth/discord/redirect")
-    public ResponseEntity<Void> discordOAuth(@RequestParam String code) {
+    public ResponseEntity<Void> discordOAuth(HttpServletRequest request, @RequestParam String code) {
         OAuthResponse oAuthResponse = _oAuthRepository.authByAuthorizationCode(code);
         if (oAuthResponse == null) {
             throw new ServerErrorException("Couldn't get an OAuth response from Discord", new Exception());
         }
 
+        String locale = _localeResolver.resolve(request);
+
         Account oAuthAccount = _oAuthRepository.getAccount(oAuthResponse.accessToken(), oAuthResponse.tokenType());
         if (oAuthAccount == null) {
             throw new ServerErrorException("Couldn't get an account from Discord", new Exception());
+        } else {
+            oAuthAccount.setLocale(locale);
         }
 
         Account savedAccount = _accountRepository.find(oAuthAccount.getId())
@@ -52,6 +59,7 @@ public class OAuthController {
                     account.setUsername(oAuthAccount.getUsername());
                     account.setDiscriminator(oAuthAccount.getDiscriminator());
                     account.setGlobalName(oAuthAccount.getGlobalName());
+                    account.setLocale(locale);
                     return account;
                 })
                 .or(() -> Optional.of(oAuthAccount))

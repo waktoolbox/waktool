@@ -1,9 +1,9 @@
 import {DraftAction, DraftData, DraftTeam, DraftTeamInfo, DraftUser} from "../../chore/draft.ts";
 import {useEffect, useState} from "react";
 import {send, subscribeWithoutUserPrefix, unsubscribe} from "../../utils/socket.ts";
-import {useRecoilValue} from "recoil";
+import {useRecoilState, useRecoilValue} from "recoil";
 import {draftDataState} from "../../atoms/atoms-draft.ts";
-import {useParams} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -32,7 +32,7 @@ type DraftTeamReady = {
 
 type DraftNotification = {
     type: string,
-    payload: DraftUser | DraftActionWithIndex | DraftUserAssigned | DraftTeamReady
+    payload: DraftUser | DraftActionWithIndex | DraftUserAssigned | DraftTeamReady | string
 }
 
 class DataController {
@@ -46,9 +46,15 @@ class DataController {
 
     constructor(data: DraftData) {
         this.data = data;
-        this.users = data.users;
-        this.teamAUsers = data.teamA;
-        this.teamBUsers = data.teamB;
+        this.users = data.users?.map(user => {
+            return {...user}
+        });
+        this.teamAUsers = data.teamA?.map(user => {
+            return {...user}
+        });
+        this.teamBUsers = data.teamB?.map(user => {
+            return {...user}
+        });
         this.history = data.history;
         this.currentAction = data.currentAction;
         this.currentActionData = data.configuration.actions[data.currentAction];
@@ -60,8 +66,9 @@ let controller: DataController;
 function DraftViewer() {
     const {t} = useTranslation();
     const {draftId} = useParams();
-    const draftData = useRecoilValue(draftDataState);
+    const [draftData, setDraftData] = useRecoilState(draftDataState);
     const whoAmI = useRecoilValue(socketWhoAmIState);
+    const location = useLocation();
 
     // Remote data
     const [users, setUsers] = useState<DraftUser[]>([]);
@@ -76,12 +83,18 @@ function DraftViewer() {
     const [currentActionData, setCurrentActionData] = useState<DraftAction>({} as DraftAction)
 
     // Computed data
-    const [endReason, setEndReason] = useState(undefined)
+    const [endReason, setEndReason] = useState<string | undefined>(undefined)
     const [imDraftLeader, setImDraftLeader] = useState(false)
     const [myTeam, setMyTeam] = useState<DraftTeam | undefined>(undefined);
     const [pickedBreed, setPickedBreed] = useState<Breeds | undefined>(undefined);
     const [hoveredBreed, setHoveredBreed] = useState<Breeds | undefined>(undefined);
     const [usersToAssign, setUsersToAssign] = useState<DraftUser[]>([]);
+
+    useEffect(() => {
+        if (location.pathname !== "/draft/" + draftId) {
+            setDraftData(undefined)
+        }
+    }, [location.pathname]);
 
     useEffect(() => {
         if (!draftData) return;
@@ -121,8 +134,51 @@ function DraftViewer() {
                 case "draft::userJoined": {
                     const user = draftNotification.payload as DraftUser;
                     if (!controller || !controller.users || controller.users.find(u => u.id === user.id)) return;
-                    controller.users = [...controller.users, user];
+                    controller.users = [...controller.users, {...user}];
                     setUsers([...controller.users])
+                    if (controller.teamAUsers) {
+                        for (const user of controller.teamAUsers) {
+                            if (user.id === user.id) {
+                                user.present = true;
+                                setTeamAUsers([...(controller?.teamAUsers || [])])
+                                break;
+                            }
+                        }
+                    }
+                    if (controller.teamBUsers) {
+                        for (const user of controller.teamBUsers) {
+                            if (user.id === user.id) {
+                                user.present = true;
+                                setTeamBUsers([...(controller?.teamBUsers || [])])
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case "draft::userLeft": {
+                    const userId = draftNotification.payload as string;
+                    if (!controller || !controller.users) return;
+                    controller.users = controller.users.filter(u => u.id !== userId);
+                    setUsers([...controller.users])
+                    if (controller.teamAUsers) {
+                        for (const user of controller.teamAUsers) {
+                            if (user.id === userId) {
+                                user.present = false;
+                                setTeamAUsers([...(controller?.teamAUsers || [])])
+                                break;
+                            }
+                        }
+                    }
+                    if (controller.teamBUsers) {
+                        for (const user of controller.teamBUsers) {
+                            if (user.id === userId) {
+                                user.present = false;
+                                setTeamBUsers([...(controller?.teamBUsers || [])])
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case "draft::userAssigned": {
@@ -131,9 +187,9 @@ function DraftViewer() {
                     const setTeam = userAssigned.team === DraftTeam.TEAM_A ? setTeamAUsers : setTeamBUsers;
                     if (!team || team.find(u => u.id === userAssigned.user.id)) return;
                     if (userAssigned.team === DraftTeam.TEAM_A) {
-                        controller.teamAUsers = [...(controller?.teamAUsers || []), userAssigned.user];
+                        controller.teamAUsers = [...(controller?.teamAUsers || []), {...userAssigned.user}];
                     } else {
-                        controller.teamBUsers = [...(controller?.teamBUsers || []), userAssigned.user];
+                        controller.teamBUsers = [...(controller?.teamBUsers || []), {...userAssigned.user}];
                     }
                     setTeam([...((userAssigned.team === DraftTeam.TEAM_A ? controller?.teamAUsers : controller?.teamBUsers) || [])])
                     break;
@@ -146,6 +202,10 @@ function DraftViewer() {
                     controller.currentAction = (controller?.currentAction || 0) + 1;
                     setCurrentActionData(controller.data?.configuration?.actions[controller.currentAction] || undefined)
                     setCurrentAction(controller.currentAction)
+
+                    if (controller.currentAction >= controller.data?.configuration?.actions?.length) {
+                        setEndReason("draft.ended");
+                    }
                     break;
                 }
                 case "draft::teamReady": {
@@ -281,6 +341,11 @@ function DraftViewer() {
                             <Grid item xs={12} sx={{mt: 1}}>
                                 <Typography variant="h5">{t('draft.currentAction')}</Typography>
                                 {currentActionData && <DraftActionView action={currentActionData}/>}
+                            </Grid>
+                        }
+                        {endReason &&
+                            <Grid item xs={12} sx={{mt: 1}}>
+                                <Typography variant="h5">{t(endReason)}</Typography>
                             </Grid>
                         }
                         {currentActionData &&

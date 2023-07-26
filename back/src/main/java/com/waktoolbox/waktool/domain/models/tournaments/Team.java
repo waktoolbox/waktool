@@ -15,7 +15,7 @@ public class Team {
     List<String> players;
     String tournament;
     String catchPhrase;
-    Object stats;
+    TeamStats stats;
     boolean displayOnTeamList;
     List<String> validatedPlayers;
 }

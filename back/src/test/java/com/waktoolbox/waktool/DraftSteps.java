@@ -141,6 +141,11 @@ public class DraftSteps implements DraftNotifier {
     }
 
     @Override
+    public void onUserLeave(DraftUser user) {
+
+    }
+
+    @Override
     public void onUserAssigned(DraftUser user, DraftTeam team) {
 
     }

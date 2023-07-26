@@ -49,6 +49,7 @@
     "too.big.catchPhrase": "La phrase d'accroche est trop longue (75 caractères maximum)",
     "too.big.name": "Le nom est trop long (25 caractères maximum)"
   },
+  "failure": "Échec",
   "footer": {
     "wakfu": "Wakfu est un MMORPG édité par Ankama Studio. Tous droits réservés.\nLe site internet “Waktool” est un fansite communautaire non-officiel du MMORPG Wakfu sans aucun lien avec Ankama.\n",
     "login": "Attention ! Ne communiquez jamais vos identifiants de jeu."
@@ -77,6 +78,27 @@
   "save": "Sauvegarder",
   "saved": "Sauvegardé",
   "tournament": {
+    "admin": {
+      "draftFirstPickTeamA": "Team A choisit son côté de draft",
+      "draftFirstPickTeamB": "Team B choisit son côté de draft",
+      "draftFirstPickNone": "Personne choisit son côté de draft",
+      "setMeAsReferee": "Me déclarer arbitre du match",
+      "setMeAsStreamer": "Me déclarer streamer du match",
+      "matchAdmin": "Admin match",
+      "matchDate": "Date du match",
+      "matchWinnerTeamA": "Team A gagne le match",
+      "matchWinnerTeamB": "Team B gagne le match",
+      "removeMeAsStreamer": "Me retirer",
+      "removeStreamer": "Retirer le streamer",
+      "rerollMap": "Reroll la carte",
+      "resetDraft": "Réinitialiser la draft",
+      "roundTurnNumber": "Nombre de tours",
+      "roundWinnerTeamA": "Team A gagne le round",
+      "roundWinnerTeamB": "Team B gagne le round",
+      "sendFightStats": "Envoyer les statistiques du combat",
+      "validateMatchAndSendStats": "Valider le match et calculer les stats",
+      "validateMatchDate": "Valider la date du match"
+    },
     "admins": "Organisateurs",
     "description": "Description",
     "display": {
@@ -92,7 +114,12 @@
       "arbitration": "Arbitrage",
       "bo": "BO {{nb}}",
       "draft": {
-        "teamA": "Équipe A"
+        "teamA": "Équipe A",
+        "goTo": "Rejoindre la draft",
+        "goToDraftTeamA": "Rejoindre en tant qu'équipe A",
+        "goToDraftTeamB": "Rejoindre en tant qu'équipe B",
+        "notStartedYet": "La draft n'a pas encore commencé",
+        "teamHasPriority": "L'équipe {{team}} peut choisir son côté"
       },
       "fightTurns": "{{nb}} tours",
       "live": "Live",
@@ -159,5 +186,6 @@
       "leaveTeam": "Quitter l'équipe"
     }
   },
-  "validate": "Valider"
+  "validate": "Valider",
+  "success": "Succès"
 }

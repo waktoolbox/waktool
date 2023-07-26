@@ -5,7 +5,9 @@ import com.waktoolbox.waktool.domain.models.tournaments.TournamentData;
 import java.util.List;
 
 public interface TournamentPhaseRepository {
-    public List<TournamentData> getTournamentData(String tournamentId);
+    void save(TournamentData tournamentData);
 
-    public int getMaxTournamentPhase(String tournamentId);
+    List<TournamentData> getTournamentData(String tournamentId);
+
+    int getMaxTournamentPhase(String tournamentId);
 }

@@ -28,7 +28,12 @@ public class DraftController {
      * Call only once to initialize the draft after loading from database
      */
     public void restore() {
-        _draft.getHistory().forEach(this::processAction);
+        _draft.getUsers().forEach(user -> user.setPresent(false));
+        _draft.getTeamA().forEach(user -> user.setPresent(false));
+        _draft.getTeamB().forEach(user -> user.setPresent(false));
+        _draft.setTeamAReady(false);
+        _draft.setTeamBReady(false);
+        _draft.getHistory().forEach(this::computeAction);
     }
 
     /**
@@ -38,10 +43,27 @@ public class DraftController {
      */
     public void onUserJoin(DraftUser user) {
         if (!_draft.getUsers().contains(user)) _draft.getUsers().add(user);
+        else
+            _draft.getUsers().stream().filter(u -> Objects.equals(u.getId(), user.getId())).findFirst().ifPresent(u -> u.setPresent(true));
+
+        if (_draft.getTeamA().contains(user))
+            _draft.getTeamA().stream().filter(u -> Objects.equals(u.getId(), user.getId())).findFirst().ifPresent(u -> u.setPresent(true));
+        if (_draft.getTeamB().contains(user))
+            _draft.getTeamB().stream().filter(u -> Objects.equals(u.getId(), user.getId())).findFirst().ifPresent(u -> u.setPresent(true));
+
         _notifier.onUserJoin(user);
 
         DraftTeam userTeam = getUserTeam(user.getId());
         if (userTeam != DraftTeam.NONE) onUserAssigned(user, userTeam);
+    }
+
+    public void onUserDisconnected(DraftUser user) {
+        if (!_draft.isTeamAReady() || !_draft.isTeamBReady()
+                || _draft.getTeamA().stream().anyMatch(u -> Objects.equals(u.getId(), user.getId()))
+                || _draft.getTeamB().stream().anyMatch(u -> Objects.equals(u.getId(), user.getId()))
+        ) {
+            _notifier.onUserLeave(user);
+        }
     }
 
     /**
@@ -75,7 +97,7 @@ public class DraftController {
 
         int currentAction = _draft.getCurrentAction();
 
-        processAction(action);
+        doProcessAction(action);
         _notifier.onAction(action, currentAction);
         return true;
     }
@@ -108,7 +130,6 @@ public class DraftController {
         final Byte[] banned = _draft.getHistory().stream()
                 .filter(a -> a.getTeam() == team && a.getType() == DraftActionType.BAN)
                 .map(DraftAction::getBreed)
-                .distinct()
                 .toArray(Byte[]::new);
 
         return new DraftTeamResult(picked, banned);
@@ -155,7 +176,13 @@ public class DraftController {
                 });
     }
 
-    private void processAction(DraftAction action) {
+    private void doProcessAction(DraftAction action) {
+        computeAction(action);
+        _draft.getHistory().add(action);
+        _draft.setCurrentAction(_draft.getCurrentAction() + 1);
+    }
+
+    private void computeAction(DraftAction action) {
         switch (action.getType()) {
             case PICK -> {
                 lockForAppropriateTeam(action);
@@ -168,8 +195,6 @@ public class DraftController {
             case BAN -> lockForAppropriateTeam(action);
             default -> throw new IllegalStateException("Unexpected action type: " + action.getType());
         }
-        _draft.getHistory().add(action);
-        _draft.setCurrentAction(_draft.getCurrentAction() + 1);
     }
 
     private void lockForAppropriateTeam(DraftAction action) {

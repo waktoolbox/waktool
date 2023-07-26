@@ -23,7 +23,17 @@ public class TournamentRepositoryImpl implements TournamentRepository {
 
     @Override
     public boolean isAdmin(String id, String user) {
-        return _repository.isAdmin(id, user) > 0;
+        return _repository.isAdmin(id, user);
+    }
+
+    @Override
+    public boolean isStreamer(String id, String user) {
+        return _repository.isStreamer(id, user);
+    }
+
+    @Override
+    public boolean isReferee(String id, String user) {
+        return _repository.isReferee(id, user);
     }
 
     @Override

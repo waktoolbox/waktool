@@ -15,6 +15,11 @@ public class DraftRepositoryImpl implements DraftRepository {
     private final DraftSpringDataRepository _draftRepository;
 
     @Override
+    public boolean exists(String id) {
+        return _draftRepository.existsById(id);
+    }
+
+    @Override
     public Draft save(Draft draft) {
         return Optional.of(draft)
                 .map(_draftEntityMapper::from)
@@ -26,6 +31,11 @@ public class DraftRepositoryImpl implements DraftRepository {
                     return savedDraft;
                 })
                 .orElseThrow(() -> new RuntimeException("Failed to save draft"));
+    }
+
+    @Override
+    public void delete(String id) {
+        _draftRepository.deleteById(id);
     }
 
     @Override
