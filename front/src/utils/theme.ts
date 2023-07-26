@@ -64,6 +64,7 @@ export default createTheme({
             }
         },
 
+        // @ts-ignore
         MuiDayCalendar: {
             styleOverrides: {
                 weekContainer: {
