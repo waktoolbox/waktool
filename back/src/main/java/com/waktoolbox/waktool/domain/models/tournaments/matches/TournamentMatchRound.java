@@ -20,4 +20,5 @@ public class TournamentMatchRound {
     TournamentMatchTeamStats teamAStats;
     DraftTeamResult teamBDraft;
     TournamentMatchTeamStats teamBStats;
+    TournamentMatchHistory history;
 }

@@ -3,7 +3,9 @@ import dayjs, {Dayjs} from 'dayjs';
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Checkbox from "@mui/material/Checkbox";
 import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
 import Tab from "@mui/material/Tab";
@@ -19,16 +21,25 @@ import {Link, useLoaderData, useNavigate, useParams} from "react-router-dom";
 import {SyntheticEvent, useEffect, useState} from "react";
 import {
     getMatch,
+    getTeamPlayers,
+    refereeRoundDraftFirstPicker,
     refereeRoundRerollMap,
     refereeRoundResetDraft,
+    refereeRoundSendStats,
     refereeSetMatchDate,
     refereeSetMeAsReferee,
+    refereeValidateMatchResult,
     streamerRemoveStreamer,
     streamerSetMeAsStreamer,
     teamSearch,
     userStartDraft
 } from "../../services/tournament.ts";
-import {TournamentDefinition, TournamentMatchModel, TournamentMatchRoundModel} from "../../chore/tournament.ts";
+import {
+    TournamentDefinition,
+    TournamentMatchHistoryEntry,
+    TournamentMatchModel,
+    TournamentMatchRoundModel
+} from "../../chore/tournament.ts";
 import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournament.ts";
 import {useTranslation} from "react-i18next";
@@ -39,6 +50,11 @@ import {streamersLoader} from "../../services/account.ts";
 import TournamentAdminDialog from "./admin/TournamentAdminDialog.tsx";
 import {loginIdState} from "../../atoms/atoms-header.ts";
 import {snackState} from "../../atoms/atoms-snackbar.ts";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import {SelectChangeEvent} from "@mui/material/Select/SelectInput";
+import {Breeds, BreedsArray} from "../../chore/breeds.ts";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -54,6 +70,14 @@ export default function TournamentMatchView() {
     const myTeam = useRecoilValue(myTournamentTeamState);
     const [teams, setTeamsCache] = useRecoilState(teamCacheState);
     const [streamerCache, setStreamerCache] = useRecoilState(streamerCacheState);
+    const [teamAPlayers, setTeamAPlayers] = useState<Map<string, string>>(new Map());
+    const [presentPlayers, setPresentPlayers] = useState(new Set<string>());
+    const [currentHistoryEntry, setCurrentHistoryEntry] = useState<TournamentMatchHistoryEntry>({
+        team: "",
+        source: 0,
+        target: 0
+    });
+    const [teamBPlayers, setTeamBPlayers] = useState<Map<string, string>>(new Map());
     const setSnackValue = useSetRecoilState(snackState);
     const me = useRecoilValue(loginIdState);
 
@@ -81,6 +105,26 @@ export default function TournamentMatchView() {
                 })
             }
 
+            if (response.match?.teamA) {
+                getTeamPlayers(id || "", response.match.teamA).then(response => {
+                    const ltp = new Map(teamAPlayers);
+                    for (const id in response.nameById) {
+                        ltp.set(id, response.nameById[id]);
+                    }
+                    setTeamAPlayers(ltp);
+                })
+            }
+
+            if (response.match?.teamB) {
+                getTeamPlayers(id || "", response.match.teamB).then(response => {
+                    const ltp = new Map(teamBPlayers);
+                    for (const id in response.nameById) {
+                        ltp.set(id, response.nameById[id]);
+                    }
+                    setTeamBPlayers(ltp);
+                })
+            }
+
             if (response.match?.streamer) {
                 if (!streamerCache.get(response.match.streamer)) {
                     streamersLoader([response.match.streamer]).then(streamerResponse => {
@@ -94,6 +138,10 @@ export default function TournamentMatchView() {
             }
         })
     }, [matchId]);
+
+    useEffect(() => {
+        setPresentPlayers(new Set([...(fight?.history?.players || [])]));
+    }, [fight])
 
     function matchText() {
         if (!match || !tournament) return;
@@ -185,11 +233,46 @@ export default function TournamentMatchView() {
         refereeSetMatchDate(id || "", matchId || "", match?.date || "").then(notificationPopup);
     }
 
+    function setMatchWinner(team: DraftTeam) {
+        setMatch({
+            ...match,
+            winner: team === DraftTeam.TEAM_A ? match?.teamA : match?.teamB
+        } as TournamentMatchModel);
+    }
+
+    function validateMatchAndSendStats() {
+        refereeValidateMatchResult(id || "", matchId || "", match?.winner || "").then(notificationPopup);
+    }
+
+    function setRoundWinner(team: DraftTeam) {
+        setFight({
+            ...fight,
+            winner: team === DraftTeam.TEAM_A ? match?.teamA : match?.teamB
+        } as TournamentMatchRoundModel)
+    }
+
+    function setRoundTurns(turns: number) {
+        setFight({
+            ...fight,
+            history: {
+                ...(fight?.history || {}),
+                turns: turns
+            }
+        } as TournamentMatchRoundModel)
+    }
+
     function roundRerollMap() {
         refereeRoundRerollMap(id || "", matchId || "", tab).then(response => {
             notificationPopup(response);
             window.location.reload();
         });
+    }
+
+    function roundDraftFirstPicker(team: DraftTeam | undefined) {
+        refereeRoundDraftFirstPicker(id || "", matchId || "", tab, team).then(response => {
+            notificationPopup(response);
+            window.location.reload();
+        })
     }
 
     function roundResetDraft() {
@@ -199,6 +282,42 @@ export default function TournamentMatchView() {
         });
     }
 
+    function changePresentPlayers(player: string, present: boolean) {
+        const players = new Set(presentPlayers);
+        if (present) players.add(player);
+        else players.delete(player);
+        setPresentPlayers(players);
+    }
+
+    function roundSendStats() {
+        if (!fight?.history) return;
+        if (!fight?.winner) return;
+
+        const players = new Set(presentPlayers);
+        if (fight.history.players) fight.history.players.forEach(p => players.add(p));
+
+        refereeRoundSendStats(id || "", matchId || "", tab, {
+            ...fight.history,
+            players: [...players.keys()]
+        }, fight.winner).then(response => {
+            notificationPopup(response);
+            window.location.reload();
+        });
+    }
+
+    function addCurrentHistoryEntryToHistory() {
+        setFight({
+            ...fight,
+            history: {
+                ...fight?.history,
+                entries: [
+                    ...(fight?.history?.entries || []),
+                    currentHistoryEntry
+                ]
+            }
+        } as TournamentMatchRoundModel)
+        setCurrentHistoryEntry({team: undefined, source: undefined, target: undefined})
+    }
 
     // TODO externalize this
     const TeamColumn = ({fight, team}: { fight: TournamentMatchRoundModel, team: DraftTeam }) => {
@@ -483,7 +602,8 @@ export default function TournamentMatchView() {
                                             onClick={() => removeStreamer()}>{t('tournament.admin.removeStreamer')}</Button>
                                 </Grid>
                                 <Grid item xs={6} hidden={match?.referee !== me}>
-                                    <DateTimePicker label={t('tournament.admin.matchDate')} value={dayjs(match?.date)}
+                                    <DateTimePicker sx={{m: 1}} label={t('tournament.admin.matchDate')}
+                                                    value={dayjs(match?.date)}
                                                     onChange={(newDate) => setAdminMatchDate(newDate)}
                                                     views={['year', 'day', 'hours', 'minutes', 'seconds']}/>
                                 </Grid>
@@ -491,6 +611,7 @@ export default function TournamentMatchView() {
                                     <Button variant="outlined" sx={{m: 1}}
                                             onClick={() => validateMatchDate()}>{t('tournament.admin.validateMatchDate')}</Button>
                                 </Grid>
+
                             </Grid>
 
 
@@ -498,10 +619,100 @@ export default function TournamentMatchView() {
                                   hidden={match?.referee !== me}>
                                 <Grid item xs={12}>
                                     <Tabs value={tab} onChange={onTabChange}>
-                                        {match && match.rounds && match.rounds.map((_, index) => (
+                                        {match?.rounds?.map((_, index) => (
                                             <Tab key={index} label={t('tournament.match.matchNb', {nb: index + 1})}/>
                                         ))}
                                     </Tabs>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Button variant="contained" color="error" sx={{m: 1}}
+                                            onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_A)}>{t('tournament.admin.draftFirstPickTeamA')}</Button>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Button variant="contained" color="error" sx={{m: 1}}
+                                            onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_B)}>{t('tournament.admin.draftFirstPickTeamB')}</Button>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Button variant="contained" color="error" sx={{m: 1}}
+                                            onClick={() => roundDraftFirstPicker(DraftTeam.NONE)}>{t('tournament.admin.draftFirstPickNone')}</Button>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Button variant="outlined" sx={{m: 1}}
+                                            onClick={() => setRoundWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.roundWinnerTeamA')}</Button>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Button variant="outlined" sx={{m: 1}}
+                                            onClick={() => setRoundWinner(DraftTeam.TEAM_B)}>{t('tournament.admin.roundWinnerTeamB')}</Button>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField sx={{m: 1}} label={t('tournament.admin.roundTurnNumber')}
+                                               id="catchPhrase" value={fight?.history?.turns} type="number"
+                                               onChange={(newValue) => setRoundTurns(+newValue.target.value)}/>
+                                </Grid>
+
+                                <Grid item xs={12} sx={{p: 1}}>
+                                    {teamAPlayers && [...teamAPlayers.keys()].map((playerId) => (
+                                        <FormControlLabel key={`teamA_${playerId}`} label={teamAPlayers.get(playerId)}
+                                                          control={<Checkbox checked={presentPlayers.has(playerId)}
+                                                                             onChange={(e) => changePresentPlayers(playerId, e.target.checked)}/>}/>
+                                    ))}
+                                    {teamBPlayers && [...teamBPlayers.keys()].map((playerId) => (
+                                        <FormControlLabel key={`teamB_${playerId}`} label={teamBPlayers.get(playerId)}
+                                                          control={<Checkbox checked={presentPlayers.has(playerId)}
+                                                                             onChange={(e) => changePresentPlayers(playerId, e.target.checked)}/>}/>
+                                    ))}
+                                </Grid>
+
+                                <Grid item xs={12} hidden={!fight || !fight.teamADraft || !fight.teamBDraft}>
+                                    <Select size="small" value={currentHistoryEntry.team}
+                                            onChange={(event: SelectChangeEvent) => {
+                                                setCurrentHistoryEntry({
+                                                    ...currentHistoryEntry,
+                                                    team: event.target.value
+                                                })
+                                            }}>
+                                        <MenuItem value={match?.teamA}>{teams.get(match?.teamA || "")}</MenuItem>
+                                        <MenuItem value={match?.teamB}>{teams.get(match?.teamB || "")}</MenuItem>
+                                    </Select>
+                                    Killer:
+                                    <Select size="small" value={currentHistoryEntry.source as unknown as string}
+                                            onChange={(event: SelectChangeEvent) => {
+                                                setCurrentHistoryEntry({
+                                                    ...currentHistoryEntry,
+                                                    source: (event.target.value as unknown as number)
+                                                })
+                                            }}>
+                                        {BreedsArray.map(breed => (
+                                            <MenuItem key={`source_${breed}`} value={breed}>
+                                                <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`} width={50}/>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    Killed:
+                                    <Select size="small" value={currentHistoryEntry.target as unknown as string}
+                                            onChange={(event: SelectChangeEvent) => {
+                                                setCurrentHistoryEntry({
+                                                    ...currentHistoryEntry,
+                                                    target: (event.target.value as unknown as number)
+                                                })
+                                            }}>
+                                        {BreedsArray.map(breed => (
+                                            <MenuItem key={`source_${breed}`} value={breed}>
+                                                <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`} width={50}/>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <Button onClick={() => addCurrentHistoryEntryToHistory()}>Add</Button>
+                                    {fight && fight.history && fight.history.entries?.map((entry, index) => (
+                                        <div key={`history_${index}`}>
+                                            {teams.get(entry.team || "")} {Breeds[entry.source as number]} killed {Breeds[entry.target as number]}
+                                        </div>
+                                    ))}
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Button variant="contained" sx={{m: 1}} color="error"
+                                            onClick={() => roundSendStats()}>{t('tournament.admin.sendFightStats')}</Button>
                                 </Grid>
 
                                 <Grid item xs={6}>
@@ -514,7 +725,21 @@ export default function TournamentMatchView() {
                                 </Grid>
                             </Grid>
 
-
+                            <Grid container sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, mt: 2}}
+                                  hidden={match?.referee !== me}>
+                                <Grid item xs={6}>
+                                    <Button variant="outlined" sx={{m: 1}}
+                                            onClick={() => setMatchWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.matchWinnerTeamA')}</Button>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Button variant="outlined" sx={{m: 1}}
+                                            onClick={() => setMatchWinner(DraftTeam.TEAM_B)}>{t('tournament.admin.matchWinnerTeamB')}</Button>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button variant="contained" color="error" sx={{m: 1}}
+                                            onClick={() => validateMatchAndSendStats()}>{t('tournament.admin.validateMatchAndSendStats')}</Button>
+                                </Grid>
+                            </Grid>
                         </CardContent>
                     </Card>
                 </TournamentAdminDialog>

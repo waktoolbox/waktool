@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TeamStatsByClass {
-    Integer id;
+    Byte id;
     Integer death;
     Integer banned;
     Integer killed;

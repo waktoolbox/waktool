@@ -4,6 +4,7 @@ export enum DraftActionType {
 }
 
 export enum DraftTeam {
+    NONE = "NONE",
     TEAM_A = "TEAM_A",
     TEAM_B = "TEAM_B"
 }

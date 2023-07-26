@@ -1,10 +1,10 @@
 package com.waktoolbox.waktool.api.tournament;
 
-import com.waktoolbox.waktool.api.models.AdminMatchDateRequest;
-import com.waktoolbox.waktool.api.models.SuccessResponse;
+import com.waktoolbox.waktool.api.models.*;
 import com.waktoolbox.waktool.domain.controllers.draft.DraftManager;
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseController;
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseControllerFactory;
+import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentStatsController;
 import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
@@ -34,6 +34,7 @@ public class TournamentAdminController {
     private final TournamentRepository _tournamentRepository;
     private final TournamentMatchRepository _tournamentMatchRepository;
     private final TournamentPhaseControllerFactory _phaseControllerFactory;
+    private final TournamentStatsController _tournamentStatsController;
 
     @PostMapping("/tournaments/{tournamentId}/admin-go-to-next-phase")
     public ResponseEntity<SuccessResponse> goToNextPhase(@PathVariable String tournamentId) {
@@ -111,6 +112,22 @@ public class TournamentAdminController {
         return ResponseEntity.ok(new SuccessResponse(true));
     }
 
+    @PostMapping("/tournaments/{tournamentId}/matches/{matchId}/referee-validate-match-result")
+    public ResponseEntity<SuccessResponse> postSetMatchResult(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String matchId, @RequestBody RefereeValidateMatchResultRequest matchResultRequest) {
+        if (!isReferee(tournamentId, discordId)) return ResponseEntity.ok(new SuccessResponse(false));
+
+        TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
+        if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
+
+        match.setWinner(matchResultRequest.winner());
+
+        _tournamentStatsController.fillStats(match, match.getTeamA());
+        _tournamentStatsController.fillStats(match, match.getTeamB());
+        _tournamentMatchRepository.save(tournamentId, match);
+
+        return ResponseEntity.ok(new SuccessResponse(true));
+    }
+
     @PostMapping("/tournaments/{tournamentId}/matches/{matchId}/rounds/{round}/referee-reroll-map")
     public ResponseEntity<SuccessResponse> postRefereeRerollMap(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String matchId, @PathVariable int round) {
         if (discordId.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
@@ -151,6 +168,46 @@ public class TournamentAdminController {
 
         _draftRepository.delete(matchRound.getDraftId());
         _draftManager.removeDraft(matchRound.getDraftId());
+
+        return ResponseEntity.ok(new SuccessResponse(true));
+    }
+
+    @PostMapping("/tournaments/{tournamentId}/matches/{matchId}/rounds/{round}/referee-send-stats")
+    public ResponseEntity<SuccessResponse> postRefereeSendStats(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String matchId, @PathVariable int round, @RequestBody RefereeSendMatchStatsRequest statsRequest) {
+        if (!isReferee(tournamentId, discordId)) return ResponseEntity.ok(new SuccessResponse(false));
+
+        TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
+        if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
+
+        Optional<TournamentMatchRound> optMatchRound = match.getRounds().stream().filter(r -> r.getRound() == round).findFirst();
+        if (optMatchRound.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
+
+        TournamentMatchRound matchRound = optMatchRound.get();
+        matchRound.setHistory(statsRequest.history());
+        matchRound.setWinner(statsRequest.winner());
+        _tournamentMatchRepository.save(tournamentId, match);
+
+        return ResponseEntity.ok(new SuccessResponse(true));
+    }
+
+    @PostMapping("/tournaments/{tournamentId}/matches/{matchId}/rounds/{round}/referee-draft-first-picker")
+    public ResponseEntity<SuccessResponse> postRefereeDraftFirstPicker(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String matchId, @PathVariable int round, @RequestBody RefereeDraftFirstPickerRequest draftFirstPickerRequest) {
+        if (!isReferee(tournamentId, discordId)) return ResponseEntity.ok(new SuccessResponse(false));
+
+        TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
+        if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
+
+        Optional<TournamentMatchRound> optMatchRound = match.getRounds().stream().filter(r -> r.getRound() == round).findFirst();
+        if (optMatchRound.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
+
+        TournamentMatchRound matchRound = optMatchRound.get();
+        String team = switch (draftFirstPickerRequest.team()) {
+            case TEAM_A -> match.getTeamA();
+            case TEAM_B -> match.getTeamB();
+            default -> null;
+        };
+        matchRound.setDraftFirstPicker(team);
+        _tournamentMatchRepository.save(tournamentId, match);
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }
