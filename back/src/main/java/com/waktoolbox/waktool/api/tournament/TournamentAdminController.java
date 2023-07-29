@@ -7,6 +7,7 @@ import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseCont
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentStatsController;
 import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchHistory;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 import com.waktoolbox.waktool.domain.repositories.DraftRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
@@ -118,8 +119,10 @@ public class TournamentAdminController {
 
         TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
         if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
+        if (match.isDone()) return ResponseEntity.ok(new SuccessResponse(false));
 
         match.setWinner(matchResultRequest.winner());
+        match.setDone(true);
 
         _tournamentStatsController.fillStats(match, match.getTeamA());
         _tournamentStatsController.fillStats(match, match.getTeamB());
@@ -183,7 +186,13 @@ public class TournamentAdminController {
         if (optMatchRound.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
 
         TournamentMatchRound matchRound = optMatchRound.get();
-        matchRound.setHistory(statsRequest.history());
+        TournamentMatchHistory history = statsRequest.history();
+        history.setEntries(
+                history.getEntries().stream()
+                        .filter(h -> h.getSource() != null && h.getTarget() != null && h.getTeam() != null)
+                        .toList()
+        );
+        matchRound.setHistory(history);
         matchRound.setWinner(statsRequest.winner());
         _tournamentMatchRepository.save(tournamentId, match);
 
