@@ -117,6 +117,9 @@ public class TournamentAdminController {
     public ResponseEntity<SuccessResponse> postSetMatchResult(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String matchId, @RequestBody RefereeValidateMatchResultRequest matchResultRequest) {
         if (!isReferee(tournamentId, discordId)) return ResponseEntity.ok(new SuccessResponse(false));
 
+        if (matchResultRequest.winner() == null || matchResultRequest.winner().isBlank())
+            return ResponseEntity.ok(new SuccessResponse(false));
+
         TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
         if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
         if (match.isDone()) return ResponseEntity.ok(new SuccessResponse(false));
