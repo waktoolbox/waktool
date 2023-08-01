@@ -87,7 +87,7 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
                     variant="h4">{t('tournament.menu.' + (tab === "PLANNING" ? "planning" : "results"))}</Typography>
             </Grid>
 
-            <Grid item xs={12} sx={{mb: 2}}>
+            <Grid item xs={12} sx={{mb: 2}} hidden={tab === "PLANNING"}>
                 <TournamentPhaseButton onChange={onPhaseChange}/>
             </Grid>
 
