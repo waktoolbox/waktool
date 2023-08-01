@@ -7,7 +7,7 @@ import {useLoaderData, useParams} from "react-router-dom";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {teamCacheState, tournamentPhasesState} from "../../atoms/atoms-tournament.ts";
 import TournamentPhaseButton from "./TournamentPhaseButton.tsx";
-import {TournamentDefinition, TournamentPhaseType} from "../../chore/tournament.ts";
+import {TournamentDefinition, TournamentMatchModel, TournamentPhaseType} from "../../chore/tournament.ts";
 import TournamentRoundRobinListView from "./TournamentRoundRobinListView.tsx";
 import TournamentRawListView from "./TournamentRawListView.tsx";
 
@@ -21,6 +21,7 @@ type LoaderResponse = {
 
 export default function TournamentMatchListView(props: TournamentMatchListViewProps) {
     const {tab} = props;
+    const [previousTab, setPreviousTab] = useState(tab);
     const {id} = useParams();
     const {t} = useTranslation();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
@@ -28,7 +29,7 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
     const phases = useRecoilValue(tournamentPhasesState)
     const [teamCache, setTeamCache] = useRecoilState(teamCacheState);
     const [displayedPhase, setDisplayedPhase] = useState(phases);
-    const [matchesToDisplay, setMatchesToDisplay] = useState([])
+    const [matchesToDisplay, setMatchesToDisplay] = useState<TournamentMatchModel[]>([])
 
     useEffect(() => {
         if (displayedPhase !== 0) return;
@@ -37,15 +38,32 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
 
     useEffect(() => {
         if (displayedPhase <= 0) return;
+        let phaseToUse = displayedPhase;
+        if (previousTab !== tab) { // reset phase on tab change to avoid displaying wrong phase
+            setPreviousTab(tab)
+            phaseToUse = phases;
+        }
+
         postMatchesSearch(id || "", {
             type: tab,
-            phase: displayedPhase
+            phase: phaseToUse
         }).then(response => {
-            setMatchesToDisplay(response.matches);
+            const matches = response.matches as TournamentMatchModel[] | undefined;
 
-            if (response.matches) {
+            setMatchesToDisplay(matches?.sort((a, b) => {
+                const aDate = a.date ? new Date(a.date).getTime() : 0;
+                const bDate = b.date ? new Date(b.date).getTime() : 0;
+                if (tab === "PLANNING") {
+                    return aDate - bDate;
+                } else if (tab === "RESULTS") {
+                    return bDate - aDate;
+                }
+                return 0;
+            }) ?? []);
+
+            if (matches) {
                 const toLoad = []
-                for (const match of response.matches) {
+                for (const match of matches) {
                     if (match.teamA && !teamCache.get(match.teamA)) toLoad.push(match.teamA);
                     if (match.teamB && !teamCache.get(match.teamB)) toLoad.push(match.teamB);
                 }
