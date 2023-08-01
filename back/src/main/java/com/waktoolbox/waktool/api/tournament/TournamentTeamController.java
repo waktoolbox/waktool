@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,7 +58,10 @@ public class TournamentTeamController {
 
     @PostMapping("/tournaments/{tournamentId}/teams:search")
     public LightTeamListResponse getTeamList(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @RequestBody PostTeamsSearch request) {
-        return new LightTeamListResponse(_tournamentTeamRepository.getTeamsNames(tournamentId, request.ids()));
+        if (request.ids() == null) return new LightTeamListResponse(new ArrayList<>());
+        List<String> ids = request.ids().stream().filter(Objects::nonNull).toList();
+        if (ids.isEmpty()) return new LightTeamListResponse(new ArrayList<>());
+        return new LightTeamListResponse(_tournamentTeamRepository.getTeamsNames(tournamentId, ids));
     }
 
     @PostMapping("/tournaments/{tournamentId}/teams")

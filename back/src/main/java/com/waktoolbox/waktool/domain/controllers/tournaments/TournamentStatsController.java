@@ -8,17 +8,20 @@ import com.waktoolbox.waktool.domain.models.tournaments.TeamStatsByClass;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchHistory;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
+import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
 public class TournamentStatsController {
+    private final TournamentMatchRepository _tournamentMatchRepository;
     private final TournamentTeamRepository _tournamentTeamRepository;
 
     public void fillStats(TournamentMatch match, String team) {
@@ -40,14 +43,23 @@ public class TournamentStatsController {
         Map<String, Integer> playedByPlayer = stats.getPlayedByPlayer();
 
         for (TournamentMatchRound round : match.getRounds()) {
-            manageDraftResultStats(team, isWinner, statsByClass, round);
+            manageDraftResultStats(team, isWinner, statsByClass, match, round);
             manageRoundHistoryStats(team, statsByClass, playedByPlayer, round);
         }
         _tournamentTeamRepository.saveTeam(team);
     }
 
-    private static void manageDraftResultStats(Team team, boolean isWinner, TeamStatsByClass[] statsByClass, TournamentMatchRound round) {
-        DraftTeamResult draftResult = team.getId().equals(round.getDraftTeamA()) ? round.getTeamADraft() : round.getTeamBDraft();
+    public void recomputeStats(String tournamentId) {
+        List<Team> teams = _tournamentTeamRepository.getTeamsByTournamentId(tournamentId);
+        teams.forEach(team -> {
+            team.setStats(null);
+            _tournamentMatchRepository.getTeamMatches(tournamentId, team.getId()).forEach(match -> fillStats(match, team));
+            _tournamentTeamRepository.saveTeam(team);
+        });
+    }
+
+    private static void manageDraftResultStats(Team team, boolean isWinner, TeamStatsByClass[] statsByClass, TournamentMatch match, TournamentMatchRound round) {
+        DraftTeamResult draftResult = team.getId().equals(match.getTeamA()) ? round.getTeamADraft() : round.getTeamBDraft();
         if (draftResult != null) {
             for (Byte pickedClass : draftResult.getPickedClasses()) {
                 TeamStatsByClass breedStats = getTeamStatsByClass(statsByClass, pickedClass);

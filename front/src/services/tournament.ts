@@ -89,6 +89,10 @@ export async function postGoToNextPhase(tournamentId: string) {
     return await pfetch(`/api/tournaments/${tournamentId}/admin-go-to-next-phase`, {});
 }
 
+export async function postRecomputeStats(tournamentId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/admin-recompute-stats`, {});
+}
+
 export async function streamerSetMeAsStreamer(tournamentId: string, matchId: string) {
     return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/set-me-as-streamer`, {});
 }

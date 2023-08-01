@@ -38,7 +38,11 @@ public class TournamentAdminController {
     private final TournamentStatsController _tournamentStatsController;
 
     @PostMapping("/tournaments/{tournamentId}/admin-go-to-next-phase")
-    public ResponseEntity<SuccessResponse> goToNextPhase(@PathVariable String tournamentId) {
+    public ResponseEntity<SuccessResponse> goToNextPhase(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId) {
+        if (discordId.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
+        if (!_tournamentRepository.isAdmin(tournamentId, discordId.get()))
+            return ResponseEntity.ok(new SuccessResponse(false));
+
         TournamentPhaseController tournamentPhaseController = _phaseControllerFactory.get(tournamentId);
         if (tournamentPhaseController.hasANextRound()) {
             log.info("Trying to go the next round");
@@ -49,6 +53,17 @@ public class TournamentAdminController {
             log.info("Trying to go the next phase");
             return ResponseEntity.ok(new SuccessResponse(tournamentPhaseController.startNextPhase()));
         }
+
+        return ResponseEntity.ok(new SuccessResponse(false));
+    }
+
+    @PostMapping("/tournaments/{tournamentId}/admin-recompute-stats")
+    public ResponseEntity<SuccessResponse> adminRecomputeTeamStats(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId) {
+        if (discordId.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
+        if (!_tournamentRepository.isAdmin(tournamentId, discordId.get()))
+            return ResponseEntity.ok(new SuccessResponse(false));
+
+        _tournamentStatsController.recomputeStats(tournamentId);
 
         return ResponseEntity.ok(new SuccessResponse(false));
     }

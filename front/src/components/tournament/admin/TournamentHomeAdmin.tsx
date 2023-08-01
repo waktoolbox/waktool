@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button";
 import {useParams} from "react-router-dom";
-import {postGoToNextPhase} from "../../../services/tournament.ts";
+import {postGoToNextPhase, postRecomputeStats} from "../../../services/tournament.ts";
 import {useState} from "react";
 
 export default function TournamentHomeAdmin() {
@@ -11,9 +11,16 @@ export default function TournamentHomeAdmin() {
         postGoToNextPhase(id ?? "").then(() => setLocked(false))
     }
 
+    function recomputeStats() {
+        postRecomputeStats(id ?? "").then(() => setLocked(false))
+    }
+
     return (
         <div>
-            <Button disabled={locked} onClick={goToNextPhase}>Go to next phase</Button>
+            <Button variant="contained" color="error" disabled={locked} onClick={goToNextPhase} sx={{m: 1}}>Go to next
+                phase</Button>
+            <Button variant="contained" color="warning" disabled={locked} onClick={recomputeStats} sx={{m: 1}}>Recompute
+                stats</Button>
         </div>
     )
 }
