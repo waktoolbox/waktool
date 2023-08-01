@@ -46,8 +46,8 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
             if (response.matches) {
                 const toLoad = []
                 for (const match of response.matches) {
-                    if (!teamCache.get(match.teamA)) toLoad.push(match.teamA);
-                    if (!teamCache.get(match.teamB)) toLoad.push(match.teamB);
+                    if (match.teamA && !teamCache.get(match.teamA)) toLoad.push(match.teamA);
+                    if (match.teamB && !teamCache.get(match.teamB)) toLoad.push(match.teamB);
                 }
                 if (toLoad.length > 0) {
                     teamSearch(id || "", toLoad).then(response => {
