@@ -15,7 +15,7 @@ COPY front/public/ public/
 
 RUN npm run build
 
-FROM maven:3.9.2-eclipse-temurin-20 as build-back
+FROM maven:3-eclipse-temurin-21 as build-back
 
 WORKDIR /back
 COPY back/pom.xml pom.xml
@@ -23,7 +23,7 @@ COPY back/src/ src/
 
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:20-jdk-alpine as build-jdk
+FROM eclipse-temurin:21-jdk-alpine as build-jdk
 RUN jlink \
     --module-path /opt/java/openjdk/jmods \
     --compress=2 \
