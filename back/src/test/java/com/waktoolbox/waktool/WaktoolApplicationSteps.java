@@ -26,7 +26,7 @@ import static com.decathlon.tzatziki.utils.Patterns.*;
 public class WaktoolApplicationSteps {
 
     @SuppressWarnings("resource")
-    static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:14.7")
+    static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:15.3")
             .withTmpFs(Map.of("/var:lib/postgresql/data", "rw"));
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {

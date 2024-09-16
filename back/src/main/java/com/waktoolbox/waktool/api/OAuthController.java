@@ -76,6 +76,8 @@ public class OAuthController {
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge((long) 60 * 60 * 24) // 1 day
                 .build();
