@@ -124,19 +124,21 @@ export default function TournamentInformationsView() {
                             ))}
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardContent
-                            sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
-                            <Typography variant="h4" sx={{
-                                textAlign: "start",
-                                mb: 1
-                            }}>{t('tournament.streamers')}</Typography>
-                            {tournament.streamers.map(streamer => (
-                                <Typography key={streamer}
-                                            sx={{color: "#8299a1"}}>{accounts.get(streamer) || streamer}</Typography>
-                            ))}
-                        </CardContent>
-                    </Card>
+                    {tournament.streamers && tournament.streamers.length > 0 &&
+                        <Card>
+                            <CardContent
+                                sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
+                                <Typography variant="h4" sx={{
+                                    textAlign: "start",
+                                    mb: 1
+                                }}>{t('tournament.streamers')}</Typography>
+                                {tournament.streamers.map(streamer => (
+                                    <Typography key={streamer}
+                                                sx={{color: "#8299a1"}}>{accounts.get(streamer) || streamer}</Typography>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    }
                 </Stack>
             </Grid>
 

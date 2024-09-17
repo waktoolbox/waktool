@@ -122,6 +122,7 @@
         "teamHasPriority": "L'équipe {{team}} peut choisir son côté"
       },
       "fightTurns": "{{nb}} tours",
+      "findAStream": "Trouver un stream",
       "live": "Live",
       "matchNb": "Combat {{nb}}",
       "more": "En savoir plus",

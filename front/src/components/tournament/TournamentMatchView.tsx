@@ -557,6 +557,20 @@ export default function TournamentMatchView() {
                                                 </Button>
                                             </a>
                                         }
+                                        {!match.streamer &&
+                                            <a href='https://www.twitch.tv/directory/category/wakfu' rel="noreferrer"
+                                               target="_blank">
+                                                <Button
+                                                    sx={{backgroundColor: "#6441A5", width: "100%", color: "#fefffa"}}>
+                                                    <Icon sx={{mr: 1, position: "relative", top: "-2px", zIndex: 0}}>
+                                                        <img style={{width: "24px", height: "30px"}}
+                                                             src='/images/twitch.svg'
+                                                             alt="Twitch icon"/>
+                                                    </Icon>
+                                                    {t('tournament.match.findAStream')}
+                                                </Button>
+                                            </a>
+                                        }
                                         {!match.streamer && me && tournament.streamers?.find(streamer => streamer === me) && (
                                             <Button sx={{backgroundColor: "#6441A5", width: "100%", color: "#fefffa"}}
                                                     onClick={() => setMeAsStreamer()}>{t('tournament.admin.setMeAsStreamer')}</Button>
