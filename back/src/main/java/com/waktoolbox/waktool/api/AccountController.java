@@ -33,7 +33,11 @@ public class AccountController {
 
     @PostMapping("/accounts:search")
     public ResponseEntity<AccountSearchResponse> searchAccounts(@RequestBody AccountSearchRequest request) {
-        List<LightAccountResponse> accounts = _accountRepository.find(request.ids()).stream().map(a -> new LightAccountResponse(a.getId(), a.getDisplayName())).toList();
+        List<LightAccountResponse> accounts = _accountRepository
+                .find(request.ids())
+                .stream()
+                .map(a -> new LightAccountResponse(a.getId(), a.getDisplayName(), a.getFullAnkamaName()))
+                .toList();
         return ResponseEntity.ok(new AccountSearchResponse(accounts));
     }
 

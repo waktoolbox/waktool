@@ -28,6 +28,7 @@ import Divider from "@mui/material/Divider";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
 import TournamentTeamComposition from "./TournamentTeamComposition.tsx";
+import {User} from "../common/User.tsx";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -75,7 +76,10 @@ export default function TournamentEditTeamView() {
             accountsLoader(accountsToRequest).then((response) => {
                 const newCache = new Map(accounts);
                 for (const account of response.accounts) {
-                    newCache.set(account.id, account.displayName);
+                    newCache.set(account.id, {
+                        displayName: account.displayName,
+                        fullAnkamaName: account.fullAnkamaName
+                    });
                 }
                 setAccounts(newCache);
             });
@@ -123,7 +127,7 @@ export default function TournamentEditTeamView() {
     function acceptApplicationInView(application: Application) {
         acceptApplication(id || "", teamId || "", application.id)
         const newAccounts = new Map(accounts);
-        newAccounts.set(application.userId, application.username)
+        newAccounts.set(application.userId, {displayName: application.username})
         setAccounts(newAccounts);
         setTeam({
             ...team,
@@ -249,7 +253,7 @@ export default function TournamentEditTeamView() {
                     {team && team.validatedPlayers && team.validatedPlayers.map((player, index) => (
                         <Grid container alignItems="center">
                             <Grid item xs={9} key={index}>
-                                <Typography>{accounts.get(player) || player}</Typography>
+                                <User userId={player}/>
                             </Grid>
                             <Grid item xs={3}>
                                 <Button color="error" disabled={me === player}

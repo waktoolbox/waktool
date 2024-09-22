@@ -71,7 +71,7 @@ export default function Tournament() {
         accountsLoader(accountsToRequest).then((response) => {
             const newCache = new Map(accountsCache);
             for (const account of response.accounts) {
-                newCache.set(account.id, account.displayName);
+                newCache.set(account.id, {displayName: account.displayName, fullAnkamaName: account.fullAnkamaName});
             }
             setAccounts(newCache);
         });

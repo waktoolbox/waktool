@@ -44,7 +44,7 @@ import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournament.ts";
 import {useTranslation} from "react-i18next";
 import {dateFormat} from "../../utils/date.ts";
-import {accountCacheState, streamerCacheState} from "../../atoms/atoms-accounts.ts";
+import {streamerCacheState} from "../../atoms/atoms-accounts.ts";
 import {DraftTeam} from "../../chore/draft.ts";
 import {streamersLoader} from "../../services/account.ts";
 import TournamentAdminDialog from "./admin/TournamentAdminDialog.tsx";
@@ -55,6 +55,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import {SelectChangeEvent} from "@mui/material/Select/SelectInput";
 import {Breeds, BreedsArray} from "../../chore/breeds.ts";
+import {User} from "../common/User.tsx";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -66,7 +67,6 @@ export default function TournamentMatchView() {
     const {id, matchId} = useParams();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
 
-    const accounts = useRecoilValue(accountCacheState);
     const myTeam = useRecoilValue(myTournamentTeamState);
     const [teams, setTeamsCache] = useRecoilState(teamCacheState);
     const [streamerCache, setStreamerCache] = useRecoilState(streamerCacheState);
@@ -537,12 +537,17 @@ export default function TournamentMatchView() {
                                     }}>
                                         <Typography variant="h4"
                                                     display="inline">{t("tournament.match.live")}</Typography>
-                                        <Typography
+
+                                        {match.streamer ?
+                                            <User userId={match.streamer}
+                                                  otherProps={{sx: {color: "#8299a1", mb: 2, mt: 2}}}/>
+                                            : <Typography
                                             sx={{
                                                 color: "#8299a1",
                                                 mb: 2,
                                                 mt: 2
-                                            }}>{match.streamer ? accounts.get(match.streamer) || match.streamer : t('tournament.match.noStreamer')}</Typography>
+                                            }}>{t('tournament.match.noStreamer')}</Typography>
+                                        }
                                         {match.streamer && streamerCache.get(match.streamer || "") &&
                                             <a href={streamerCache.get(match.streamer || "")} rel="noreferrer"
                                                target="_blank">
@@ -590,8 +595,12 @@ export default function TournamentMatchView() {
                                     }}>
                                         <Typography
                                             variant="h4">{t('tournament.match.arbitration')}</Typography>
-                                        <Typography color="#8299a1"
-                                                    sx={{mt: 2}}>{match.referee ? accounts.get(match.referee) || match.referee : t('tournament.match.noReferee')}</Typography>
+                                        {match.referee ?
+                                            <User userId={match.referee} otherProps={{sx: {color: "#8299a1"}}}/>
+                                            :
+                                            <Typography color="#8299a1"
+                                                        sx={{mt: 2}}>{t('tournament.match.noReferee')}</Typography>
+                                        }
                                     </CardContent>
                                 </Card>
                             </Grid>

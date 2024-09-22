@@ -33,6 +33,7 @@ import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournamen
 import {loginIdState} from "../../atoms/atoms-header.ts";
 import {snackState} from "../../atoms/atoms-snackbar.ts";
 import TournamentMatchInlinedView from "./TournamentMatchInlinedView.tsx";
+import {User} from "../common/User.tsx";
 
 const defaultTeam = {
     name: "",
@@ -101,7 +102,10 @@ export default function TournamentTeamView() {
             accountsLoader(accountsToRequest).then((response) => {
                 const newCache = new Map(accounts);
                 for (const account of response.accounts) {
-                    newCache.set(account.id, account.displayName);
+                    newCache.set(account.id, {
+                        displayName: account.displayName,
+                        fullAnkamaName: account.fullAnkamaName
+                    });
                 }
                 setAccounts(newCache);
             });
@@ -254,9 +258,7 @@ export default function TournamentTeamView() {
                                 mb: 1
                             }}>{t('tournament.team.members')}</Typography>
                             {team.validatedPlayers.map(player => (
-                                <Typography key={player} sx={{color: "#8299a1"}}>
-                                    {accounts.get(player) || player}
-                                </Typography>
+                                <User userId={player} key={player} otherProps={{sx: {color: "#8299a1"}}}/>
                             ))}
                         </CardContent>
                     </Card>

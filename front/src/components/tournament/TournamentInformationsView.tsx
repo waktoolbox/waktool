@@ -8,7 +8,6 @@ import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import {useRecoilValue} from "recoil";
-import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import WaktoolRichText from "../editor/WaktoolRichText.tsx";
 import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import {languageState, loginIdState} from "../../atoms/atoms-header.ts";
@@ -16,6 +15,7 @@ import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
 import TournamentAdminDialog from "./admin/TournamentAdminDialog.tsx";
 import TournamentHomeAdmin from "./admin/TournamentHomeAdmin.tsx";
+import {User} from "../common/User.tsx";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -23,7 +23,6 @@ type LoaderResponse = {
 
 export default function TournamentInformationsView() {
     const {t} = useTranslation();
-    const accounts = useRecoilValue(accountCacheState);
     const myTeam = useRecoilValue(myTournamentTeamState);
     const me = useRecoilValue(loginIdState);
     const language = useRecoilValue(languageState);
@@ -33,9 +32,9 @@ export default function TournamentInformationsView() {
     const [rules, setRules] = useState("{}");
 
     useEffect(() => {
-        setDescription(tournament?.description[language as any])
-        setRewards(tournament?.rewards[language as any])
-        setRules(tournament?.rules[language as any])
+        setDescription(tournament?.description[language as unknown as number])
+        setRewards(tournament?.rewards[language as unknown as number])
+        setRules(tournament?.rules[language as unknown as number])
     }, [language])
 
     const tournament = (useLoaderData() as LoaderResponse).tournament;
@@ -106,8 +105,7 @@ export default function TournamentInformationsView() {
                                 mb: 1
                             }}>{t('tournament.admins')}</Typography>
                             {tournament.admins.map(admin => (
-                                <Typography key={admin}
-                                            sx={{color: "#8299a1"}}>{accounts.get(admin) || admin}</Typography>
+                                <User userId={admin} key={admin} otherProps={{sx: {color: "#8299a1"}}}/>
                             ))}
                         </CardContent>
                     </Card>
@@ -119,8 +117,7 @@ export default function TournamentInformationsView() {
                                 mb: 1
                             }}>{t('tournament.referees')}</Typography>
                             {tournament.referees.map(referee => (
-                                <Typography key={referee}
-                                            sx={{color: "#8299a1"}}>{accounts.get(referee) || referee}</Typography>
+                                <User userId={referee} key={referee} otherProps={{sx: {color: "#8299a1"}}}/>
                             ))}
                         </CardContent>
                     </Card>
@@ -133,8 +130,7 @@ export default function TournamentInformationsView() {
                                     mb: 1
                                 }}>{t('tournament.streamers')}</Typography>
                                 {tournament.streamers.map(streamer => (
-                                    <Typography key={streamer}
-                                                sx={{color: "#8299a1"}}>{accounts.get(streamer) || streamer}</Typography>
+                                    <User userId={streamer} key={streamer} otherProps={{sx: {color: "#8299a1"}}}/>
                                 ))}
                             </CardContent>
                         </Card>

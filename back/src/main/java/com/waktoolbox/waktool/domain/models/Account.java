@@ -30,6 +30,11 @@ public class Account {
         return username + "#" + discriminator;
     }
 
+    @JsonIgnore
+    public String getFullAnkamaName() {
+        return ankamaName + "#" + ankamaDiscriminator;
+    }
+
     public boolean areAnkamaInfoValid() {
         if (ankamaName == null || ankamaDiscriminator == null) return false;
         Integer parsedDiscriminator = Integer.valueOf(ankamaDiscriminator);

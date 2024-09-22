@@ -1,6 +1,11 @@
 import {atom} from "recoil";
 
-export const accountCacheState = atom<Map<string, string>>({
+export type Account = {
+    displayName: string,
+    fullAnkamaName?: string
+}
+
+export const accountCacheState = atom<Map<string, Account>>({
     key: "accountCache",
     default: new Map()
 })
