@@ -13,7 +13,7 @@ import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {snackState} from "../../atoms/atoms-snackbar.ts";
-import {BreedsArray} from "../../chore/breeds.ts";
+import TournamentTeamComposition from "./TournamentTeamComposition.tsx";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -29,42 +29,17 @@ export default function TournamentCreateTeamView() {
 
     const [pickedServer, setPickedServer] = useState('')
     const [errors, setErrors] = useState<string[]>();
-    const [team, setTeam] = useState<TournamentTeamModel>({
+    const [team, setTeam] = useState<Partial<TournamentTeamModel>>({
         tournament: id,
         catchPhrase: "",
         breeds: [],
         name: "",
         server: "",
         displayOnTeamList: true
-    } as TournamentTeamModel);
+    } as Partial<TournamentTeamModel>);
     const servers = ["Pandora", "Rubilax"];
 
-    const imageHoverStyle = (breed: number) => {
-        if (!team.breeds) return "";
-        if (hasPickedBreed(breed)) return "imageHoverRed"
-        if (team.breeds.length >= 6) return "imageHoverDisabled"
-        return "imageHover"
-    }
-
-    const hasPickedBreed = (breed: number) => team.breeds?.includes(breed);
-
-    const pickOrUnpickBreed = (breed: number) => {
-        if (!hasPickedBreed(breed)) {
-            if (team.breeds && team.breeds.length >= 6) return;
-
-            const t = {
-                ...team,
-                breeds: team.breeds ? [...team.breeds, breed] : [breed]
-            };
-            setTeam(t)
-            setErrors(validateTournamentTeam(t))
-            return;
-        }
-
-        const t = {
-            ...team,
-            breeds: team.breeds ? team.breeds.filter(b => b !== breed) : []
-        };
+    function setTeamValidateAndSetErrors(t: Partial<TournamentTeamModel>) {
         setTeam(t)
         setErrors(validateTournamentTeam(t))
     }
@@ -73,10 +48,9 @@ export default function TournamentCreateTeamView() {
         setPickedServer(newServer)
         const t = {
             ...team,
-            server: servers[newServer as any]
+            server: servers[newServer as unknown as number]
         };
-        setTeam(t)
-        setErrors(validateTournamentTeam(t));
+        setTeamValidateAndSetErrors(t);
     }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -84,8 +58,7 @@ export default function TournamentCreateTeamView() {
             ...team,
             [event.target.id]: event.target.value
         };
-        setTeam(t)
-        setErrors(validateTournamentTeam(t));
+        setTeamValidateAndSetErrors(t);
     }
 
     function registerTeam() {
@@ -106,12 +79,12 @@ export default function TournamentCreateTeamView() {
 
     }
 
-    function validateTournamentTeam(team: TournamentTeamModel): string[] | undefined {
+    function validateTournamentTeam(team: Partial<TournamentTeamModel>): string[] | undefined {
         const errors = [];
 
         if (!team.name || team.name.length <= 0) errors.push("error.missing.name");
         if (team.name && team.name.length > 25) errors.push("error.too.big.name");
-        if (!servers.includes(team.server)) errors.push("error.badServer");
+        if (!servers.includes(team.server || "")) errors.push("error.badServer");
         if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("error.too.big.catchPhrase");
         if (tournament.mustRegisterTeamComposition && (!team.breeds || team.breeds.length !== 6)) errors.push("error.badPickedBreeds");
 
@@ -156,7 +129,7 @@ export default function TournamentCreateTeamView() {
                                     onClick={() => setServer(server)}
                                     value={server}
                                 >
-                                    {servers[server as any]}
+                                    {servers[server as unknown as number]}
                                 </MenuItem>
                             ))}
                         </TextField>
@@ -166,27 +139,9 @@ export default function TournamentCreateTeamView() {
                                    id="catchPhrase" value={team.catchPhrase}
                                    onChange={handleChange}/>
                     </Grid>
-                    {tournament.mustRegisterTeamComposition &&
-                        <Grid item xs={12} sx={{p: 1}}>
-                            <Typography variant="h6">{t('tournament.team.composition')}</Typography>
-                            <Grid container>
-                                {BreedsArray.map(breed => (
-                                    <Grid item key={breed} xs={2}>
-                                        <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`}
-                                             style={{width: "95%", display: "inline", borderRadius: 15}}
-                                             className={`draftImage
-                                             ${team.breeds && team.breeds.length >= 6 && team.breeds.filter(b => b === breed).length <= 0 ? "imageDisabled" : ""}  
-                                             ${hasPickedBreed(breed) ? "imagePicked" : ""}
-                                             ${imageHoverStyle(breed)}
-                                             `}
-
-                                             onClick={() => {
-                                                 pickOrUnpickBreed(breed)
-                                             }}/>
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        </Grid>
+                    {tournament.mustRegisterTeamComposition && team.breeds &&
+                        <TournamentTeamComposition team={team} breeds={team.breeds}
+                                                   setTeamValidateAndSetErrors={setTeamValidateAndSetErrors}/>
                     }
 
                     <Grid item xs={12} sx={{p: 1}}>

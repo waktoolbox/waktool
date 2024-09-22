@@ -3,7 +3,13 @@ package com.waktoolbox.waktool.domain.models.tournaments;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Optional.ofNullable;
 
 @Getter
 @Setter
@@ -19,4 +25,14 @@ public class Team {
     TeamStats stats;
     boolean displayOnTeamList;
     List<String> validatedPlayers;
+
+    public static List<Integer> extractValidBreeds(List<Integer> breeds) {
+        return ofNullable(breeds)
+                .map(Collection::stream)
+                .map(s -> s.filter(Objects::nonNull))
+                .map(Stream::distinct)
+                .map(s -> s.limit(6))
+                .map(s -> s.collect(Collectors.toList()))
+                .orElse(null);
+    }
 }

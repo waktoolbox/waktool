@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.waktoolbox.waktool.domain.models.tournaments.Team.extractValidBreeds;
+
 // TODO refactor to move logic to domain
 
 @RestController
@@ -46,7 +48,18 @@ public class TournamentTeamController {
     @GetMapping("/tournaments/{tournamentId}/teams/{teamId}")
     public TeamResponse getTeam(@RequestAttribute Optional<String> discordId, @PathVariable String teamId) {
         if (teamId == null) return null;
-        return new TeamResponse(_tournamentTeamRepository.getTeam(teamId).orElse(null));
+        Optional<Team> optTeam = _tournamentTeamRepository.getTeam(teamId);
+
+        if (optTeam.isEmpty()) return new TeamResponse(null);
+
+        Team team = optTeam.get();
+
+        boolean isAdmin = discordId.isPresent() && _tournamentRepository.isAdmin(team.getTournament(), discordId.get());
+        boolean isTeamMember = discordId.isPresent() && team.getValidatedPlayers().contains(discordId.get());
+        if (isAdmin || isTeamMember) return new TeamResponse(team);
+
+        team.setBreeds(null);
+        return new TeamResponse(team);
     }
 
     @GetMapping("/tournaments/{tournamentId}/teams")
@@ -87,6 +100,7 @@ public class TournamentTeamController {
         team.setLeader(leader);
         team.setDisplayOnTeamList(requestTeam.isDisplayOnTeamList());
         team.setValidatedPlayers(new ArrayList<>());
+        team.setBreeds(extractValidBreeds(requestTeam.getBreeds()));
 
         team.getValidatedPlayers().add(leader);
 
@@ -121,6 +135,7 @@ public class TournamentTeamController {
 
         if (!tournamentStarted || isAdmin) {
             team.setDisplayOnTeamList(requestTeam.isDisplayOnTeamList());
+            team.setBreeds(extractValidBreeds(requestTeam.getBreeds()));
         }
 
         team.setCatchPhrase(requestTeam.getCatchPhrase());

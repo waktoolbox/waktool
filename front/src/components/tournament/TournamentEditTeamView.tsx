@@ -27,6 +27,7 @@ import {snackState} from "../../atoms/atoms-snackbar.ts";
 import Divider from "@mui/material/Divider";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
+import TournamentTeamComposition from "./TournamentTeamComposition.tsx";
 
 type LoaderResponse = {
     tournament: TournamentDefinition
@@ -50,13 +51,14 @@ export default function TournamentEditTeamView() {
 
     const [pickedServer, setPickedServer] = useState('')
     const [errors, setErrors] = useState<string[]>();
-    const [team, setTeam] = useState<TournamentTeamModel>({
+    const [team, setTeam] = useState<Partial<TournamentTeamModel>>({
         tournament: id,
         catchPhrase: "",
         name: "",
         server: "",
+        breeds: undefined,
         displayOnTeamList: true
-    } as TournamentTeamModel);
+    } as Partial<TournamentTeamModel>);
     const [applications, setTeamApplications] = useState<Application[]>([]);
     const servers = ["Pandora", "Rubilax"];
 
@@ -65,7 +67,7 @@ export default function TournamentEditTeamView() {
 
         getTournamentTeam(id || "", teamId).then(response => {
             setTeam(response.team)
-            setPickedServer(servers.indexOf(response.team.server) as any)
+            setPickedServer(servers.indexOf(response.team.server) as unknown as string)
 
             const toLoad = [...response.team.validatedPlayers];
             const accountsToRequest = toLoad.filter(accountId => !accounts.get(accountId));
@@ -84,27 +86,26 @@ export default function TournamentEditTeamView() {
         })
     }, [teamId])
 
+    const setTeamValidateAndSetErrors = (t: Partial<TournamentTeamModel>) => {
+        setTeam(t)
+        setErrors(validateTournamentTeam(t));
+    }
+
     const setServer = (newServer: string) => {
         setPickedServer(newServer)
-        setTeam({
+        const t = {
             ...team,
-            server: servers[newServer as any]
-        })
-        setErrors(validateTournamentTeam({
-            ...team,
-            server: servers[newServer as any]
-        }));
+            server: servers[newServer as unknown as number]
+        };
+        setTeamValidateAndSetErrors(t);
     }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setTeam({
+        const t = {
             ...team,
             [event.target.id]: event.target.value
-        })
-        setErrors(validateTournamentTeam({
-            ...team,
-            [event.target.id]: event.target.value
-        }));
+        };
+        setTeamValidateAndSetErrors(t);
     }
 
     function save() {
@@ -126,7 +127,7 @@ export default function TournamentEditTeamView() {
         setAccounts(newAccounts);
         setTeam({
             ...team,
-            validatedPlayers: [...team.validatedPlayers, application.userId]
+            validatedPlayers: team.validatedPlayers ? [...team.validatedPlayers, application.userId] : [application.userId]
         })
         setTeamApplications(applications.filter(application => application.id !== application.id))
     }
@@ -140,7 +141,7 @@ export default function TournamentEditTeamView() {
         deleteTeamPlayer(id || "", teamId || "", userId)
             .then(() => setTeam({
                 ...team,
-                validatedPlayers: team.validatedPlayers.filter(player => player !== userId)
+                validatedPlayers: team?.validatedPlayers?.filter(player => player !== userId)
             }));
 
     }
@@ -152,14 +153,15 @@ export default function TournamentEditTeamView() {
             .then(() => window.location.href = `/tournament/${id}`)
     }
 
-    function validateTournamentTeam(team: TournamentTeamModel): string[] | undefined {
+    function validateTournamentTeam(team: Partial<TournamentTeamModel>): string[] | undefined {
         const errors = [];
 
         if (!team.name || team.name.length <= 0) errors.push("error.missing.name");
         if (team.name && team.name.length > 25) errors.push("error.too.big.name");
         if (team.players && team.players.length > 6) errors.push('error.teamTooBig');
-        if (!servers.includes(team.server)) errors.push("error.badServer");
+        if (!servers.includes(team.server || "")) errors.push("error.badServer");
         if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("error.too.big.catchPhrase");
+        if (tournament.mustRegisterTeamComposition && (!team.breeds || team.breeds.length !== 6)) errors.push("error.badPickedBreeds");
 
         return errors.length <= 0 ? undefined : errors;
     }
@@ -179,7 +181,8 @@ export default function TournamentEditTeamView() {
                            components={{span: <span className="blueWord"/>}}/>
                 </Typography>
             </Grid>
-            <Grid item lg={4} xs={0} sx={{justifyContent: "flex-end"}} display={{xs: 'none', lg: 'flex'}}>
+            <Grid item lg={4} xs={0} sx={{justifyContent: "flex-end", margin: "auto"}}
+                  display={{xs: 'none', lg: 'flex'}} maxHeight={333}>
                 <img src="/images/osamodas_registration.png" alt="Osamodas"/>
             </Grid>
             <Grid item lg={8} xs={12} sx={{textAlign: "start", pl: 4, pr: 4}}>
@@ -202,7 +205,7 @@ export default function TournamentEditTeamView() {
                                     onClick={() => setServer(server)}
                                     value={server}
                                 >
-                                    {servers[server as any]}
+                                    {servers[server as unknown as number]}
                                 </MenuItem>
                             ))}
                         </TextField>
@@ -212,6 +215,10 @@ export default function TournamentEditTeamView() {
                                    id="catchPhrase" value={team.catchPhrase}
                                    onChange={handleChange}/>
                     </Grid>
+                    {tournament.mustRegisterTeamComposition && team.breeds &&
+                        <TournamentTeamComposition team={team} breeds={team.breeds}
+                                                   setTeamValidateAndSetErrors={setTeamValidateAndSetErrors}/>
+                    }
                     <Grid item xs={12} sx={{p: 1}}>
                         {errors && errors.length > 0 && errors.map(error => (
                             <Typography color="error" key={error}>{t(error)}</Typography>

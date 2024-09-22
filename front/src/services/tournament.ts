@@ -44,11 +44,11 @@ export async function teamSearch(tournamentId: string, teamIds: string[]) {
     return await pfetch(`/api/tournaments/${tournamentId}/teams:search`, {ids: teamIds});
 }
 
-export async function postRegisterTeam(tournamentId: string, team: TournamentTeamModel) {
+export async function postRegisterTeam(tournamentId: string, team: Partial<TournamentTeamModel>) {
     return await pfetch(`/api/tournaments/${tournamentId}/teams`, team);
 }
 
-export async function putEditTeam(tournamentId: string, team: TournamentTeamModel) {
+export async function putEditTeam(tournamentId: string, team: Partial<TournamentTeamModel>) {
     return await putFetch(`/api/tournaments/${tournamentId}/teams/${team.id}`, team);
 }
 
