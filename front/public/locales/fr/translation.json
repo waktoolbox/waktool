@@ -41,6 +41,7 @@
   "error": {
     "ankamaName": "Le pseudo Ankama est obligatoire et doit être valide",
     "ankamaDiscriminator": "Le discriminant Ankama est obligatoire et doit être valide (sans le #)",
+    "badPickedBreeds": "Les classes sélectionnées ne sont pas valides",
     "badServer": "Le serveur est invalide",
     "missing.name": "Le nom est obligatoire",
     "mustBeOnDiscordToCreateTeam": "Vous devez être sur le serveur Discord du tournoi pour créer une équipe",
@@ -151,6 +152,7 @@
     "team": {
       "apply": "Postuler",
       "appliants": "Postulant(s)",
+      "composition": "Composition",
       "confirmDeletion": "Êtes-vous sûr de vouloir supprimer l'équipe ?",
       "delete": "Supprimer l'équipe",
       "displayOnTeamList": "Afficher dans la liste des équipes",

@@ -16,6 +16,7 @@ export interface TournamentDefinition {
     server: string;
     startDate: string;
     endDate: string;
+    mustRegisterTeamComposition: boolean;
     level: number;
     description: string;
     rewards: string;
@@ -53,6 +54,7 @@ export interface TournamentTeamModel {
     leader: string;
     players: string[];
     validatedPlayers: string[];
+    breeds?: number[];
     catchPhrase: string;
     displayOnTeamList: boolean;
     stats?: TournamentStatsModel;

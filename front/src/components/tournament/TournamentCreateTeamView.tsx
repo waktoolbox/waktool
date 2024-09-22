@@ -3,9 +3,9 @@ import Typography from "@mui/material/Typography";
 import {Trans, useTranslation} from "react-i18next";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLoaderData, useNavigate, useParams} from "react-router-dom";
 import {ChangeEvent, useState} from "react";
-import {TournamentTeamModel} from "../../chore/tournament.ts";
+import {TournamentDefinition, TournamentTeamModel} from "../../chore/tournament.ts";
 import Button from "@mui/material/Button";
 import {postRegisterTeam} from "../../services/tournament.ts";
 import {useRecoilState, useSetRecoilState} from "recoil";
@@ -13,11 +13,17 @@ import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {snackState} from "../../atoms/atoms-snackbar.ts";
+import {BreedsArray} from "../../chore/breeds.ts";
+
+type LoaderResponse = {
+    tournament: TournamentDefinition
+}
 
 export default function TournamentCreateTeamView() {
     const navigate = useNavigate();
     const {t} = useTranslation();
     const {id} = useParams();
+    const tournament = (useLoaderData() as LoaderResponse).tournament;
     const [_, setMyTournamentTeam] = useRecoilState(myTournamentTeamState);
     const setSnackValue = useSetRecoilState(snackState);
 
@@ -26,33 +32,60 @@ export default function TournamentCreateTeamView() {
     const [team, setTeam] = useState<TournamentTeamModel>({
         tournament: id,
         catchPhrase: "",
+        breeds: [],
         name: "",
         server: "",
         displayOnTeamList: true
     } as TournamentTeamModel);
     const servers = ["Pandora", "Rubilax"];
 
+    const imageHoverStyle = (breed: number) => {
+        if (!team.breeds) return "";
+        if (hasPickedBreed(breed)) return "imageHoverRed"
+        if (team.breeds.length >= 6) return "imageHoverDisabled"
+        return "imageHover"
+    }
+
+    const hasPickedBreed = (breed: number) => team.breeds?.includes(breed);
+
+    const pickOrUnpickBreed = (breed: number) => {
+        if (!hasPickedBreed(breed)) {
+            if (team.breeds && team.breeds.length >= 6) return;
+
+            const t = {
+                ...team,
+                breeds: team.breeds ? [...team.breeds, breed] : [breed]
+            };
+            setTeam(t)
+            setErrors(validateTournamentTeam(t))
+            return;
+        }
+
+        const t = {
+            ...team,
+            breeds: team.breeds ? team.breeds.filter(b => b !== breed) : []
+        };
+        setTeam(t)
+        setErrors(validateTournamentTeam(t))
+    }
+
     const setServer = (newServer: string) => {
         setPickedServer(newServer)
-        setTeam({
+        const t = {
             ...team,
             server: servers[newServer as any]
-        })
-        setErrors(validateTournamentTeam({
-            ...team,
-            server: servers[newServer as any]
-        }));
+        };
+        setTeam(t)
+        setErrors(validateTournamentTeam(t));
     }
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setTeam({
+        const t = {
             ...team,
             [event.target.id]: event.target.value
-        })
-        setErrors(validateTournamentTeam({
-            ...team,
-            [event.target.id]: event.target.value
-        }));
+        };
+        setTeam(t)
+        setErrors(validateTournamentTeam(t));
     }
 
     function registerTeam() {
@@ -80,6 +113,7 @@ export default function TournamentCreateTeamView() {
         if (team.name && team.name.length > 25) errors.push("error.too.big.name");
         if (!servers.includes(team.server)) errors.push("error.badServer");
         if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("error.too.big.catchPhrase");
+        if (tournament.mustRegisterTeamComposition && (!team.breeds || team.breeds.length !== 6)) errors.push("error.badPickedBreeds");
 
         return errors.length <= 0 ? undefined : errors;
     }
@@ -98,7 +132,8 @@ export default function TournamentCreateTeamView() {
                     <Trans i18nKey="tournament.team.register.title" components={{span: <span className="blueWord"/>}}/>
                 </Typography>
             </Grid>
-            <Grid item lg={4} xs={0} sx={{justifyContent: "flex-end"}} display={{xs: 'none', lg: 'flex'}}>
+            <Grid item lg={4} xs={0} sx={{justifyContent: "flex-end", margin: "auto"}}
+                  display={{xs: 'none', lg: 'flex'}} maxHeight={333}>
                 <img src="/images/osamodas_registration.png" alt="Osamodas"/>
             </Grid>
             <Grid item lg={8} xs={12} sx={{textAlign: "start", pl: 4, pr: 4}}>
@@ -131,6 +166,29 @@ export default function TournamentCreateTeamView() {
                                    id="catchPhrase" value={team.catchPhrase}
                                    onChange={handleChange}/>
                     </Grid>
+                    {tournament.mustRegisterTeamComposition &&
+                        <Grid item xs={12} sx={{p: 1}}>
+                            <Typography variant="h6">{t('tournament.team.composition')}</Typography>
+                            <Grid container>
+                                {BreedsArray.map(breed => (
+                                    <Grid item key={breed} xs={2}>
+                                        <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`}
+                                             style={{width: "95%", display: "inline", borderRadius: 15}}
+                                             className={`draftImage
+                                             ${team.breeds && team.breeds.length >= 6 && team.breeds.filter(b => b === breed).length <= 0 ? "imageDisabled" : ""}  
+                                             ${hasPickedBreed(breed) ? "imagePicked" : ""}
+                                             ${imageHoverStyle(breed)}
+                                             `}
+
+                                             onClick={() => {
+                                                 pickOrUnpickBreed(breed)
+                                             }}/>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Grid>
+                    }
+
                     <Grid item xs={12} sx={{p: 1}}>
                         {errors && errors.length > 0 && errors.map(error => (
                             <Typography color="error" key={error}>{t(error)}</Typography>

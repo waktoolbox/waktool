@@ -80,3 +80,22 @@ h6 {
     top: 50%;
     transform: translateY(10%);
 }
+
+.imagePicked {
+    box-shadow: inset 0 0 0 10px #03c8be;
+}
+
+.imageHover:hover {
+    box-shadow: inset 0 0 0 10px #03c8be;
+    cursor: pointer
+}
+
+.imageDisabled {
+    filter: grayscale(1);
+    cursor: not-allowed;
+}
+
+.imageHoverRed:hover {
+    box-shadow: inset 0 0 0 10px #e64b4b;
+    cursor: pointer
+}

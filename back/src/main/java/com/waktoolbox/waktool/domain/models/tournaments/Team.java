@@ -13,6 +13,7 @@ public class Team {
     String leader;
     String server;
     List<String> players;
+    List<Integer> breeds;
     String tournament;
     String catchPhrase;
     TeamStats stats;

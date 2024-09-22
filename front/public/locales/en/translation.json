@@ -41,6 +41,7 @@
   "error": {
     "ankamaName": "Ankama nickname is mandatory and must be valid",
     "ankamaDiscriminator": "Ankama tag is mandatory and must be valid (without #)",
+    "badPickedBreeds": "Selected classes are not valid",
     "badServer": "Invalid server",
     "missing.name": "Name is mandatory",
     "mustBeOnDiscordToCreateTeam": "You must be on tournament's Discord to create a team",
@@ -151,6 +152,7 @@
     "team": {
       "apply": "Apply",
       "appliants": "Applier(s)",
+      "composition": "Composition",
       "confirmDeletion": "Do you confirm team deletion?",
       "delete": "Delete team",
       "displayOnTeamList": "Display team on teams list",
