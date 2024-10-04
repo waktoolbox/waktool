@@ -1,6 +1,7 @@
 package com.waktoolbox.waktool.domain.controllers.tournaments.phases;
 
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseControllerContext;
+import com.waktoolbox.waktool.domain.models.drafts.DraftTeamResult;
 import com.waktoolbox.waktool.domain.models.tournaments.*;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
@@ -22,7 +23,7 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         TournamentPhaseData tournamentPhaseData = new TournamentPhaseData();
         if (context.getTournamentData().isEmpty()) { // first init
             List<Team> teams = context.getTournamentTeamRepository().getTeamsByTournamentId(context.getTournament().getId());
-            tournamentPhaseData.setTeams(teams.stream().map(Team::getId).map(id -> new TournamentPhaseDataTeam(id, 0)).toList());
+            tournamentPhaseData.setTeams(teams.stream().map(team -> new TournamentPhaseDataTeam(team.getId(), team.getBreeds(), 0)).toList());
         } else {
             String tournamentId = context.getTournament().getId();
             TournamentData previousPhase = context.getTournamentData().get(context.getPhase() - 1);
@@ -157,8 +158,15 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
     private List<TournamentMatchRound> createRoundsBeforeFinals(List<TournamentPhaseDataTeam> teams, TournamentMatch tournamentMatch) {
         List<TournamentMatchRound> rounds = new ArrayList<>();
         // TODO late: use config
-        int lowerTeamSizeRoundCount = teams.size() <= 4 ? 5 : 3;
-        int roundsCount = teams.size() <= 8 ? lowerTeamSizeRoundCount : 1;
+        int numberOfTeams = teams.size();
+        int roundsCount = switch (numberOfTeams) {
+            case 1, 2 -> 5; // final
+            case 3, 4, 5, 6, 7, 8 -> 3; // semi, quarter
+            default -> 1; // all others
+        };
+
+        Map<String, DraftTeamResult> breedsByTeam = numberOfTeams > 16 ? collectTeamBreeds(teams) : new HashMap<>();
+
         for (int round = 0; round < roundsCount; round++) {
             TournamentMatchRound matchRound = new TournamentMatchRound();
 
@@ -168,11 +176,22 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
 
             matchRound.setMap(rollMap());
             matchRound.setRound(round);
-            matchRound.setDraftId(tournamentMatch.getId() + "_" + round);
+            if (numberOfTeams > 16) {
+                matchRound.setTeamADraft(breedsByTeam.get(tournamentMatch.getTeamA()));
+                matchRound.setTeamBDraft(breedsByTeam.get(tournamentMatch.getTeamB()));
+            } else {
+                matchRound.setDraftId(tournamentMatch.getId() + "_" + round);
+            }
 
             rounds.add(matchRound);
         }
         return rounds;
+    }
+
+    private Map<String, DraftTeamResult> collectTeamBreeds(List<TournamentPhaseDataTeam> teams) {
+        return context.getTournamentTeamRepository().getTeamsWithIds(teams.stream().map(TournamentPhaseDataTeam::getId).toList())
+                .stream()
+                .collect(Collectors.toMap(Team::getId, team -> new DraftTeamResult(team.getBreeds().toArray(new Byte[0]), new Byte[0])));
     }
 
     private List<TournamentMatchRound> createRoundsForFinals(TournamentMatch tournamentMatch, TournamentPhaseDataTeam noLoss, TournamentPhaseDataTeam oneLoss) {
