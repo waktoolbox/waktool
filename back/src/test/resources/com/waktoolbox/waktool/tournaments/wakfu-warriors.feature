@@ -111,42 +111,49 @@ Feature: Wakfu Warriors workflow
     When we start next round or phase of tournament ww
 
     Then there is 8 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 3
     Given all teams A of tournament ww win their match
 
     # Phase 3 round 2
     When we start next round or phase of tournament ww
 
     Then there is 4 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 3
     Given all teams A of tournament ww win their match
 
     # Phase 4 round 1 - 8 teams
     When we start next round or phase of tournament ww
 
     Then there is 4 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 4
     Given all teams A of tournament ww win their match
 
     # Phase 4 round 2
     When we start next round or phase of tournament ww
 
     Then there is 2 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 4
     Given all teams A of tournament ww win their match
 
     # Phase 5 round 1 - Semi
     When we start next round or phase of tournament ww
 
     Then there is 2 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 5
     Given all teams A of tournament ww win their match
 
     # 3rd place
     When we start next round or phase of tournament ww
 
     Then there is 1 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 5
     Given all teams A of tournament ww win their match
 
     # Final
     When we start next round or phase of tournament ww
 
     Then there is 1 pending matches in tournament ww
+    And the matches drafts are manual in tournament ww phase 5 round 3 match round 1
     Given all teams A of tournament ww win their match
 
     # Tournament is ended, it shouldn't generate anything
@@ -158,6 +165,3 @@ Feature: Wakfu Warriors workflow
       | numberOfTeams |
       | 63            |
       | 64            |
-
-
-

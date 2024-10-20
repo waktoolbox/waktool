@@ -163,4 +163,25 @@ public class TournamentSteps {
             }
         });
     }
+
+    @Then(THAT + "the matches drafts are manual in tournament " + VARIABLE + " phase " + NUMBER + "$")
+    public void matchDraftUsingManual(String id, Number phase) {
+        List<TournamentMatch> matches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase.intValue())
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .toList();
+
+        Assertions.assertTrue(matches.stream().allMatch(m -> m.getRounds().getFirst().getDraftFirstPicker() != null));
+    }
+
+    @Then(THAT + "the matches drafts are manual in tournament " + VARIABLE + " phase " + NUMBER + " round " + NUMBER + " match round " + NUMBER + "$")
+    public void matchDraftUsingManual(String id, Number phase, Number round, Number matchRound) {
+        List<TournamentMatch> matches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase.intValue())
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .filter(m -> m.getRound() == round.intValue())
+                .toList();
+
+        Assertions.assertTrue(matches.stream().allMatch(m -> m.getRounds().get(matchRound.intValue()).getDraftFirstPicker() != null));
+    }
 }
