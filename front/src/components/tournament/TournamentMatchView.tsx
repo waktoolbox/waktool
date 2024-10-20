@@ -542,11 +542,11 @@ export default function TournamentMatchView() {
                                             <User userId={match.streamer}
                                                   otherProps={{sx: {color: "#8299a1", mb: 2, mt: 2}}}/>
                                             : <Typography
-                                            sx={{
-                                                color: "#8299a1",
-                                                mb: 2,
-                                                mt: 2
-                                            }}>{t('tournament.match.noStreamer')}</Typography>
+                                                sx={{
+                                                    color: "#8299a1",
+                                                    mb: 2,
+                                                    mt: 2
+                                                }}>{t('tournament.match.noStreamer')}</Typography>
                                         }
                                         {match.streamer && streamerCache.get(match.streamer || "") &&
                                             <a href={streamerCache.get(match.streamer || "")} rel="noreferrer"
@@ -611,16 +611,14 @@ export default function TournamentMatchView() {
 
             <div hidden={!(me && tournament.referees?.find(referee => referee === me))}
                  style={{position: 'fixed', bottom: 3, right: 3}}>
-                <TournamentAdminDialog buttonText={t('tournament.admin.matchAdmin')}
-                                       title={t('tournament.admin.matchAdmin')}>
+                <TournamentAdminDialog buttonText={t('tournament.admin.matchAdmin')} withTitle={false}
+                                       title={""}>
                     <Card>
-                        <CardContent>
-                            <Grid container sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, mb: 1}}>
-                                <Grid item xs={6}>
+                        <CardContent sx={{m: 1, borderRadius: 3}}>
+                            <Grid container sx={{borderRadius: 3, mb: 1, backgroundColor: '#162329'}}>
+                                <Grid item xs={12}>
                                     <Button variant="outlined" sx={{m: 1}}
                                             onClick={() => setMeAsReferee()}>{t('tournament.admin.setMeAsReferee')}</Button>
-                                </Grid>
-                                <Grid item xs={6}>
                                     <Button variant="contained" sx={{m: 1}} color="error"
                                             onClick={() => removeStreamer()}>{t('tournament.admin.removeStreamer')}</Button>
                                 </Grid>
@@ -634,11 +632,9 @@ export default function TournamentMatchView() {
                                     <Button variant="outlined" sx={{m: 1}}
                                             onClick={() => validateMatchDate()}>{t('tournament.admin.validateMatchDate')}</Button>
                                 </Grid>
-
                             </Grid>
 
-
-                            <Grid container sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3}}
+                            <Grid container sx={{borderRadius: 3, backgroundColor: '#162329', alignItems: 'center'}}
                                   hidden={match?.referee !== me}>
                                 <Grid item xs={12}>
                                     <Tabs value={tab} onChange={onTabChange}>
@@ -647,30 +643,43 @@ export default function TournamentMatchView() {
                                         ))}
                                     </Tabs>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Button variant="contained" color="error" sx={{m: 1}}
-                                            onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_A)}>{t('tournament.admin.draftFirstPickTeamA')}</Button>
+                                <Grid item xs={3}>
+                                    <Typography sx={{ml: 1, mt: 1}}
+                                                display="inline">{t('tournament.admin.draftFirstPickTeam')}</Typography>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Button variant="contained" color="error" sx={{m: 1}}
-                                            onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_B)}>{t('tournament.admin.draftFirstPickTeamB')}</Button>
+                                            onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_A)}>{t('tournament.admin.teamA')}</Button>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Button variant="contained" color="error" sx={{m: 1}}
-                                            onClick={() => roundDraftFirstPicker(DraftTeam.NONE)}>{t('tournament.admin.draftFirstPickNone')}</Button>
+                                            onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_B)}>{t('tournament.admin.teamB')}</Button>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
+                                    <Button variant="contained" color="error" sx={{m: 1}}
+                                            onClick={() => roundDraftFirstPicker(DraftTeam.NONE)}>{t('tournament.admin.none')}</Button>
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Typography sx={{ml: 1, mt: 1}}
+                                                display="inline">{t('tournament.admin.roundWinner')}</Typography>
+                                </Grid>
+                                <Grid item xs={3}>
                                     <Button variant="outlined" sx={{m: 1}}
-                                            onClick={() => setRoundWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.roundWinnerTeamA')}</Button>
+                                            onClick={() => setRoundWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.teamA')}</Button>
                                 </Grid>
-                                <Grid item xs={4}>
+                                <Grid item xs={3}>
                                     <Button variant="outlined" sx={{m: 1}}
-                                            onClick={() => setRoundWinner(DraftTeam.TEAM_B)}>{t('tournament.admin.roundWinnerTeamB')}</Button>
+                                            onClick={() => setRoundWinner(DraftTeam.TEAM_B)}>{t('tournament.admin.teamB')}</Button>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <TextField sx={{m: 1}} label={t('tournament.admin.roundTurnNumber')}
+                                <Grid item xs={3}>
+                                    <TextField size="small" sx={{m: 1}} label={t('tournament.admin.roundTurnNumber')}
                                                id="catchPhrase" value={fight?.history?.turns} type="number"
                                                onChange={(newValue) => setRoundTurns(+newValue.target.value)}/>
+                                </Grid>
+
+                                <Grid item xs={12} sx={{p: 1}}>
+                                    <Typography display="inline">{t('tournament.admin.playersFromTeamA')}</Typography>
                                 </Grid>
 
                                 <Grid item xs={12} sx={{p: 1}}>
@@ -679,6 +688,13 @@ export default function TournamentMatchView() {
                                                           control={<Checkbox checked={presentPlayers.has(playerId)}
                                                                              onChange={(e) => changePresentPlayers(playerId, e.target.checked)}/>}/>
                                     ))}
+                                </Grid>
+
+                                <Grid item xs={12} sx={{p: 1}}>
+                                    <Typography display="inline">{t('tournament.admin.playersFromTeamB')}</Typography>
+                                </Grid>
+
+                                <Grid item xs={12} sx={{p: 1}}>
                                     {teamBPlayers && [...teamBPlayers.keys()].map((playerId) => (
                                         <FormControlLabel key={`teamB_${playerId}`} label={teamBPlayers.get(playerId)}
                                                           control={<Checkbox checked={presentPlayers.has(playerId)}
@@ -686,80 +702,104 @@ export default function TournamentMatchView() {
                                     ))}
                                 </Grid>
 
-                                <Grid item xs={12} hidden={!fight || !fight.teamADraft || !fight.teamBDraft}>
-                                    <Select size="small" value={currentHistoryEntry.team}
-                                            onChange={(event: SelectChangeEvent) => {
-                                                setCurrentHistoryEntry({
-                                                    ...currentHistoryEntry,
-                                                    team: event.target.value
-                                                })
-                                            }}>
-                                        <MenuItem value={match?.teamA}>{teams.get(match?.teamA || "")}</MenuItem>
-                                        <MenuItem value={match?.teamB}>{teams.get(match?.teamB || "")}</MenuItem>
-                                    </Select>
-                                    Killer:
-                                    <Select size="small" value={currentHistoryEntry.source as unknown as string}
-                                            onChange={(event: SelectChangeEvent) => {
-                                                setCurrentHistoryEntry({
-                                                    ...currentHistoryEntry,
-                                                    source: (event.target.value as unknown as number)
-                                                })
-                                            }}>
-                                        {BreedsArray.map(breed => (
-                                            <MenuItem key={`source_${breed}`} value={breed}>
-                                                <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`} width={50}/>
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                    Killed:
-                                    <Select size="small" value={currentHistoryEntry.target as unknown as string}
-                                            onChange={(event: SelectChangeEvent) => {
-                                                setCurrentHistoryEntry({
-                                                    ...currentHistoryEntry,
-                                                    target: (event.target.value as unknown as number)
-                                                })
-                                            }}>
-                                        {BreedsArray.map(breed => (
-                                            <MenuItem key={`source_${breed}`} value={breed}>
-                                                <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`} width={50}/>
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                    <Button onClick={() => addCurrentHistoryEntryToHistory()}>Add</Button>
-                                    {fight && fight.history && fight.history.entries?.map((entry, index) => (
-                                        <div key={`history_${index}`}>
-                                            {teams.get(entry.team || "")} {Breeds[entry.source as number]} killed {Breeds[entry.target as number]}
-                                        </div>
-                                    ))}
+                                <Grid item xs={12} sx={{pl: 1}}
+                                      hidden={!fight || !fight.teamADraft || !fight.teamBDraft}>
+                                    <Grid container>
+                                        <Grid item xs={5}>
+                                            <Typography display="inline"
+                                                        sx={{mr: 1}}>{t('tournament.admin.team')}</Typography>
+                                            <Select variant="outlined" size="small" value={currentHistoryEntry.team}
+                                                    onChange={(event: SelectChangeEvent) => {
+                                                        setCurrentHistoryEntry({
+                                                            ...currentHistoryEntry,
+                                                            team: event.target.value
+                                                        })
+                                                    }}>
+                                                <MenuItem
+                                                    value={match?.teamA}>{teams.get(match?.teamA || "")}</MenuItem>
+                                                <MenuItem
+                                                    value={match?.teamB}>{teams.get(match?.teamB || "")}</MenuItem>
+                                            </Select>
+                                        </Grid>
+                                        <Grid item xs={2}>
+                                            <Typography display="inline"
+                                                        sx={{mr: 1}}>{t('tournament.admin.killer')}</Typography>
+                                            <Select variant="outlined" size="small"
+                                                    value={currentHistoryEntry.source as unknown as string}
+                                                    onChange={(event: SelectChangeEvent) => {
+                                                        setCurrentHistoryEntry({
+                                                            ...currentHistoryEntry,
+                                                            source: (event.target.value as unknown as number)
+                                                        })
+                                                    }}>
+                                                {BreedsArray.map(breed => (
+                                                    <MenuItem key={`source_${breed}`} value={breed}>
+                                                        <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`}
+                                                             width={40}/>
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </Grid>
+                                        <Grid item xs={2}>
+                                            <Typography display="inline"
+                                                        sx={{mr: 1}}>{t('tournament.admin.killed')}</Typography>
+                                            <Select variant="outlined" size="small"
+                                                    value={currentHistoryEntry.target as unknown as string}
+                                                    onChange={(event: SelectChangeEvent) => {
+                                                        setCurrentHistoryEntry({
+                                                            ...currentHistoryEntry,
+                                                            target: (event.target.value as unknown as number)
+                                                        })
+                                                    }}>
+                                                {BreedsArray.map(breed => (
+                                                    <MenuItem key={`source_${breed}`} value={breed}>
+                                                        <img src={`/classes/${breed}_0.png`} alt={`Breed ${breed}`}
+                                                             width={40}/>
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <Button variant="contained"
+                                                    onClick={() => addCurrentHistoryEntryToHistory()}>{t('tournament.admin.add')}</Button>
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            {fight && fight.history && fight.history.entries?.map((entry, index) => (
+                                                <Typography key={`history_${index}`}>
+                                                    {teams.get(entry.team || "")} {Breeds[entry.source as number]} killed {Breeds[entry.target as number]}
+                                                </Typography>
+                                            ))}
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
 
-                                <Grid item xs={12}>
-                                    <Button variant="contained" sx={{m: 1}} color="error"
-                                            onClick={() => roundSendStats()}>{t('tournament.admin.sendFightStats')}</Button>
-                                </Grid>
-
-                                <Grid item xs={6}>
+                                <Grid item xs={3}>
                                     <Button variant="contained" sx={{m: 1}} color="error"
                                             onClick={() => roundRerollMap()}>{t('tournament.admin.rerollMap')}</Button>
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={4}>
                                     <Button variant="contained" sx={{m: 1}} color="error"
                                             onClick={() => roundResetDraft()}>{t('tournament.admin.resetDraft')}</Button>
                                 </Grid>
+
+                                <Grid item xs={5}>
+                                    <Button variant="contained" sx={{m: 1}} color="error"
+                                            onClick={() => roundSendStats()}>{t('tournament.admin.sendFightStats')}</Button>
+                                </Grid>
                             </Grid>
 
-                            <Grid container sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, mt: 2}}
+                            <Grid container sx={{mt: 1, p: 1, borderRadius: 3, backgroundColor: '#162329'}}
                                   hidden={match?.referee !== me}>
-                                <Grid item xs={6}>
-                                    <Button variant="outlined" sx={{m: 1}}
+                                <Grid item xs={3.5}>
+                                    <Button variant="outlined"
                                             onClick={() => setMatchWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.matchWinnerTeamA')}</Button>
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <Button variant="outlined" sx={{m: 1}}
+                                <Grid item xs={3.5}>
+                                    <Button variant="outlined"
                                             onClick={() => setMatchWinner(DraftTeam.TEAM_B)}>{t('tournament.admin.matchWinnerTeamB')}</Button>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Button variant="contained" color="error" sx={{m: 1}}
+                                <Grid item xs={5}>
+                                    <Button variant="contained" color="error"
                                             onClick={() => validateMatchAndSendStats()}>{t('tournament.admin.validateMatchAndSendStats')}</Button>
                                 </Grid>
                             </Grid>

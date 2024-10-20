@@ -153,7 +153,7 @@ public class TournamentTeamController {
         return new TeamPlayersResponse(_accountRepository
                 .find(team.getValidatedPlayers())
                 .stream()
-                .collect(Collectors.toMap(Account::getId, Account::getDisplayName)));
+                .collect(Collectors.toMap(Account::getId, Account::getFullAnkamaName)));
     }
 
     @GetMapping("/tournaments/{tournamentId}/teams/{teamId}/applications")
