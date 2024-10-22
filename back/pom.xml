@@ -20,7 +20,7 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
 		<java.version>21</java.version>
-		<tzatziki.version>1.5.3</tzatziki.version>
+		<tzatziki.version>1.6.1</tzatziki.version>
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 	</properties>
 
@@ -165,6 +165,12 @@
 			<artifactId>tzatziki-spring-jpa</artifactId>
 			<version>${tzatziki.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>jackson-datatype-hibernate5</artifactId>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

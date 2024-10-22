@@ -19,14 +19,14 @@ public class Team {
     String leader;
     String server;
     List<String> players;
-    List<Integer> breeds;
+    List<Byte> breeds;
     String tournament;
     String catchPhrase;
     TeamStats stats;
     boolean displayOnTeamList;
     List<String> validatedPlayers;
 
-    public static List<Integer> extractValidBreeds(List<Integer> breeds) {
+    public static List<Byte> extractValidBreeds(List<Byte> breeds) {
         return ofNullable(breeds)
                 .map(Collection::stream)
                 .map(s -> s.filter(Objects::nonNull))
