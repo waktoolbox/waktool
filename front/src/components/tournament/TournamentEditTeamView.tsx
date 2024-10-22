@@ -61,7 +61,7 @@ export default function TournamentEditTeamView() {
         displayOnTeamList: true
     } as Partial<TournamentTeamModel>);
     const [applications, setTeamApplications] = useState<Application[]>([]);
-    const servers = ["Pandora", "Rubilax"];
+    const servers = ["Ogrest", "Pandora", "Rubilax"];
 
     useEffect(() => {
         if (!teamId) return;

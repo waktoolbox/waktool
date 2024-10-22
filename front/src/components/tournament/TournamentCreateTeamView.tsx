@@ -37,7 +37,7 @@ export default function TournamentCreateTeamView() {
         server: "",
         displayOnTeamList: true
     } as Partial<TournamentTeamModel>);
-    const servers = ["Pandora", "Rubilax"];
+    const servers = ["Ogrest", "Pandora", "Rubilax"];
 
     function setTeamValidateAndSetErrors(t: Partial<TournamentTeamModel>) {
         setTeam(t)

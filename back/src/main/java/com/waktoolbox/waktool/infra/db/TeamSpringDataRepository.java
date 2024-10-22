@@ -46,6 +46,7 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
                     content->('stats')->>('victories') as victories
                     FROM teams
                     WHERE content->>('tournament') = :tournamentId AND content->>('displayOnTeamList') = 'true'
+                    ORDER BY created_at ASC
             """, nativeQuery = true)
     List<LightTeam> getPublicLightTournamentTeams(String tournamentId);
 
@@ -58,6 +59,7 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
                     content->('stats')->>('victories') as victories
                     FROM teams
                     WHERE content->>('tournament') = :tournamentId
+                    ORDER BY created_at ASC
             """, nativeQuery = true)
     List<LightTeam> getAllLightTournamentTeams(String tournamentId);
 

@@ -29,7 +29,7 @@ import static com.waktoolbox.waktool.domain.models.tournaments.Team.extractValid
 public class TournamentTeamController {
     @Value("${waktool.base-url}")
     private String BASE_URL;
-    private static final String TEAM_URL = "%s/tournament/wakfu-warriors/tab/8/team/%s";
+    private static final String TEAM_URL = "%s/tournament/%s/tab/8/team/%s";
 
     private final AccountRepository _accountRepository;
     private final ApplicationRepository _applicationRepository;
@@ -188,6 +188,8 @@ public class TournamentTeamController {
 
         Optional<String> discordGuildId = _tournamentRepository.getDiscordGuildId(tournamentId);
         String userId = discordId.get();
+        if (_applicationRepository.doesThisApplicationExist(tournamentId, teamId, discordId.get()))
+            return new PostApplicationResponse(false, null);
         if (discordGuildId.isPresent() && (!_discordRepository.isGuildMember(discordGuildId.get(), userId))) {
             return new PostApplicationResponse(false, "error.mustBeOnDiscordToJoinTournament");
         }
@@ -198,7 +200,7 @@ public class TournamentTeamController {
         _applicationRepository.saveApplication(tournamentId, teamId, userId);
 
         Team team = optTeam.get();
-        _notifier.notifyUser(team.getLeader(), TranslatorKey.TOURNAMENT_USER_APPLIED, String.format(TEAM_URL, BASE_URL, teamId));
+        _notifier.notifyUser(team.getLeader(), TranslatorKey.TOURNAMENT_USER_APPLIED, String.format(TEAM_URL, BASE_URL, tournamentId, teamId));
         return new PostApplicationResponse(true, null);
     }
 
@@ -214,16 +216,18 @@ public class TournamentTeamController {
         if (applicationUserId.isEmpty()) return ResponseEntity.badRequest().build();
 
         Optional<Team> optTeam = _tournamentTeamRepository.getTeam(teamId);
-        if (!optTeam.isPresent()) return ResponseEntity.badRequest().build();
+        if (optTeam.isEmpty()) return ResponseEntity.badRequest().build();
         Team team = optTeam.get();
 
         if (!Objects.equals(team.getLeader(), userId) && !_tournamentRepository.isAdmin(tournamentId, userId))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        team.getValidatedPlayers().add(applicationUserId.get());
-        _tournamentTeamRepository.saveTeam(team);
+        if (!team.getValidatedPlayers().contains(applicationUserId.get())) {
+            team.getValidatedPlayers().add(applicationUserId.get());
+            _tournamentTeamRepository.saveTeam(team);
+            _notifier.notifyUser(applicationUserId.get(), TranslatorKey.TOURNAMENT_USER_APPLICATION_ACCEPTED, team.getName());
+        }
         _applicationRepository.deleteApplication(tournamentId, teamId, applicationId);
-        _notifier.notifyUser(applicationUserId.get(), TranslatorKey.TOURNAMENT_USER_APPLICATION_ACCEPTED, team.getName());
         return ResponseEntity.ok().build();
     }
 

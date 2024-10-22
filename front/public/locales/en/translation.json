@@ -161,7 +161,7 @@
       "composition": "Composition",
       "confirmDeletion": "Do you confirm team deletion?",
       "delete": "Delete team",
-      "displayOnTeamList": "Display team on teams list",
+      "displayOnTeamList": "Display team on teams list before registrations end",
       "goTo": "Open team",
       "manage": "Manage",
       "manageMyRegistration": "Manage my registration",
