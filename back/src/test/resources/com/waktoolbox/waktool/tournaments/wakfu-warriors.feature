@@ -68,6 +68,7 @@ Feature: Wakfu Warriors workflow
     """
 
     # First match for all teams, all random
+    And if <numberOfTeams> == 58 => there is 29 pending matches in tournament ww
     And if <numberOfTeams> == 63 => there is 31 pending matches in tournament ww
     And if <numberOfTeams> == 64 => there is 32 pending matches in tournament ww
     Given all teams A of tournament ww win their match
@@ -76,6 +77,7 @@ Feature: Wakfu Warriors workflow
     When we start next round or phase of tournament ww
 
     # Second match for all teams, 1 loss teams vs 1 loss teams, no loss vs no loss
+    Then if <numberOfTeams> == 58 => there is 28 pending matches in tournament ww
     Then if <numberOfTeams> == 63 => there is 31 pending matches in tournament ww
     Then if <numberOfTeams> == 64 => there is 32 pending matches in tournament ww
     And the matches drafts are using predefined team breeds in tournament ww phase 1
@@ -85,7 +87,8 @@ Feature: Wakfu Warriors workflow
     When we start next round or phase of tournament ww
 
     # 2 loss are eliminated, 2 wins are qualified, let's fight between 1 loss again
-    Then there is 16 pending matches in tournament ww
+    Then if <numberOfTeams> == 58 => there is 14 pending matches in tournament ww
+    Then if <numberOfTeams> != 58 => there is 16 pending matches in tournament ww
     And the matches drafts are using predefined team breeds in tournament ww phase 1
     Given all teams A of tournament ww win their match
 
@@ -93,7 +96,8 @@ Feature: Wakfu Warriors workflow
     When we start next round or phase of tournament ww
 
     # 1 loss teams encounter each other, no loss teams encounter each others
-    Then there is 16 pending matches in tournament ww
+    Then if <numberOfTeams> == 58 => there is 14 pending matches in tournament ww
+    Then if <numberOfTeams> != 58 => there is 16 pending matches in tournament ww
     And the matches drafts are using predefined team breeds in tournament ww phase 2
     Given all teams A of tournament ww win their match
 
@@ -101,7 +105,8 @@ Feature: Wakfu Warriors workflow
     When we start next round or phase of tournament ww
 
     # 1 loss from winner bracket encounters 1 loss from looser bracket
-    Then there is 8 pending matches in tournament ww
+    Then if <numberOfTeams> == 58 => there is 7 pending matches in tournament ww
+    Then if <numberOfTeams> != 58 => there is 8 pending matches in tournament ww
     And the matches drafts are using predefined team breeds in tournament ww phase 2
     Given all teams A of tournament ww win their match
 
@@ -161,6 +166,7 @@ Feature: Wakfu Warriors workflow
 
     Examples:
       | numberOfTeams |
+      | 58            |
       | 63            |
       | 64            |
 

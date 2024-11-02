@@ -205,11 +205,13 @@ public class TournamentAdminController {
 
         TournamentMatchRound matchRound = optMatchRound.get();
         TournamentMatchHistory history = statsRequest.history();
-        history.setEntries(
-                history.getEntries().stream()
-                        .filter(h -> h.getSource() != null && h.getTarget() != null && h.getTeam() != null)
-                        .toList()
-        );
+        if (history.getEntries() != null) {
+            history.setEntries(
+                    history.getEntries().stream()
+                            .filter(h -> h.getSource() != null && h.getTarget() != null && h.getTeam() != null)
+                            .toList()
+            );
+        }
         matchRound.setHistory(history);
         matchRound.setWinner(statsRequest.winner());
         _tournamentMatchRepository.save(tournamentId, match);

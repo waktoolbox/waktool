@@ -330,7 +330,7 @@ export default function TournamentMatchView() {
             <Grid item xs={6}>
                 <Grid container>
                     <Grid item xs={12}>
-                        {fight.winner === appropriateTeam &&
+                        {fight.winner && fight.winner === appropriateTeam &&
                             <EmojiEventsIcon sx={{
                                 height: '60px',
                                 width: '60px',
@@ -338,7 +338,7 @@ export default function TournamentMatchView() {
                                 color: "#07c6b6"
                             }}/>
                         }
-                        {fight.winner === otherTeam &&
+                        {fight.winner && fight.winner === otherTeam &&
                             <CancelIcon sx={{
                                 height: '60px',
                                 width: '60px',
@@ -350,7 +350,7 @@ export default function TournamentMatchView() {
                     <Grid item xs={12}>
 
                         <Link to={`/tournament/${id}/tab/2/team/${appropriateTeam}`}>
-                            {fight.draftTeamA === appropriateTeam &&
+                            {fight.draftTeamA && fight.draftTeamA === appropriateTeam &&
                                 <Tooltip title={t('tournament.match.draft.teamA')} placement="top">
                                     <LooksOneIcon sx={{verticalAlign: "middle", mb: "3px", mr: 1, color: "#8299a1"}}/>
                                 </Tooltip>
