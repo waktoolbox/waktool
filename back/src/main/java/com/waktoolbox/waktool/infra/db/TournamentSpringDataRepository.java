@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -50,4 +51,7 @@ public interface TournamentSpringDataRepository extends CrudRepository<Tournamen
 
     @Query(value = "SELECT t.discordGuildId FROM TournamentEntity t WHERE t.id = :id")
     Optional<String> getDiscordGuildId(String id);
+
+    @Query(value = "SELECT id AS tournamentId, content->>('matchNotificationChannel') AS channelId FROM tournaments WHERE content->>('matchNotificationChannel') IS NOT NULL", nativeQuery = true)
+    List<TournamentToNotify> getTournamentsToNotify();
 }

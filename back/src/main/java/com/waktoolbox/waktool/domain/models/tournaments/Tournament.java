@@ -14,6 +14,7 @@ public class Tournament {
     int[] maps;
     String name;
     String discordLink;
+    String matchNotificationChannel;
     String level;
     Object rules;
     List<String> admins;

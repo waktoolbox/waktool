@@ -35,6 +35,7 @@ import java.util.Optional;
 @Slf4j
 public class DiscordRepositoryImpl implements DiscordRepository, NotificationRepository, OAuthRepository {
     private static final RestTemplate DEFAULT_REST_TEMPLATE = new RestTemplate();
+    private static final String BOT_TOKEN_AUTHORIZATION = "Bot %s";
 
     private final AccountRepository _accountRepository;
     private final Translator _translator;
@@ -135,7 +136,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
     @Override
     public boolean isGuildMember(String guildId, String userId) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization", String.format("Bot %s", _botToken));
+        httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
 
         try {
             ResponseEntity<GuildMember> entity = _camelCaseMappingRestTemplate.exchange(
@@ -165,7 +166,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
             String message = _translator.get(key, locale, args);
 
             HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.set("Authorization", String.format("Bot %s", _botToken));
+            httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
 
             try {
                 DiscordDMChannel channel = _camelCaseMappingRestTemplate.exchange(
@@ -180,15 +181,22 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
                     return;
                 }
 
-                _camelCaseMappingRestTemplate.exchange(
-                        _baseUrl + "/channels/" + channel.id() + "/messages",
-                        HttpMethod.POST,
-                        new HttpEntity<>(new DiscordMessage(message), httpHeaders),
-                        Void.class
-                );
+                notifyChannel(channel.id(), DiscordMessage.builder().content(message).build());
             } catch (Exception e) {
-                log.error("Unable to send message to user " + userId, e);
+                log.error("Unable to send message to user {}", userId, e);
             }
         });
+    }
+
+    public void notifyChannel(String channelId, DiscordMessage message) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
+
+        _camelCaseMappingRestTemplate.exchange(
+                _baseUrl + "/channels/" + channelId + "/messages",
+                HttpMethod.POST,
+                new HttpEntity<>(message, httpHeaders),
+                Void.class
+        );
     }
 }

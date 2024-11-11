@@ -3,6 +3,7 @@ package com.waktoolbox.waktool.infra.db;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface TournamentMatchSpringDataRepository extends CrudRepository<TournamentMatchEntity, String> {
@@ -20,4 +21,7 @@ public interface TournamentMatchSpringDataRepository extends CrudRepository<Tour
             AND content->>('done') = 'false'
             """, nativeQuery = true)
     int countAllNotDoneMatchesByTournamentIdAndPhaseAndRound(String tournamentId, int phase, String round);
+
+    @Query(value = "SELECT * FROM matches WHERE tournament_id = ?1 AND to_timestamp(CAST(content->>'date' AS double precision)) >= ?2 AND to_timestamp(CAST(content->>'date' AS double precision)) <= ?3", nativeQuery = true)
+    List<TournamentMatchEntity> getMatchesToNotify(String tournamentId, Instant minBound, Instant maxBound);
 }
