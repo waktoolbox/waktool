@@ -2,11 +2,16 @@ package com.waktoolbox.waktool;
 
 import com.decathlon.tzatziki.steps.ObjectSteps;
 import com.decathlon.tzatziki.utils.Guard;
+import com.decathlon.tzatziki.utils.Time;
+import com.waktoolbox.waktool.infra.cron.MatchNotificationTaskScheduler;
 import com.waktoolbox.waktool.utils.JwtHelper;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.spring.CucumberContextConfiguration;
 import io.jsonwebtoken.Claims;
 import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
@@ -14,6 +19,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.time.Clock;
 import java.util.Map;
 
 import static com.decathlon.tzatziki.utils.Guard.GUARD;
@@ -39,19 +45,33 @@ public class WaktoolApplicationSteps {
                     "spring.datasource.url=" + POSTGRES.getJdbcUrl(),
                     "spring.datasource.username=" + POSTGRES.getUsername(),
                     "spring.datasource.password=" + POSTGRES.getPassword(),
+                    "oauth2.discord.base-url=" + url() + "/discord",
                     "oauth2.discord.token-uri=" + url() + "/discord/token",
                     "oauth2.discord.user-info-uri=" + url() + "/discord/user",
                     "waktool.base-url=" + url() + "/mocked-front"
             ).applyTo(applicationContext);
+
+            applicationContext.getBeanFactory().registerResolvableDependency(Clock.class, Mockito.mock(Clock.class));
         }
     }
 
     private final ObjectSteps _objectSteps;
     private final JwtHelper _jwtHelper;
 
+    @Autowired
+    private Clock clock;
+
+    @Autowired
+    private MatchNotificationTaskScheduler _matchNotificationTaskScheduler;
+
     public WaktoolApplicationSteps(ObjectSteps objectSteps, JwtHelper jwtHelper) {
         _objectSteps = objectSteps;
         _jwtHelper = jwtHelper;
+    }
+
+    @Before
+    public void before() {
+        Mockito.doAnswer(invocation -> Time.now()).when(clock).instant();
     }
 
     private String randomUsername(int length) {
@@ -95,5 +115,10 @@ public class WaktoolApplicationSteps {
         );
 
         _objectSteps.add(name, _jwtHelper.generateJwt(claims, null));
+    }
+
+    @Given(THAT + GUARD + "the match notificator runs$")
+    public void runMatchNotificator(Guard guard) {
+        _matchNotificationTaskScheduler.run();
     }
 }

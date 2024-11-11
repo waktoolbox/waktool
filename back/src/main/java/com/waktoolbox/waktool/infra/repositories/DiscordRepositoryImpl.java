@@ -180,15 +180,22 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
                     return;
                 }
 
-                _camelCaseMappingRestTemplate.exchange(
-                        _baseUrl + "/channels/" + channel.id() + "/messages",
-                        HttpMethod.POST,
-                        new HttpEntity<>(new DiscordMessage(message), httpHeaders),
-                        Void.class
-                );
+                notifyChannel(channel.id(), DiscordMessage.builder().content(message).build());
             } catch (Exception e) {
-                log.error("Unable to send message to user " + userId, e);
+                log.error("Unable to send message to user {}", userId, e);
             }
         });
+    }
+
+    public void notifyChannel(String channelId, DiscordMessage message) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format("Bot %s", _botToken));
+
+        _camelCaseMappingRestTemplate.exchange(
+                _baseUrl + "/channels/" + channelId + "/messages",
+                HttpMethod.POST,
+                new HttpEntity<>(message, httpHeaders),
+                Void.class
+        );
     }
 }
