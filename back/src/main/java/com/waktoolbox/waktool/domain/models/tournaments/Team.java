@@ -3,6 +3,7 @@ package com.waktoolbox.waktool.domain.models.tournaments;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,7 @@ import static java.util.Optional.ofNullable;
 
 @Getter
 @Setter
-public class Team {
+public class Team implements Serializable {
     String id;
     String name;
     String leader;

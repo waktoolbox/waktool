@@ -2,7 +2,7 @@ import {useTranslation} from "react-i18next";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import {RadioGroup} from "@mui/material";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {tournamentPhasesState} from "../../atoms/atoms-tournament.ts";
 import {ChangeEvent, useEffect, useState} from "react";
 import {getPhases} from "../../services/tournament.ts";
@@ -14,7 +14,7 @@ type TournamentPhaseButtonProps = {
 
 export default function TournamentPhaseButton(props: TournamentPhaseButtonProps) {
     const {id} = useParams();
-    const [phases, setPhases] = useRecoilState(tournamentPhasesState)
+    const [phases, setPhases] = useAtomState(tournamentPhasesState)
     const [phase, setPhase] = useState(0)
     const {onChange} = props;
     const {t} = useTranslation();

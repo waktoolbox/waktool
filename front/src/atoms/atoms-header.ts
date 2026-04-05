@@ -1,42 +1,42 @@
-import {atom, selector} from "recoil";
+import {atom, injectAtomValue, injectEffect, injectStore} from "@zedux/react";
 import {gfetch} from "../utils/fetch-utils.ts";
 
-export const menuDrawerState = atom({
-    key: 'menuDrawerState',
-    default: false
-})
+export const menuDrawerState = atom("menuDrawerState", false);
 
-export const loginStateUpdater = atom({
-    key: "loginStateUpdater",
-    default: 0
+export const loginStateUpdater = atom("loginStateUpdater", 0);
+
+export const loginState = atom<any>("loginState", () => {
+    const updater = injectAtomValue(loginStateUpdater);
+    const store = injectStore({
+        data: {logged: false},
+        status: 'loading'
+    });
+
+    injectEffect(() => {
+        gfetch("/api/accounts")
+            .then(data => {
+                if (!data) {
+                    store.setState({data: {logged: false}, status: 'success'});
+                } else {
+                    store.setState({
+                        data: {...data, logged: data.id !== null && data.id !== undefined},
+                        status: 'success'
+                    });
+                }
+            })
+            .catch(() => {
+                store.setState({data: {logged: false}, status: 'error'});
+            });
+    }, [updater]);
+
+    return store;
 });
 
-export const loginState = atom({
-    key: 'loginState',
-    default: selector({
-        key: 'loginState/default',
-        get: async ({get}) => {
-            get(loginStateUpdater)
-            const data = await gfetch("/api/accounts");
-            return {
-                ...data,
-                logged: data.id !== null && data.id !== undefined
-            };
-        }
-    })
+
+export const loginIdState = atom("loginIdState", () => {
+    const loginDataState = injectAtomValue(loginState);
+    return (loginDataState as any)?.data?.id as string | undefined;
 });
 
-export const loginIdState = atom({
-    key: 'loginIdState',
-    default: selector({
-        key: 'loginIdState/default',
-        get: async ({get}) => {
-            return get(loginState)?.id;
-        }
-    })
-});
 
-export const languageState = atom({
-    key: 'languageState',
-    default: 'en'
-})
+export const languageState = atom('languageState', 'en');

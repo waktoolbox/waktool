@@ -19,7 +19,7 @@ import {
     getTournamentTeam,
     putEditTeam
 } from "../../services/tournament.ts";
-import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {useAtomState, useAtomValue} from "@zedux/react";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {loginIdState} from "../../atoms/atoms-header.ts";
@@ -44,11 +44,11 @@ export default function TournamentEditTeamView() {
     const {t} = useTranslation();
     const {id, teamId} = useParams();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
-    const [accounts, setAccounts] = useRecoilState(accountCacheState);
-    const me = useRecoilValue(loginIdState);
-    const isAdmin = tournament.admins.includes(me);
+    const [accounts, setAccounts] = useAtomState(accountCacheState);
+    const me = useAtomValue(loginIdState);
+    const isAdmin = tournament.admins.includes(me!);
     const isStarted = Date.parse(tournament.startDate).toString() < Date.now().toString();
-    const setSnackValue = useSetRecoilState(snackState)
+    const [, setSnackValue] = useAtomState(snackState)
 
     const [pickedServer, setPickedServer] = useState('')
     const [errors, setErrors] = useState<string[]>();

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
@@ -33,7 +34,7 @@ public class DraftEntity {
 
     @Getter
     @Setter
-    public static class DraftData {
+    public static class DraftData implements Serializable {
         List<DraftUser> teamA;
         List<DraftUser> teamB;
         List<DraftAction> history;

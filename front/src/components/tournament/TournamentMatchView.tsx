@@ -40,7 +40,7 @@ import {
     TournamentMatchModel,
     TournamentMatchRoundModel
 } from "../../chore/tournament.ts";
-import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {useAtomState, useAtomValue} from "@zedux/react";
 import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournament.ts";
 import {useTranslation} from "react-i18next";
 import {dateFormat} from "../../utils/date.ts";
@@ -67,9 +67,9 @@ export default function TournamentMatchView() {
     const {id, matchId} = useParams();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
 
-    const myTeam = useRecoilValue(myTournamentTeamState);
-    const [teams, setTeamsCache] = useRecoilState(teamCacheState);
-    const [streamerCache, setStreamerCache] = useRecoilState(streamerCacheState);
+    const myTeam = useAtomValue(myTournamentTeamState);
+    const [teams, setTeamsCache] = useAtomState(teamCacheState);
+    const [streamerCache, setStreamerCache] = useAtomState(streamerCacheState);
     const [teamAPlayers, setTeamAPlayers] = useState<Map<string, string>>(new Map());
     const [presentPlayers, setPresentPlayers] = useState(new Set<string>());
     const [currentHistoryEntry, setCurrentHistoryEntry] = useState<TournamentMatchHistoryEntry>({
@@ -78,8 +78,8 @@ export default function TournamentMatchView() {
         target: 0
     });
     const [teamBPlayers, setTeamBPlayers] = useState<Map<string, string>>(new Map());
-    const setSnackValue = useSetRecoilState(snackState);
-    const me = useRecoilValue(loginIdState);
+    const [, setSnackValue] = useAtomState(snackState);
+    const me = useAtomValue(loginIdState);
 
     const [tab, setTab] = useState(0);
     const [match, setMatch] = useState<TournamentMatchModel | undefined>(undefined);

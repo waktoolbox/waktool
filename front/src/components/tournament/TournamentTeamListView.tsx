@@ -13,7 +13,7 @@ import {Link, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getTournamentTeams} from "../../services/tournament.ts";
 import {TournamentTeamModel} from "../../chore/tournament.ts";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {teamCacheState} from "../../atoms/atoms-tournament.ts";
 
 
@@ -22,7 +22,7 @@ export default function TournamentTeamListView() {
     const {t} = useTranslation();
     const {id} = useParams();
     const [teams, setTeams] = useState<TournamentTeamModel[]>([])
-    const [teamCache, setTeamCache] = useRecoilState(teamCacheState);
+    const [teamCache, setTeamCache] = useAtomState(teamCacheState);
 
     useEffect(() => {
         getTournamentTeams(id || "").then(response => {

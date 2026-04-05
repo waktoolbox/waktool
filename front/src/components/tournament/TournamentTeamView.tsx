@@ -16,7 +16,7 @@ import VideogameAssetOffIcon from '@mui/icons-material/VideogameAssetOff';
 
 import {Trans, useTranslation} from "react-i18next";
 import {Link, useLoaderData, useParams} from "react-router-dom";
-import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {useAtomState, useAtomValue} from "@zedux/react";
 import {useEffect, useState} from "react";
 import {
     applyToTeam,
@@ -55,16 +55,16 @@ type LoaderResponse = {
 export default function TournamentTeamView() {
     const {t} = useTranslation();
     const {id, teamId} = useParams();
-    const [accounts, setAccounts] = useRecoilState(accountCacheState);
+    const [accounts, setAccounts] = useAtomState(accountCacheState);
     const [applyDisabled, setApplyDisabled] = useState(true);
-    const setSnackValue = useSetRecoilState(snackState);
-    const [teamCache, setTeamCache] = useRecoilState(teamCacheState);
+    const [, setSnackValue] = useAtomState(snackState);
+    const [teamCache, setTeamCache] = useAtomState(teamCacheState);
 
-    const me = useRecoilValue(loginIdState);
+    const me = useAtomValue(loginIdState);
 
-    const [myTeam, setMyTeam] = useRecoilState(myTournamentTeamState);
+    const [myTeam, setMyTeam] = useAtomState(myTournamentTeamState);
     const tournament = (useLoaderData() as LoaderResponse).tournament;
-    const isAdmin = tournament.admins.includes(me);
+    const isAdmin = tournament.admins.includes(me!);
 
     const [team, setTeam] = useState<TournamentTeamModel>(defaultTeam);
     const [teamMatches, setTeamMatches] = useState<TournamentMatchModel[]>([]);
@@ -135,7 +135,7 @@ export default function TournamentTeamView() {
     }
 
     function leaveTeam() {
-        deleteTeamPlayer(id || "", team.id || "", me).then(() => {
+        deleteTeamPlayer(id || "", team.id || "", me!).then(() => {
             setMyTeam(undefined);
             setTeam({...team, validatedPlayers: team.validatedPlayers.filter(p => p !== me)});
             setApplyDisabled(false)

@@ -6,7 +6,7 @@ import {Trans, useTranslation} from "react-i18next";
 import {Form, useActionData, useLoaderData} from 'react-router-dom'
 import {Account as AccountModel} from "../services/account.ts";
 import {useEffect, useState} from "react";
-import {useSetRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {loginStateUpdater} from "../atoms/atoms-header.ts";
 import {snackState} from "../atoms/atoms-snackbar.ts";
 
@@ -28,8 +28,8 @@ export default function Account() {
     const {t} = useTranslation();
     const account = useLoaderData() as AccountModel;
     const actionData = useActionData();
-    const setLoginStateUpdater = useSetRecoilState(loginStateUpdater);
-    const setSnackValue = useSetRecoilState(snackState);
+    const [, setLoginStateUpdater] = useAtomState(loginStateUpdater);
+    const [, setSnackValue] = useAtomState(snackState);
 
     const [ankamaName, setAnkamaName] = useState(account.ankamaName || "");
     const [ankamaDiscriminator, setAnkamaDiscriminator] = useState(account.ankamaDiscriminator || "");

@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import {Link} from "react-router-dom";
 import {useTranslation} from "react-i18next";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {menuDrawerState} from "../atoms/atoms-header.ts";
 
 type Items = {
@@ -51,7 +51,7 @@ const categories: Category[] = [
 
 function MenuDrawer() {
     const {t} = useTranslation();
-    const [drawerState, setDrawerState] = useRecoilState(menuDrawerState);
+    const [drawerState, setDrawerState] = useAtomState(menuDrawerState);
 
     return (
         <SwipeableDrawer

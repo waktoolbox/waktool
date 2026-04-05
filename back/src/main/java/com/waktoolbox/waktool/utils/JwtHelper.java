@@ -2,18 +2,21 @@ package com.waktoolbox.waktool.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.WebUtils;
 
-import java.time.Instant;
+import javax.crypto.SecretKey;
+import java.time.Clock;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class JwtHelper {
     public static final String DISCORD_ID = "discord_id";
@@ -22,31 +25,42 @@ public class JwtHelper {
     @Value("#{'${jwt.secret}'.getBytes()}")
     private byte[] SECRET;
 
+    private final Clock clock;
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(SECRET);
+    }
+
     public Claims buildClaimsFromValues(String... values) {
-        Claims claims = Jwts.claims();
+        var claimsBuilder = Jwts.claims();
         for (int i = 0; i < values.length; i += 2) {
-            claims.put(values[i], values[i + 1]);
+            claimsBuilder.add(values[i], values[i + 1]);
         }
-        return claims;
+        return claimsBuilder.build();
     }
 
     public String generateJwt(Claims claims, String subject) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
-                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(Date.from(clock.instant()))
+                .expiration(Date.from(clock.instant().plus(1, ChronoUnit.DAYS)))
+                .signWith(getSigningKey())
                 .compact();
 
     }
 
     public Claims decodeJwt(String token) throws RuntimeException {
-        Claims body = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
-        if (body.getExpiration().before(Date.from(Instant.now()))) {
+        Claims payload = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        if (payload.getExpiration().before(Date.from(clock.instant()))) {
             throw new RuntimeException("Token expired");
         }
-        return body;
+        return payload;
     }
 
     public Optional<Claims> extractFromRequest(HttpServletRequest request) {

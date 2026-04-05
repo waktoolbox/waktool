@@ -4,11 +4,12 @@ import com.waktoolbox.waktool.domain.models.drafts.DraftTeamResult;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
 @Setter
-public class TournamentMatchRound {
+public class TournamentMatchRound implements Serializable {
     int map;
     int round;
     String draftId;

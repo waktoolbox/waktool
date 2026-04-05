@@ -3,10 +3,19 @@ server:
   port: ${APP_PORT:8000}
 
 spring:
+  docker:
+    compose:
+      files: ${DOCKER_COMPOSE_PATH:../docker-compose.yaml}
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:15435/postgres}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:changeme}
+
+  sql:
+    init:
+      mode: always
+      data-locations: ${SQL_INIT_PATH:classpath:db/init.sql}
+      continue-on-error: true
 
 oauth2:
   discord:

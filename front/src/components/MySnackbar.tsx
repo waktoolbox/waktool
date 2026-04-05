@@ -1,11 +1,11 @@
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import {SyntheticEvent} from "react";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {snackState} from "../atoms/atoms-snackbar.ts";
 
 export default function MySnackbar() {
-    const [snack, setSnack] = useRecoilState(snackState)
+    const [snack, setSnack] = useAtomState(snackState)
 
     const handleClose = (_: SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') return;

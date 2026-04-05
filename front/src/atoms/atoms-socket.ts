@@ -1,6 +1,6 @@
-import {atom} from "recoil";
+import {atom} from "@zedux/react";
 
-export const socketWhoAmIState = atom({
-    key: 'socketWhoAmIState',
-    default: ""
-})
+export const socketWhoAmIState = atom(
+    "socketWhoAmIState",
+    ""
+)

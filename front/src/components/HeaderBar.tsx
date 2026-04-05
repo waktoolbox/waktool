@@ -11,19 +11,20 @@ import {Navigate, useLocation} from "react-router-dom";
 import LanguagePicker from "./LanguagePicker.tsx";
 import MenuDrawer from "./MenuDrawer.tsx";
 import {loginState, menuDrawerState} from "../atoms/atoms-header.ts";
-import {useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
+import {atom, useAtomState, useAtomValue} from "@zedux/react";
 import {snackState} from "../atoms/atoms-snackbar.ts";
 import MySnackbar from "./MySnackbar.tsx";
 
 export default function HeaderBar() {
     const {t} = useTranslation();
-    const [_, setDrawerState] = useRecoilState(menuDrawerState);
-    const setSnackValue = useSetRecoilState(snackState);
-    const logged = useRecoilValue(loginState);
+    const [_, setDrawerState] = useAtomState(menuDrawerState);
+    const [, setSnackValue] = useAtomState(snackState);
+    const logged = useAtomValue(loginState || atom('dummy', {data: {logged: false}}));
     const location = useLocation();
 
-    if (logged && location.pathname !== "/account" && logged.logged) {
-        if (!logged.ankamaName || !logged.ankamaDiscriminator) {
+    if (logged && location.pathname !== "/account" && (logged as any)?.data?.logged) {
+
+        if (!(logged as any)?.data?.ankamaName || !(logged as any)?.data?.ankamaDiscriminator) {
             setSnackValue({
                 severity: "error",
                 message: t('error.missingAnkamaInfo') as string,
@@ -74,7 +75,7 @@ export default function HeaderBar() {
                     justifyContent: "flex-end",
                     alignItems: "center"
                 }}>
-                    {!logged?.logged && (
+                    {!(logged as any)?.data?.logged && (
                         <a href={import.meta.env.VITE_DISCORD_OAUTH_URL}>
                             <Button variant="outlined" sx={{height: "38px"}}>
                                 <PersonIcon/>
@@ -83,7 +84,7 @@ export default function HeaderBar() {
                         </a>
                     )}
 
-                    {logged?.logged && (
+                    {(logged as any)?.data?.logged && (
                         <a href={`${import.meta.env.VITE_BACKEND_URL}/api/oauth/disconnect`}>
                             <Button variant="outlined" sx={{height: "38px"}}>
                                 <PersonIconOutlined/>

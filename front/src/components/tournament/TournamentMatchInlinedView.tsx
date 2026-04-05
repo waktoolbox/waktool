@@ -11,7 +11,7 @@ import {TournamentMatchModel} from "../../chore/tournament.ts";
 import {Link, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {teamCacheState} from "../../atoms/atoms-tournament.ts";
-import {useRecoilValue} from "recoil";
+import {useAtomValue} from "@zedux/react";
 import {dateFormat} from "../../utils/date.ts";
 
 type TournamentMatchInlinedViewProps = {
@@ -25,7 +25,7 @@ export default function TournamentMatchInlinedView(props: TournamentMatchInlined
     const {id, teamId} = useParams();
     const {backgroundColor, displayedTeam, match} = props;
 
-    const teamCache = useRecoilValue(teamCacheState);
+    const teamCache = useAtomValue(teamCacheState);
     const displayedTeamName = teamCache.get(displayedTeam || match.teamA)
     const otherTeamName = teamCache.get(!displayedTeam || match.teamA === displayedTeam ? match.teamB : match.teamA)
 

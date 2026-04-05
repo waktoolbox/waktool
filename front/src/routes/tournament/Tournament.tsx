@@ -13,7 +13,7 @@ import Stack from "@mui/material/Stack";
 import {useEffect, useState} from "react";
 import Button from "@mui/material/Button";
 import TournamentInformationsView from "../../components/tournament/TournamentInformationsView.tsx";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {accountCacheState} from "../../atoms/atoms-accounts.ts";
 import {accountsLoader} from "../../services/account.ts";
 import {getMyTournamentTeam} from "../../services/tournament.ts";
@@ -58,8 +58,8 @@ type LoaderResponse = {
 export default function Tournament() {
     const {t} = useTranslation();
     const {id, targetTab} = useParams();
-    const [accountsCache, setAccounts] = useRecoilState(accountCacheState);
-    const [_, setMyTournamentTeam] = useRecoilState(myTournamentTeamState);
+    const [accountsCache, setAccounts] = useAtomState(accountCacheState);
+    const [_, setMyTournamentTeam] = useAtomState(myTournamentTeamState);
 
     const [tab, setTab] = useState(targetTab ? +targetTab : Tabs.HOME);
     const tournament = (useLoaderData() as LoaderResponse).tournament;

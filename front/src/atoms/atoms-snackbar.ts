@@ -1,4 +1,4 @@
-import {atom} from "recoil";
+import {atom} from "@zedux/react";
 import {AlertColor} from "@mui/material/Alert";
 
 export type SnackMessage = {
@@ -7,11 +7,11 @@ export type SnackMessage = {
     open: boolean
 }
 
-export const snackState = atom<SnackMessage>({
-    key: "snack",
-    default: {
+export const snackState = atom<SnackMessage>(
+    "snack",
+    {
         severity: undefined,
         message: undefined,
         open: false
     }
-})
+)

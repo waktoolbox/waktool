@@ -7,7 +7,7 @@ import {useTranslation} from "react-i18next";
 import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import {useRecoilValue} from "recoil";
+import {atom, useAtomValue} from "@zedux/react";
 import WaktoolRichText from "../editor/WaktoolRichText.tsx";
 import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import {languageState, loginIdState} from "../../atoms/atoms-header.ts";
@@ -23,9 +23,9 @@ type LoaderResponse = {
 
 export default function TournamentInformationsView() {
     const {t} = useTranslation();
-    const myTeam = useRecoilValue(myTournamentTeamState);
-    const me = useRecoilValue(loginIdState);
-    const language = useRecoilValue(languageState);
+    const myTeam = useAtomValue(myTournamentTeamState);
+    const me = useAtomValue(loginIdState || atom('dummy-me', ''));
+    const language = useAtomValue(languageState);
 
     const [description, setDescription] = useState("{}");
     const [rewards, setRewards] = useState("{}");

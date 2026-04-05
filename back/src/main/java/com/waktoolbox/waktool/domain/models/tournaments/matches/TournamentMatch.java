@@ -3,12 +3,13 @@ package com.waktoolbox.waktool.domain.models.tournaments.matches;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 
 @Getter
 @Setter
-public class TournamentMatch {
+public class TournamentMatch implements Serializable {
     String id;
     Instant date;
     boolean done;

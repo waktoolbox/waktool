@@ -3,12 +3,13 @@ package com.waktoolbox.waktool.domain.models.tournaments;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 
 @Getter
 @Setter
-public class Tournament {
+public class Tournament implements Serializable {
     String id;
     String logo;
     int[] maps;

@@ -5,15 +5,15 @@ import DraftViewer from "../components/draft/DraftViewer.tsx";
 import {useEffect} from "react";
 import {send, subscribe, unsubscribe} from "../utils/socket.ts";
 import {DraftData} from "../chore/draft.ts";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {draftDataState} from "../atoms/atoms-draft.ts";
 import {socketWhoAmIState} from "../atoms/atoms-socket.ts";
 
 export default function Draft() {
     const navigate = useNavigate();
     const {draftId} = useParams();
-    const [draftData, setDraftData] = useRecoilState(draftDataState);
-    const [whoAmI, setWhoAmI] = useRecoilState(socketWhoAmIState);
+    const [draftData, setDraftData] = useAtomState(draftDataState);
+    const [whoAmI, setWhoAmI] = useAtomState(socketWhoAmIState);
 
     useEffect(() => {
         subscribe("whoami", (response: { id: string }) => {

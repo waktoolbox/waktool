@@ -1,11 +1,15 @@
 package com.waktoolbox.waktool;
 
-import io.cucumber.junit.Cucumber;
-import io.cucumber.junit.CucumberOptions;
-import org.junit.runner.RunWith;
+import org.junit.platform.suite.api.IncludeEngines;
+import org.junit.platform.suite.api.SelectPackages;
+import org.junit.platform.suite.api.Suite;
 
-@RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"pretty", "json:target/cucumber.json", "html:target/site/cucumber.html"}, glue = {"com.decathlon.tzatziki.steps", "com.waktoolbox.waktool"})
+@Suite
+@IncludeEngines("cucumber")
+@SelectPackages("com.waktoolbox.waktool")
 public class CucumberTest {
+    static {
+        System.out.println("WAKTOOL: CucumberTest class loaded!");
+    }
     // Do NOT delete this class, it enables tests on mvn test phase
 }

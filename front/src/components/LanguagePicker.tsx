@@ -3,7 +3,7 @@ import Icon from "@mui/material/Icon";
 import MenuItem from "@mui/material/MenuItem";
 import Select, {SelectProps} from "@mui/material/Select";
 import {useEffect, useState} from "react";
-import {useRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {languageState} from "../atoms/atoms-header.ts";
 
 interface Language {
@@ -19,7 +19,7 @@ export default function LanguagePicker(props: SelectProps) {
     const {i18n} = useTranslation();
     const resolvedLanguage = i18n.resolvedLanguage || "en";
     const [language, setLanguage] = useState(resolvedLanguage)
-    const [_, setRecoilLanguage] = useRecoilState(languageState);
+    const [_, setRecoilLanguage] = useAtomState(languageState);
 
     useEffect(() => {
         setRecoilLanguage(resolvedLanguage);

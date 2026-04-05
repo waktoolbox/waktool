@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import {useTranslation} from "react-i18next";
 import {postMatchesSearch, teamSearch} from "../../services/tournament.ts";
 import {useLoaderData, useParams} from "react-router-dom";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useAtomState, useAtomValue} from "@zedux/react";
 import {teamCacheState, tournamentPhasesState} from "../../atoms/atoms-tournament.ts";
 import TournamentPhaseButton from "./TournamentPhaseButton.tsx";
 import {TournamentDefinition, TournamentMatchModel, TournamentPhaseType} from "../../chore/tournament.ts";
@@ -26,8 +26,8 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
     const {t} = useTranslation();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
     const [tournamentPhaseComponent, setTournamentPhaseComponent] = useState<ReactComponentElement<any> | undefined>(undefined);
-    const phases = useRecoilValue(tournamentPhasesState)
-    const [teamCache, setTeamCache] = useRecoilState(teamCacheState);
+    const phases = useAtomValue(tournamentPhasesState)
+    const [teamCache, setTeamCache] = useAtomState(teamCacheState);
     const [displayedPhase, setDisplayedPhase] = useState(phases);
     const [matchesToDisplay, setMatchesToDisplay] = useState<TournamentMatchModel[]>([])
 

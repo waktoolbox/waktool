@@ -1,7 +1,7 @@
 import {DraftAction, DraftData, DraftTeam, DraftTeamInfo, DraftUser} from "../../chore/draft.ts";
 import {useEffect, useState} from "react";
 import {send, subscribeWithoutUserPrefix, unsubscribe} from "../../utils/socket.ts";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useAtomState, useAtomValue} from "@zedux/react";
 import {draftDataState} from "../../atoms/atoms-draft.ts";
 import {useLocation, useParams} from "react-router-dom";
 import Button from "@mui/material/Button";
@@ -66,8 +66,8 @@ let controller: DataController;
 function DraftViewer() {
     const {t} = useTranslation();
     const {draftId} = useParams();
-    const [draftData, setDraftData] = useRecoilState(draftDataState);
-    const whoAmI = useRecoilValue(socketWhoAmIState);
+    const [draftData, setDraftData] = useAtomState(draftDataState);
+    const whoAmI = useAtomValue(socketWhoAmIState);
     const location = useLocation();
 
     // Remote data

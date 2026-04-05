@@ -17,19 +17,22 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.Clock;
 import java.util.Map;
 
 import static com.decathlon.tzatziki.utils.Guard.GUARD;
-import static com.decathlon.tzatziki.utils.MockFaster.url;
 import static com.decathlon.tzatziki.utils.Patterns.*;
 
 @CucumberContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = WaktoolApplication.class)
 @ContextConfiguration(initializers = WaktoolApplicationSteps.Initializer.class)
 public class WaktoolApplicationSteps {
+    private static String url() {
+        return "http://localhost:8089";
+    }
 
     @SuppressWarnings("resource")
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:15.3")
@@ -48,17 +51,17 @@ public class WaktoolApplicationSteps {
                     "oauth2.discord.base-url=" + url() + "/discord",
                     "oauth2.discord.token-uri=" + url() + "/discord/token",
                     "oauth2.discord.user-info-uri=" + url() + "/discord/user",
-                    "waktool.base-url=" + url() + "/mocked-front"
+                    "waktool.base-url=" + url() + "/mocked-front",
+                    "jwt.secret=this_is_a_very_secret_key_that_is_at_least_32_characters_long"
             ).applyTo(applicationContext);
 
-            applicationContext.getBeanFactory().registerResolvableDependency(Clock.class, Mockito.mock(Clock.class));
         }
     }
 
     private final ObjectSteps _objectSteps;
     private final JwtHelper _jwtHelper;
 
-    @Autowired
+    @MockitoBean
     private Clock clock;
 
     @Autowired

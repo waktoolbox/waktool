@@ -8,7 +8,7 @@ import {ChangeEvent, useState} from "react";
 import {TournamentDefinition, TournamentTeamModel} from "../../chore/tournament.ts";
 import Button from "@mui/material/Button";
 import {postRegisterTeam} from "../../services/tournament.ts";
-import {useRecoilState, useSetRecoilState} from "recoil";
+import {useAtomState} from "@zedux/react";
 import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -24,8 +24,8 @@ export default function TournamentCreateTeamView() {
     const {t} = useTranslation();
     const {id} = useParams();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
-    const [_, setMyTournamentTeam] = useRecoilState(myTournamentTeamState);
-    const setSnackValue = useSetRecoilState(snackState);
+    const [_, setMyTournamentTeam] = useAtomState(myTournamentTeamState);
+    const [, setSnackValue] = useAtomState(snackState);
 
     const [pickedServer, setPickedServer] = useState('')
     const [errors, setErrors] = useState<string[]>();

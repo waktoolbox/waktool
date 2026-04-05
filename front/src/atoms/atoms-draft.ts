@@ -1,8 +1,8 @@
-import {atom} from "recoil";
+import {atom} from "@zedux/react";
 import {DraftData} from "../chore/draft.ts";
 
 
-export const draftDataState = atom<DraftData | undefined>({
-    key: "draftData",
-    default: undefined
-})
+export const draftDataState = atom<DraftData | undefined>(
+    "draftData",
+    undefined
+)
