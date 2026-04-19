@@ -26,7 +26,7 @@ oauth2:
     client-id: ${CLIENT_ID:changeme}
     client-secret: ${CLIENT_SECRET:changeme}
     token: ${TOKEN:changeme}
-    scope: identify,email
+    scope: identify email
     redirect-uri: ${BASE_URL:changeme}/api/oauth/discord/redirect
 
 jwt:

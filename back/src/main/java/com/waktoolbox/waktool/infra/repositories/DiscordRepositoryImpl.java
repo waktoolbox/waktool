@@ -34,11 +34,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class DiscordRepositoryImpl implements DiscordRepository, NotificationRepository, OAuthRepository {
-    private static final RestTemplate DEFAULT_REST_TEMPLATE = new RestTemplate();
     private static final String BOT_TOKEN_AUTHORIZATION = "Bot %s";
 
     private final AccountRepository _accountRepository;
     private final Translator _translator;
+    private final RestTemplateBuilder _restTemplateBuilder;
 
     @Value("${oauth2.discord.token-uri}")
     private String _tokenUri;
@@ -67,7 +67,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
     @Value("${oauth2.discord.redirect-uri}")
     private String _redirectUri;
 
-    private RestTemplate _camelCaseMappingRestTemplate;
+    private RestTemplate _discordRestTemplate;
 
     @PostConstruct
     public void setupMapperAndTemplates() {
@@ -75,7 +75,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
-        _camelCaseMappingRestTemplate = new RestTemplateBuilder()
+        _discordRestTemplate = _restTemplateBuilder
                 .additionalMessageConverters(new MappingJackson2HttpMessageConverter(mapper))
                 .build();
     }
@@ -89,10 +89,8 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
         httpHeaders.add("Authorization", "Basic " + credentials);
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.add("client_id", _clientId);
-        requestBody.add("client_secret", _clientSecret);
         requestBody.add("redirect_uri", _redirectUri);
-        requestBody.add("scope", String.join(",", _scope));
+        requestBody.add("scope", String.join(" ", _scope));
         requestBody.add("code", code);
         requestBody.add("grant_type", _authorizationGrantType);
 
@@ -100,7 +98,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
         try {
             // Sorry, I hate url form encoded crap
             // I tried some better way to do this, but after 3 hours, crappy code is working, nice code isn't
-            DiscordOAuthTokenResponse body = DEFAULT_REST_TEMPLATE.exchange(_tokenUri, HttpMethod.POST, request, DiscordOAuthTokenResponse.class).getBody();
+            DiscordOAuthTokenResponse body = _discordRestTemplate.exchange(_tokenUri, HttpMethod.POST, request, DiscordOAuthTokenResponse.class).getBody();
             if (body == null) throw new IllegalStateException("Null body while request is success, should not happen");
             return new OAuthResponse(body.accessToken(), body.tokenType());
         } catch (Exception e) {
@@ -112,10 +110,10 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
     @Override
     public Account getAccount(String token, String tokenType) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization", String.format("%s %s", tokenType, token));
+        httpHeaders.set("Authorization", String.format("%s %s", tokenType != null ? tokenType : "Bearer", token));
 
         try {
-            DiscordUserInformationResponse userInformation = _camelCaseMappingRestTemplate.exchange(_userInfoUri, HttpMethod.GET, new HttpEntity<>(httpHeaders), DiscordUserInformationResponse.class).getBody();
+            DiscordUserInformationResponse userInformation = _discordRestTemplate.exchange(_userInfoUri, HttpMethod.GET, new HttpEntity<>(httpHeaders), DiscordUserInformationResponse.class).getBody();
             if (userInformation == null) throw new IllegalStateException("User is null, should not happen");
             return Account.builder()
                     .id(userInformation.id())
@@ -139,7 +137,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
         httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
 
         try {
-            ResponseEntity<GuildMember> entity = _camelCaseMappingRestTemplate.exchange(
+            ResponseEntity<GuildMember> entity = _discordRestTemplate.exchange(
                     _baseUrl + "/guilds/" + guildId + "/members/" + userId,
                     HttpMethod.GET,
                     new HttpEntity<>(httpHeaders),
@@ -169,7 +167,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
             httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
 
             try {
-                DiscordDMChannel channel = _camelCaseMappingRestTemplate.exchange(
+                DiscordDMChannel channel = _discordRestTemplate.exchange(
                         _baseUrl + "/users/@me/channels",
                         HttpMethod.POST,
                         new HttpEntity<>(new DiscordCreateDM(userId), httpHeaders),
@@ -192,7 +190,7 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
 
-        _camelCaseMappingRestTemplate.exchange(
+        _discordRestTemplate.exchange(
                 _baseUrl + "/channels/" + channelId + "/messages",
                 HttpMethod.POST,
                 new HttpEntity<>(message, httpHeaders),
