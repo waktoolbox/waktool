@@ -40,6 +40,18 @@ public class DraftSteps implements DraftNotifier {
         _controller = new DraftController(_draft, this);
     }
 
+    @Given("a Wakfu Warrior draft with a {int}s timer")
+    public void aWakfuWarriorDraftWithTimer(int timer) {
+        DraftConfiguration configuration = new DraftConfiguration();
+        configuration.setActions(DraftDefaultModels.WAKFU_WARRIORS.getActions());
+        configuration.setTurnDurationSeconds(timer);
+
+        _draft = new Draft();
+        _draft.setConfiguration(configuration);
+
+        _controller = new DraftController(_draft, this);
+    }
+
     @Given("draft is now server provided {word}")
     public void whenServerProvided(String isServer) {
         _draft.getConfiguration().setProvidedByServer(Boolean.parseBoolean(isServer));

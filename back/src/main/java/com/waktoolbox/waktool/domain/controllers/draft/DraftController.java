@@ -219,7 +219,7 @@ public class DraftController {
         });
 
         Byte selected = validBreeds.get(_random.nextInt(validBreeds.size()));
-        DraftAction generatedAction = new DraftAction(pendingAction.getType(), pendingAction.getTeam(), selected, pendingAction.isLockForPickingTeam(), pendingAction.isLockForOpponentTeam());
+        DraftAction generatedAction = new DraftAction(pendingAction.getTeam(), pendingAction.getType(), selected, pendingAction.isLockForPickingTeam(), pendingAction.isLockForOpponentTeam());
 
         int currentAction = _draft.getCurrentAction();
         doProcessAction(generatedAction);

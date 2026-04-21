@@ -170,8 +170,10 @@ Feature: Draft works as expected
       | 2 | 5 | 10 |
 
   Scenario: Draft timer expires and triggers a pseudo-random pick
-    Given a Wakfu Warrior draft
+    Given a Wakfu Warrior draft with a 45s timer
+    Given 1 joins draft
     Given 1 joins team A
+    Given 2 joins draft
     Given 2 joins team B
     Given team A set ready to true
     Given team B set ready to true
