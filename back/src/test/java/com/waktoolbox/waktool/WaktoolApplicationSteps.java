@@ -1,6 +1,7 @@
 package com.waktoolbox.waktool;
 
 import com.decathlon.tzatziki.steps.ObjectSteps;
+import com.decathlon.tzatziki.steps.HttpSteps;
 import com.decathlon.tzatziki.utils.Guard;
 import com.decathlon.tzatziki.utils.Time;
 import com.waktoolbox.waktool.infra.cron.MatchNotificationTaskScheduler;
@@ -31,7 +32,7 @@ import static com.decathlon.tzatziki.utils.Patterns.*;
 @ContextConfiguration(initializers = WaktoolApplicationSteps.Initializer.class)
 public class WaktoolApplicationSteps {
     private static String url() {
-        return "http://localhost:8089";
+        return "http://localhost:" + HttpSteps.localPort;
     }
 
     @SuppressWarnings("resource")
