@@ -54,6 +54,7 @@ export interface DraftConfiguration {
     leader?: string;
     providedByServer?: boolean;
     actions: DraftAction[];
+    turnDurationSeconds?: number;
 }
 
 export interface DraftUser {
@@ -82,4 +83,6 @@ export interface DraftData {
     teamB?: DraftUser[];
     teamBInfo?: DraftTeamInfo;
     teamBReady?: boolean;
+
+    turnExpirationTime?: string;
 }

@@ -14,4 +14,6 @@ public interface DraftNotifier {
     void onAction(DraftAction action, int index);
 
     void onTeamReady(DraftTeam team, boolean ready);
+
+    void onTimerUpdated(java.time.Instant turnExpirationTime);
 }

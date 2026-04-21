@@ -11,4 +11,5 @@ public class DraftConfiguration implements Serializable {
     String leader;
     DraftAction[] actions;
     boolean providedByServer;
+    Integer turnDurationSeconds;
 }

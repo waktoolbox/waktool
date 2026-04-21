@@ -168,3 +168,20 @@ Feature: Draft works as expected
       | 4 | 7 | 12 | 13 | 15 | 17 |
     And ban result for team B is
       | 2 | 5 | 10 |
+
+  Scenario: Draft timer expires and triggers a pseudo-random pick
+    Given a Wakfu Warrior draft with a 45s timer
+    Given 1 joins draft
+    Given 1 joins team A
+    Given 2 joins draft
+    Given 2 joins team B
+    Given team A set ready to true
+    Given team B set ready to true
+
+    # Force expiration on team A BAN
+    Then draft timer expires
+    Then the last action should be true
+
+    # Next action is team B BAN, it should be possible normally
+    Given 2 bans 5 for team B true true
+    Then the last action should be true

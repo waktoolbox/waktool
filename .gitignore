@@ -58,3 +58,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+### Project Plans / Tasks ###
+/.tasks/

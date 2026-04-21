@@ -3,6 +3,7 @@ package com.waktoolbox.waktool.domain.models.drafts;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,4 +21,5 @@ public class Draft {
     boolean teamAReady;
     boolean teamBReady;
     int currentAction;
+    Instant turnExpirationTime;
 }

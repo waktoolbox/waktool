@@ -9,6 +9,7 @@
   "date": "{{date, datetime}}",
   "disconnect": "Déconnexion",
   "draft": {
+    "timerDurationSeconds": "Temps par tour (sec)",
     "action": {
       "add": "Ajouter une action"
     },

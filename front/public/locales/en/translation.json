@@ -9,6 +9,7 @@
   "date": "{{date, datetime}}",
   "disconnect": "Log out",
   "draft": {
+    "timerDurationSeconds": "Turn timer (s)",
     "action": {
       "add": "Add action"
     },
