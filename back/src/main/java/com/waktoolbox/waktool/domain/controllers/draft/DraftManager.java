@@ -26,7 +26,13 @@ public class DraftManager {
 
     @Scheduled(fixedDelay = 60 * 1000)
     private void cleanup() {
-        _currentDrafts.entrySet().removeIf(entry -> entry.getValue().isExpired());
+        _currentDrafts.entrySet().removeIf(entry -> {
+            if (entry.getValue().isExpired()) {
+                entry.getValue().shutdown();
+                return true;
+            }
+            return false;
+        });
     }
 
     public Optional<DraftUser> getUser(String id) {
@@ -79,7 +85,7 @@ public class DraftManager {
         if (!draft.getConfiguration().isProvidedByServer()) return true;
 
         String[] matchIdAndRound = draft.getId().split("_");
-        if (matchIdAndRound.length == 0) return true;
+        if (matchIdAndRound.length < 2) return true;
 
         TournamentMatchAndTournamentId matchAndTournamentId = _matchRepository.getMatchAndTournamentId(matchIdAndRound[0]);
         if (matchAndTournamentId == null || matchAndTournamentId.match().getDate() == null) return true;
@@ -153,6 +159,7 @@ public class DraftManager {
             }
             if (controller.isEnded()) {
                 saveDraftEnd(controller);
+                controller.shutdown();
                 _currentDrafts.remove(controller.getDraft().getId());
                 controller.getDraft().getUsers().forEach(u -> removeDraftFromUser(u, controller.getDraft().getId()));
             }
@@ -199,6 +206,7 @@ public class DraftManager {
         if (!_currentDrafts.containsKey(draftId)) return;
 
         DraftController removed = _currentDrafts.remove(draftId);
+        removed.shutdown();
         removed.getDraft().getUsers().forEach(user -> user.removeDraft(draftId));
     }
 }

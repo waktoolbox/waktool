@@ -145,7 +145,7 @@ function DraftViewer() {
         };
 
         updateTimer();
-        const interval = setInterval(updateTimer, 500);
+        const interval = setInterval(updateTimer, 1000);
         return () => clearInterval(interval);
     }, [turnExpirationTime]);
 
@@ -236,10 +236,11 @@ function DraftViewer() {
                     break;
                 }
                 case "draft::timerUpdated": {
-                    const newTimer = draftNotification.payload as string;
+                    const newTimer = draftNotification.payload as string | null;
                     if (!controller) return;
-                    controller.data.turnExpirationTime = newTimer;
-                    setTurnExpirationTime(newTimer);
+                    const turnExpirationTime = newTimer ?? undefined;
+                    controller.data.turnExpirationTime = turnExpirationTime;
+                    setTurnExpirationTime(turnExpirationTime);
                     break;
                 }
             }

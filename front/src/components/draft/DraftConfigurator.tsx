@@ -53,7 +53,7 @@ function DraftConfigurator() {
             </Grid>
             <Grid item xs={6} md={3} order={{xs: 4, md: 2}}>
                 <TextField size="small" type="number" sx={{float: "right", mr: 1, width: "100%"}}
-                           value={timerDuration || ''}
+                           value={timerDuration ?? ''}
                            label={t('draft.timerDurationSeconds')} onChange={(e) => {
                     const val = parseInt(e.target.value);
                     setTimerDuration(isNaN(val) ? undefined : val);

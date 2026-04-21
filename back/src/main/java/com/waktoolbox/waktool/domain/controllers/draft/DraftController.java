@@ -107,7 +107,7 @@ public class DraftController {
      * @param user   doing it
      * @return true if action was valid and processed
      */
-    public boolean onAction(DraftAction action, String user) {
+    public synchronized boolean onAction(DraftAction action, String user) {
         if (!validate(action, user)) return false;
 
         if (_timerTask != null) _timerTask.cancel(false);
@@ -135,7 +135,7 @@ public class DraftController {
      * @param team  to toggle
      * @param ready state
      */
-    public void onTeamReady(DraftTeam team, boolean ready) {
+    public synchronized void onTeamReady(DraftTeam team, boolean ready) {
         boolean wasReady = areTeamReady();
         if (team == DraftTeam.TEAM_A) _draft.setTeamAReady(ready);
         if (team == DraftTeam.TEAM_B) _draft.setTeamBReady(ready);
@@ -187,6 +187,10 @@ public class DraftController {
         return _draft.getCurrentAction() >= _draft.getConfiguration().getActions().length;
     }
 
+    public void shutdown() {
+        _scheduler.shutdownNow();
+    }
+
     // *****************************************************************************************************************
     // ***************************************** INTERNAL MECHANIC ONLY METHODS ****************************************
     // *****************************************************************************************************************
@@ -202,7 +206,9 @@ public class DraftController {
         _timerTask = _scheduler.schedule(this::forceRandomAction, delay, TimeUnit.SECONDS);
     }
 
-    private void forceRandomAction() {
+    private synchronized void forceRandomAction() {
+        if (isEnded()) return;
+        
         DraftAction pendingAction = getCurrentAction();
         if (pendingAction == null) return;
 
@@ -217,6 +223,14 @@ public class DraftController {
             }
             return false;
         });
+
+        if (validBreeds.isEmpty()) {
+            _draft.setTurnExpirationTime(null);
+            _notifier.onTimerUpdated(null);
+            shutdown();
+            if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
+            return;
+        }
 
         Byte selected = validBreeds.get(_random.nextInt(validBreeds.size()));
         DraftAction generatedAction = new DraftAction(pendingAction.getTeam(), pendingAction.getType(), selected, pendingAction.isLockForPickingTeam(), pendingAction.isLockForOpponentTeam());
@@ -236,7 +250,7 @@ public class DraftController {
         if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
     }
 
-    public void expireTimerForTest() {
+    void expireTimerForTest() {
         if (_timerTask != null) {
             _timerTask.cancel(false);
             forceRandomAction();
