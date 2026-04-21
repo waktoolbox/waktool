@@ -250,7 +250,7 @@ public class DraftController {
         if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
     }
 
-    void expireTimerForTest() {
+    public void expireTimerForTest() {
         if (_timerTask != null) {
             _timerTask.cancel(false);
             forceRandomAction();
