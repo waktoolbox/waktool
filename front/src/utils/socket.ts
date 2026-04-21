@@ -1,34 +1,42 @@
-import {Stomp} from "@stomp/stompjs";
+import {Client, StompSubscription} from "@stomp/stompjs";
 
 console.log("Initiating Stomp configuration")
-const client = Stomp.client(import.meta.env.VITE_SOCKET_URL);
-client.heartbeatIncoming = 30000;
-client.heartbeatOutgoing = 2000;
+
+const client = new Client({
+    brokerURL: import.meta.env.VITE_SOCKET_URL,
+    heartbeatIncoming: 30000,
+    heartbeatOutgoing: 2000,
+    reconnectDelay: 2000,
+    onConnect: () => {
+        console.log("Stomp connected");
+
+        for (const {path, callback, hasPrefix} of Array.from(subscriptionsMap.values())) {
+            const topic = hasPrefix ? subscriptionPrefix + path : path;
+            const stompSub = client.subscribe(topic, (response) => callback(JSON.parse(response.body)));
+            activeStompSubscriptions.set(path, stompSub);
+        }
+
+        if (!pending) return;
+        console.log("Running " + pending.length + " pending functions ")
+        for (const pendingFunc of pending) {
+            pendingFunc();
+        }
+        pending = undefined;
+    },
+    onWebSocketClose: () => {
+        if (!pending) pending = [];
+        console.log("Stomp connection lost");
+    }
+});
+
 type StompPendingFunction = () => void;
 let pending: StompPendingFunction[] | undefined = [];
 
-function doConnect() {
-    client.connect({},
-        () => {
-            console.log("Stomp connected");
-            if (!pending) return;
-            console.log("Running " + pending.length + " pending functions ")
-            for (const pendingFunc of pending) {
-                pendingFunc();
-            }
-            pending = undefined;
-        },
-        () => {
-            if (!pending) pending = []
-            console.log("Stomp connection lost");
-        }
-    )
-}
-
-doConnect();
-
 const subscriptionPrefix = "/user/topic/";
-const subscriptions = new Set<string>();
+const subscriptionsMap = new Map<string, { path: string, callback: (data: any) => void, hasPrefix: boolean }>();
+const activeStompSubscriptions = new Map<string, StompSubscription>();
+
+client.activate();
 
 function executeOrSchedule(func: () => void) {
     if (!pending || client.connected) {
@@ -39,23 +47,33 @@ function executeOrSchedule(func: () => void) {
 }
 
 export function subscribe(path: string, callback: (data: any) => void) {
-    if (subscriptions.has(path)) return;
-    subscriptions.add(path);
-    executeOrSchedule(() => client.subscribe(subscriptionPrefix + path, (response) => callback(JSON.parse(response.body))));
+    if (subscriptionsMap.has(path)) return;
+    subscriptionsMap.set(path, {path, callback, hasPrefix: true});
+    executeOrSchedule(() => {
+        const sub = client.subscribe(subscriptionPrefix + path, (response) => callback(JSON.parse(response.body)));
+        activeStompSubscriptions.set(path, sub);
+    });
 }
 
 export function subscribeWithoutUserPrefix(path: string, callback: (data: any) => void) {
-    if (subscriptions.has(path)) return;
-    subscriptions.add(path);
-    executeOrSchedule(() => client.subscribe(path, (response) => callback(JSON.parse(response.body))));
+    if (subscriptionsMap.has(path)) return;
+    subscriptionsMap.set(path, {path, callback, hasPrefix: false});
+    executeOrSchedule(() => {
+        const sub = client.subscribe(path, (response) => callback(JSON.parse(response.body)));
+        activeStompSubscriptions.set(path, sub);
+    });
 }
 
 export function unsubscribe(path: string) {
-    if (!subscriptions.has(path)) return;
-    subscriptions.delete(path);
-    executeOrSchedule(() => client.unsubscribe(subscriptionPrefix + path));
+    if (!subscriptionsMap.has(path)) return;
+    subscriptionsMap.delete(path);
+    const sub = activeStompSubscriptions.get(path);
+    if (sub) {
+        sub.unsubscribe();
+        activeStompSubscriptions.delete(path);
+    }
 }
 
 export function send(path: string, data: any) {
-    executeOrSchedule(() => client.send("/app/" + path, {}, JSON.stringify(data)));
+    executeOrSchedule(() => client.publish({destination: "/app/" + path, body: JSON.stringify(data)}));
 }

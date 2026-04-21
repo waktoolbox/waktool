@@ -1,5 +1,6 @@
 package com.waktoolbox.waktool.domain.controllers.draft;
 
+import com.waktoolbox.waktool.domain.models.Breeds;
 import com.waktoolbox.waktool.domain.models.drafts.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,10 @@ public class DraftController {
     @Setter
     private Runnable _onDraftUpdatedCallback;
 
-    private final Set<Byte> _lockedForTeamA = new HashSet<>();
-    private final Set<Byte> _lockedForTeamB = new HashSet<>();
-    private final List<Byte> _pickedByTeamA = new ArrayList<>();
-    private final List<Byte> _pickedByTeamB = new ArrayList<>();
+    private final Set<Breeds> _lockedForTeamA = new HashSet<>();
+    private final Set<Breeds> _lockedForTeamB = new HashSet<>();
+    private final List<Breeds> _pickedByTeamA = new ArrayList<>();
+    private final List<Breeds> _pickedByTeamB = new ArrayList<>();
 
     /**
      * Call only once to initialize the draft after loading from database
@@ -160,15 +161,15 @@ public class DraftController {
      * @return the picked and banned classes
      */
     public DraftTeamResult computeDraftResult(DraftTeam team) {
-        final Byte[] picked = _draft.getHistory().stream()
+        final Breeds[] picked = _draft.getHistory().stream()
                 .filter(a -> a.getTeam() == team && a.getType() == DraftActionType.PICK)
                 .map(DraftAction::getBreed)
-                .toArray(Byte[]::new);
+                .toArray(Breeds[]::new);
 
-        final Byte[] banned = _draft.getHistory().stream()
+        final Breeds[] banned = _draft.getHistory().stream()
                 .filter(a -> a.getTeam() == team && a.getType() == DraftActionType.BAN)
                 .map(DraftAction::getBreed)
-                .toArray(Byte[]::new);
+                .toArray(Breeds[]::new);
 
         return new DraftTeamResult(picked, banned);
     }
@@ -212,15 +213,14 @@ public class DraftController {
         DraftAction pendingAction = getCurrentAction();
         if (pendingAction == null) return;
 
-        List<Byte> validBreeds = new ArrayList<>();
-        for (byte i = 1; i <= 20; i++) {
-            validBreeds.add(i);
+        List<Breeds> validBreeds = new ArrayList<>();
+        Breeds[] existingBreeds = Breeds.values();
+        for (Breeds b : existingBreeds) {
+            validBreeds.add(b);
         }
         validBreeds.removeIf(b -> {
-            if (pendingAction.getType() == DraftActionType.PICK) {
-                if (pendingAction.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(b)) return true;
-                if (pendingAction.getTeam() == DraftTeam.TEAM_B && _lockedForTeamB.contains(b)) return true;
-            }
+            if (pendingAction.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(b)) return true;
+            if (pendingAction.getTeam() == DraftTeam.TEAM_B && _lockedForTeamB.contains(b)) return true;
             return false;
         });
 
@@ -232,7 +232,7 @@ public class DraftController {
             return;
         }
 
-        Byte selected = validBreeds.get(_random.nextInt(validBreeds.size()));
+        Breeds selected = validBreeds.get(_random.nextInt(validBreeds.size()));
         DraftAction generatedAction = new DraftAction(pendingAction.getTeam(), pendingAction.getType(), selected, pendingAction.isLockForPickingTeam(), pendingAction.isLockForOpponentTeam());
 
         int currentAction = _draft.getCurrentAction();
@@ -320,10 +320,8 @@ public class DraftController {
         DraftTeam userTeam = getUserTeam(user);
         if (userTeam == DraftTeam.NONE || action.getTeam() != userTeam) return false;
 
-        if (action.getType() == DraftActionType.PICK) {
-            if (action.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(action.getBreed())) return false;
-            if (action.getTeam() == DraftTeam.TEAM_B && _lockedForTeamB.contains(action.getBreed())) return false;
-        }
+        if (action.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(action.getBreed())) return false;
+        if (action.getTeam() == DraftTeam.TEAM_B && _lockedForTeamB.contains(action.getBreed())) return false;
 
         return true;
     }
