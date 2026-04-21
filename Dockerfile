@@ -1,19 +1,20 @@
 FROM node:20-alpine as build-front
 WORKDIR /front
 
-COPY front/*.json ./
-RUN npm install
+COPY front/package.json front/pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile --shamefully-hoist
 
 # Keep it after install to avoid chaos
 ENV NODE_ENV=production
 
 COPY front/.env.production .env
 COPY front/index.html index.html
+COPY front/tsconfig*.json ./
 COPY front/vite.config.ts vite.config.ts
 COPY front/src/ src/
 COPY front/public/ public/
 
-RUN npm run build
+RUN pnpm run build
 
 FROM maven:3-eclipse-temurin-21 as build-back
 
