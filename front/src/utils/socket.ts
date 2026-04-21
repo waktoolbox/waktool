@@ -2,8 +2,20 @@ import {Client, StompSubscription} from "@stomp/stompjs";
 
 console.log("Initiating Stomp configuration")
 
+function getGuestId() {
+    let id = sessionStorage.getItem("guest-id");
+    if (!id) {
+        id = "guest-" + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
+        sessionStorage.setItem("guest-id", id);
+    }
+    return id;
+}
+
 const client = new Client({
     brokerURL: import.meta.env.VITE_SOCKET_URL,
+    connectHeaders: {
+        'guest-id': getGuestId()
+    },
     heartbeatIncoming: 30000,
     heartbeatOutgoing: 2000,
     reconnectDelay: 2000,
