@@ -54,6 +54,10 @@ public class SocketDraftNotifier implements DraftNotifier {
     @Override
     public void onTeamReady(DraftTeam team, boolean ready) {
         send(new DraftNotificationWrapper("draft::teamReady", new DraftTeamReady(team, ready)));
+    }
 
+    @Override
+    public void onTimerUpdated(java.time.Instant turnExpirationTime) {
+        send(new DraftNotificationWrapper("draft::timerUpdated", turnExpirationTime != null ? turnExpirationTime.toString() : null));
     }
 }

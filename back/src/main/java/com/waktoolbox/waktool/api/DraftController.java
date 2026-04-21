@@ -47,7 +47,7 @@ public class DraftController {
         return _draftManager.userRequestDraft(user, draft.id);
     }
 
-    private record DraftCreateMessage(DraftAction[] actions) {
+    private record DraftCreateMessage(DraftAction[] actions, Integer turnDurationSeconds) {
     }
 
     @MessageMapping("/draft::create")
@@ -58,7 +58,7 @@ public class DraftController {
             DraftCreateMessage message
     ) {
         DraftUser user = computeDraftUser(attributes, simpSessionId);
-        return new DraftIdOnlyMessage(_draftManager.createDraftByUser(user, message.actions).getId());
+        return new DraftIdOnlyMessage(_draftManager.createDraftByUser(user, message.actions, message.turnDurationSeconds).getId());
     }
 
     private record DraftActionMessage(String draftId, DraftAction action) {

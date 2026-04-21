@@ -3,11 +3,16 @@ package com.waktoolbox.waktool.domain.controllers.draft;
 import com.waktoolbox.waktool.domain.models.drafts.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Accessors(prefix = "_")
@@ -18,6 +23,13 @@ public class DraftController {
     private final Draft _draft;
     private final DraftNotifier _notifier;
     private final Instant _startDate = Instant.now();
+
+    private final ScheduledExecutorService _scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> _timerTask;
+    private final Random _random = new Random();
+
+    @Setter
+    private Runnable _onDraftUpdatedCallback;
 
     private final Set<Byte> _lockedForTeamA = new HashSet<>();
     private final Set<Byte> _lockedForTeamB = new HashSet<>();
@@ -33,6 +45,9 @@ public class DraftController {
         _draft.getTeamB().forEach(user -> user.setPresent(false));
         _draft.setTeamAReady(false);
         _draft.setTeamBReady(false);
+        _draft.setTurnExpirationTime(null);
+        _notifier.onTimerUpdated(null);
+        if (_timerTask != null) _timerTask.cancel(false);
         _draft.getHistory().forEach(this::computeAction);
     }
 
@@ -95,10 +110,22 @@ public class DraftController {
     public boolean onAction(DraftAction action, String user) {
         if (!validate(action, user)) return false;
 
+        if (_timerTask != null) _timerTask.cancel(false);
+
         int currentAction = _draft.getCurrentAction();
 
         doProcessAction(action);
         _notifier.onAction(action, currentAction);
+
+        if (!isEnded()) {
+            scheduleTimer();
+        } else {
+            _draft.setTurnExpirationTime(null);
+            _notifier.onTimerUpdated(null);
+            _scheduler.shutdown();
+        }
+
+        if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
         return true;
     }
 
@@ -109,10 +136,21 @@ public class DraftController {
      * @param ready state
      */
     public void onTeamReady(DraftTeam team, boolean ready) {
+        boolean wasReady = areTeamReady();
         if (team == DraftTeam.TEAM_A) _draft.setTeamAReady(ready);
         if (team == DraftTeam.TEAM_B) _draft.setTeamBReady(ready);
 
         _notifier.onTeamReady(team, ready);
+
+        if (!wasReady && areTeamReady() && !isEnded()) {
+            scheduleTimer();
+        } else if (wasReady && !areTeamReady()) {
+            if (_timerTask != null) _timerTask.cancel(false);
+            _draft.setTurnExpirationTime(null);
+            _notifier.onTimerUpdated(null);
+        }
+
+        if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
     }
 
     /**
@@ -152,6 +190,58 @@ public class DraftController {
     // *****************************************************************************************************************
     // ***************************************** INTERNAL MECHANIC ONLY METHODS ****************************************
     // *****************************************************************************************************************
+
+    private void scheduleTimer() {
+        Integer delay = _draft.getConfiguration().getTurnDurationSeconds();
+        if (delay == null || delay <= 0) {
+            _timerTask = null;
+            return;
+        }
+        _draft.setTurnExpirationTime(Instant.now().plusSeconds(delay));
+        _notifier.onTimerUpdated(_draft.getTurnExpirationTime());
+        _timerTask = _scheduler.schedule(this::forceRandomAction, delay, TimeUnit.SECONDS);
+    }
+
+    private void forceRandomAction() {
+        DraftAction pendingAction = getCurrentAction();
+        if (pendingAction == null) return;
+
+        List<Byte> validBreeds = new ArrayList<>();
+        for (byte i = 1; i <= 20; i++) {
+            validBreeds.add(i);
+        }
+        validBreeds.removeIf(b -> {
+            if (pendingAction.getType() == DraftActionType.PICK) {
+                if (pendingAction.getTeam() == DraftTeam.TEAM_A && _lockedForTeamA.contains(b)) return true;
+                if (pendingAction.getTeam() == DraftTeam.TEAM_B && _lockedForTeamB.contains(b)) return true;
+            }
+            return false;
+        });
+
+        Byte selected = validBreeds.get(_random.nextInt(validBreeds.size()));
+        DraftAction generatedAction = new DraftAction(pendingAction.getType(), pendingAction.getTeam(), selected, pendingAction.isLockForPickingTeam(), pendingAction.isLockForOpponentTeam());
+
+        int currentAction = _draft.getCurrentAction();
+        doProcessAction(generatedAction);
+        _notifier.onAction(generatedAction, currentAction);
+
+        if (!isEnded()) {
+            scheduleTimer();
+        } else {
+            _draft.setTurnExpirationTime(null);
+            _notifier.onTimerUpdated(null);
+            _scheduler.shutdown();
+        }
+
+        if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
+    }
+
+    public void expireTimerForTest() {
+        if (_timerTask != null) {
+            _timerTask.cancel(false);
+            forceRandomAction();
+        }
+    }
 
     private void onUserAssigned(DraftUser user, DraftTeam team) {
         if (team == DraftTeam.NONE) throw new IllegalStateException("Unexpected team: " + team);

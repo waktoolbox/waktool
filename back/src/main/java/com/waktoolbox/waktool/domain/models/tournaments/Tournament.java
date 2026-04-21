@@ -30,4 +30,5 @@ public class Tournament implements Serializable {
     List<String> streamers;
     String teamNumber;
     Object description;
+    Integer draftAvailableMinutesBeforeMatch;
 }

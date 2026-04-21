@@ -6,10 +6,12 @@ import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchA
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 import com.waktoolbox.waktool.domain.repositories.DraftRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
+import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -20,6 +22,7 @@ public class DraftManager {
     private final DraftRepository _draftRepository;
     private final DraftNotifierFactory _draftNotifierFactory;
     private final TournamentMatchRepository _matchRepository;
+    private final TournamentRepository _tournamentRepository;
 
     @Scheduled(fixedDelay = 60 * 1000)
     private void cleanup() {
@@ -44,17 +47,21 @@ public class DraftManager {
         Draft draft = _draftRepository.load(draftId);
         if (draft == null) return null;
 
+        if (!canAccessDraft(draft)) return null;
+
         DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        setupControllerCallbacks(controller);
         controller.restore();
         _currentDrafts.put(draft.getId(), controller);
         return joinDraft(user, draft.getId());
     }
 
-    public Draft createDraftByUser(DraftUser user, DraftAction[] actions) {
+    public Draft createDraftByUser(DraftUser user, DraftAction[] actions, Integer turnDurationSeconds) {
         DraftConfiguration configuration = new DraftConfiguration();
         configuration.setProvidedByServer(false);
         configuration.setLeader(user.getId());
         configuration.setActions(actions);
+        if (turnDurationSeconds != null) configuration.setTurnDurationSeconds(turnDurationSeconds);
 
         Draft draft = new Draft();
         draft.setId(String.valueOf(UUID.randomUUID()));
@@ -63,12 +70,30 @@ public class DraftManager {
         draft.setTeamBInfo(new DraftTeamInfo("2", "Team B"));
 
         DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        setupControllerCallbacks(controller);
         _currentDrafts.put(draft.getId(), controller);
         return joinDraft(user, draft.getId());
     }
 
+    private boolean canAccessDraft(Draft draft) {
+        if (!draft.getConfiguration().isProvidedByServer()) return true;
+
+        String[] matchIdAndRound = draft.getId().split("_");
+        if (matchIdAndRound.length == 0) return true;
+
+        TournamentMatchAndTournamentId matchAndTournamentId = _matchRepository.getMatchAndTournamentId(matchIdAndRound[0]);
+        if (matchAndTournamentId == null || matchAndTournamentId.match().getDate() == null) return true;
+
+        var tournament = _tournamentRepository.getTournament(matchAndTournamentId.tournamentId()).orElse(null);
+        if (tournament == null || tournament.getDraftAvailableMinutesBeforeMatch() == null) return true;
+
+        Instant accessDate = matchAndTournamentId.match().getDate().minus(tournament.getDraftAvailableMinutesBeforeMatch(), java.time.temporal.ChronoUnit.MINUTES);
+        return !Instant.now().isBefore(accessDate);
+    }
+
     public void createDraftByServer(Draft draft) {
         DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        setupControllerCallbacks(controller);
         _currentDrafts.put(draft.getId(), controller);
         saveDraft(controller);
     }
@@ -89,17 +114,8 @@ public class DraftManager {
         DraftController draft = _currentDrafts.get(draftId);
         if (draft == null) return;
 
-        boolean executed = draft.onAction(action, user);
-
-        if (executed && draft.getDraft().getConfiguration().isProvidedByServer()) {
-            saveDraft(draft);
-        }
-
-        if (draft.isEnded()) {
-            saveDraftEnd(draft);
-            _currentDrafts.remove(draftId);
-            draft.getDraft().getUsers().forEach(u -> removeDraftFromUser(u, draftId));
-        }
+        draft.onAction(action, user);
+        // Persistence is now naturally handled via _onDraftUpdatedCallback
     }
 
     public void assignUser(String draftId, String user, String target, DraftTeam team) {
@@ -128,6 +144,19 @@ public class DraftManager {
                 .map(_currentDrafts::get)
                 .filter(Objects::nonNull)
                 .forEach(d -> d.onUserDisconnected(user));
+    }
+
+    private void setupControllerCallbacks(DraftController controller) {
+        controller.setOnDraftUpdatedCallback(() -> {
+            if (controller.getDraft().getConfiguration().isProvidedByServer()) {
+                saveDraft(controller);
+            }
+            if (controller.isEnded()) {
+                saveDraftEnd(controller);
+                _currentDrafts.remove(controller.getDraft().getId());
+                controller.getDraft().getUsers().forEach(u -> removeDraftFromUser(u, controller.getDraft().getId()));
+            }
+        });
     }
 
     private void saveDraft(DraftController draft) {

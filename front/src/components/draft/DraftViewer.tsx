@@ -81,6 +81,8 @@ function DraftViewer() {
     const [history, setHistory] = useState<DraftAction[]>([]);
     const [currentAction, setCurrentAction] = useState(0)
     const [currentActionData, setCurrentActionData] = useState<DraftAction>({} as DraftAction)
+    const [turnExpirationTime, setTurnExpirationTime] = useState<string | undefined>(undefined);
+    const [timerRemaining, setTimerRemaining] = useState<number>(0);
 
     // Computed data
     const [endReason, setEndReason] = useState<string | undefined>(undefined)
@@ -110,6 +112,7 @@ function DraftViewer() {
         setHistory(controller.history || [])
         setCurrentAction(controller.currentAction || 0)
         setCurrentActionData(controller.data.configuration?.actions[controller?.currentAction || 0] || undefined)
+        setTurnExpirationTime(controller.data.turnExpirationTime)
 
         setEndReason(undefined) // TODO just to avoid warning, clean when implemented
         setImDraftLeader(controller.data?.configuration?.leader === whoAmI);
@@ -127,6 +130,24 @@ function DraftViewer() {
             computeUsersToAssign();
         }
     }, [teamAUsers, teamBUsers])
+
+    useEffect(() => {
+        if (!turnExpirationTime) {
+            setTimerRemaining(0);
+            return;
+        }
+
+        const updateTimer = () => {
+            const end = new Date(turnExpirationTime).getTime();
+            const now = new Date().getTime();
+            const diff = Math.max(0, Math.floor((end - now) / 1000));
+            setTimerRemaining(diff);
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 500);
+        return () => clearInterval(interval);
+    }, [turnExpirationTime]);
 
     useEffect(() => {
         subscribeWithoutUserPrefix("/topic/draft-" + draftId, (draftNotification: DraftNotification) => {
@@ -212,6 +233,13 @@ function DraftViewer() {
                     const teamReady = draftNotification.payload as DraftTeamReady;
                     if (teamReady.team === DraftTeam.TEAM_A) setTeamAReady(teamReady.ready)
                     if (teamReady.team === DraftTeam.TEAM_B) setTeamBReady(teamReady.ready)
+                    break;
+                }
+                case "draft::timerUpdated": {
+                    const newTimer = draftNotification.payload as string;
+                    if (!controller) return;
+                    controller.data.turnExpirationTime = newTimer;
+                    setTurnExpirationTime(newTimer);
                     break;
                 }
             }
@@ -339,7 +367,10 @@ function DraftViewer() {
                     <Grid container>
                         {currentActionData &&
                             <Grid item xs={12} sx={{mt: 1}}>
-                                <Typography variant="h5">{t('draft.currentAction')}</Typography>
+                                <Typography variant="h5">
+                                    {t('draft.currentAction')}
+                                    {turnExpirationTime && ` - ${timerRemaining}s`}
+                                </Typography>
                                 {currentActionData && <DraftActionView action={currentActionData}/>}
                             </Grid>
                         }

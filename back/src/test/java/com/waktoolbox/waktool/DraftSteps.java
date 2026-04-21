@@ -76,6 +76,12 @@ public class DraftSteps implements DraftNotifier {
         _lastActionSuccess = _controller.onAction(null, user);
     }
 
+    @Given("draft timer expires")
+    public void whenDraftTimerExpires() {
+        _controller.expireTimerForTest();
+        _lastActionSuccess = true;
+    }
+
     @Then("the last action should be {word}")
     public void thenLastActionShouldBeSuccessful(String success) {
         assertThat(_lastActionSuccess, is(Boolean.parseBoolean(success)));
@@ -157,6 +163,11 @@ public class DraftSteps implements DraftNotifier {
 
     @Override
     public void onTeamReady(DraftTeam team, boolean ready) {
+
+    }
+
+    @Override
+    public void onTimerUpdated(java.time.Instant turnExpirationTime) {
 
     }
 }
