@@ -68,6 +68,7 @@ COPY --from=build-jdk /opt/jdk java
 
 ENV JAVA_HOME=/opt/java
 ENV PATH="$PATH:$JAVA_HOME/bin"
+ENV RESOURCES_PATH=file:/opt/front/dist/
 
 EXPOSE 8080
 
