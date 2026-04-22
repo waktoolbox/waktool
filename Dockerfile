@@ -1,10 +1,15 @@
-FROM node:20-alpine as build-front
+# =============================================================================
+# Stage 1: Build frontend with pnpm
+# =============================================================================
+FROM node:20-alpine AS build-front
+
 WORKDIR /front
 
+# Install pnpm and cache dependencies
 COPY front/package.json front/pnpm-lock.yaml ./
 RUN corepack enable && pnpm install --frozen-lockfile --shamefully-hoist
 
-# Keep it after install to avoid chaos
+# Set production mode after install to avoid skipping devDependencies
 ENV NODE_ENV=production
 
 COPY front/.env.production .env
@@ -16,27 +21,40 @@ COPY front/public/ public/
 
 RUN pnpm run build
 
-FROM maven:3-eclipse-temurin-21 as build-back
+# =============================================================================
+# Stage 2: Build backend with Maven (dependency caching layer)
+# =============================================================================
+FROM maven:3-eclipse-temurin-21 AS build-back
 
 WORKDIR /back
+
+# Cache Maven dependencies in a separate layer
 COPY back/pom.xml pom.xml
+RUN mvn dependency:go-offline -B
+
+# Build the application
 COPY back/src/ src/
+RUN mvn clean package -DskipTests -B
 
-RUN mvn clean package -DskipTests
+# =============================================================================
+# Stage 3: Build a minimal JDK with jlink
+# =============================================================================
+FROM eclipse-temurin:21-jdk-alpine AS build-jdk
 
-FROM eclipse-temurin:21-jdk-alpine as build-jdk
 RUN jlink \
     --module-path /opt/java/openjdk/jmods \
-    --compress=2 \
+    --compress=zip-6 \
     --add-modules java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management,java.naming,java.scripting,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported \
     --no-header-files \
     --no-man-pages \
     --output /opt/jdk
 
-FROM alpine:3.18.2
+# =============================================================================
+# Stage 4: Final minimal runtime image
+# =============================================================================
+FROM alpine:3.21
 
-RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
-RUN update-ca-certificates
+RUN apk update && apk add --no-cache ca-certificates && update-ca-certificates
 
 ENV JAVA_OPTS="-XX:+ShowCodeDetailsInExceptionMessages"
 
@@ -50,6 +68,7 @@ COPY --from=build-jdk /opt/jdk java
 
 ENV JAVA_HOME=/opt/java
 ENV PATH="$PATH:$JAVA_HOME/bin"
-ENV RESOURCES_PATH=file:/opt/front/dist/
+
+EXPOSE 8080
 
 ENTRYPOINT java $JAVA_OPTS -jar app.jar --server.address=0.0.0.0

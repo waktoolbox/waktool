@@ -1,9 +1,7 @@
-version: "3.5"
-
 services:
   postgres:
     container_name: postgres_waktool
-    image: postgres:15.3
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
@@ -12,13 +10,12 @@ services:
       - postgres:/data/postgres
     ports:
       - "15435:5432"
-    networks:
-      - postgres
     restart: unless-stopped
-
-networks:
-  postgres:
-    driver: bridge
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres:

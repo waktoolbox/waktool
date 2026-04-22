@@ -1,23 +1,34 @@
-# fly.toml app configuration file generated for waktool-prod on 2023-06-26T02:06:12+02:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# fly.toml — Fly.io v2 Apps configuration
+# See https://fly.io/docs/reference/configuration/
 
 app = "waktool-prod"
 primary_region = "cdg"
 
+[build]
+
+[env]
+APP_PORT = "8080"
+
 [http_service]
 internal_port = 8080
 force_https = true
-auto_stop_machines = false
+auto_stop_machines = "suspend"
 auto_start_machines = true
 min_machines_running = 1
 
-[services.concurrency]
+[http_service.concurrency]
 type = "requests"
-hard_limit = 99999
-soft_limit = 99999
+soft_limit = 200
+hard_limit = 250
 
-[[services.ports]]
-handlers = ["tls", "http"]
-port = 443
+[http_service.checks]
+[http_service.checks.health]
+interval = "30s"
+timeout = "5s"
+grace_period = "15s"
+method = "GET"
+path = "/"
+
+[[vm]]
+size = "shared-cpu-1x"
+memory = "512mb"
