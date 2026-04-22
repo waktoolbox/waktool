@@ -18,3 +18,6 @@ type = "requests"
 hard_limit = 99999
 soft_limit = 99999
 
+[[services.ports]]
+handlers = ["tls", "http"]
+port = 443
