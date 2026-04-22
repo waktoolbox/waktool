@@ -2,6 +2,7 @@ package com.waktoolbox.waktool;
 
 import com.waktoolbox.waktool.domain.controllers.draft.DraftController;
 import com.waktoolbox.waktool.domain.controllers.draft.DraftNotifier;
+import com.waktoolbox.waktool.domain.models.Breeds;
 import com.waktoolbox.waktool.domain.models.drafts.*;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.Transpose;
@@ -79,7 +80,7 @@ public class DraftSteps implements DraftNotifier {
 
     @Given("{word} {action} {int} for team {team} {word} {word}")
     public void whenAction(String user, DraftActionType action, int breed, DraftTeam team, String lockForPicking, String lockForOpponent) {
-        DraftAction draftAction = new DraftAction(team, action, (byte) breed, Boolean.parseBoolean(lockForPicking), Boolean.parseBoolean(lockForOpponent));
+        DraftAction draftAction = new DraftAction(team, action, Breeds.fromId((byte) breed), Boolean.parseBoolean(lockForPicking), Boolean.parseBoolean(lockForOpponent));
         _lastActionSuccess = _controller.onAction(draftAction, user);
     }
 
@@ -135,7 +136,7 @@ public class DraftSteps implements DraftNotifier {
     public void thenPickResultIs(DraftTeam team, @Transpose List<Byte> result) {
         DraftTeamResult draftTeamResult = _controller.computeDraftResult(team);
 
-        List<Byte> pickedClasses = Arrays.stream(draftTeamResult.getPickedClasses()).toList();
+        List<Byte> pickedClasses = Arrays.stream(draftTeamResult.getPickedClasses()).map(Breeds::getId).toList();
         assertThat(result.size(), is(pickedClasses.size()));
         for (Byte breed : result) {
             assertThat(pickedClasses.contains(breed), is(true));
@@ -146,7 +147,7 @@ public class DraftSteps implements DraftNotifier {
     public void thenBanResultIs(DraftTeam team, @Transpose List<Byte> result) {
         DraftTeamResult draftTeamResult = _controller.computeDraftResult(team);
 
-        List<Byte> bannedClasses = Arrays.stream(draftTeamResult.getBannedClasses()).toList();
+        List<Byte> bannedClasses = Arrays.stream(draftTeamResult.getBannedClasses()).map(Breeds::getId).toList();
         assertThat(result.size(), is(bannedClasses.size()));
         for (Byte breed : result) {
             assertThat(bannedClasses.contains(breed), is(true));

@@ -28,9 +28,10 @@ public class SocketChannelInterceptor implements ChannelInterceptor {
 
     private static final Function<StompHeaderAccessor, User> MESSAGE_TO_USER = (wrapper) -> {
         Optional<Object> optAttributes = Optional.ofNullable(wrapper.getSessionAttributes());
-        if (optAttributes.isEmpty()) return new User(UserType.ANONYMOUS_USER, WRAPPER_TO_SIMP_ID.apply(wrapper));
+        if (optAttributes.isEmpty() || !(optAttributes.get() instanceof Map<?, ?> attributes)) {
+            return new User(UserType.ANONYMOUS_USER, WRAPPER_TO_SIMP_ID.apply(wrapper));
+        }
 
-        Map<?, ?> attributes = (Map<?, ?>) optAttributes.get();
         if (attributes.get(DISCORD_ID) instanceof Optional<?> opt && opt.isPresent()) {
             return new User(UserType.DISCORD_USER, (String) opt.get());
         }

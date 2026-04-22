@@ -22,6 +22,7 @@ const client = new Client({
     onConnect: () => {
         console.log("Stomp connected");
 
+        // (Re)subscribe to all desired topics
         for (const {path, callback, hasPrefix} of Array.from(subscriptionsMap.values())) {
             const topic = hasPrefix ? subscriptionPrefix + path : path;
             const stompSub = client.subscribe(topic, (response) => callback(JSON.parse(response.body)));
@@ -36,8 +37,9 @@ const client = new Client({
         pending = undefined;
     },
     onWebSocketClose: () => {
-        if (!pending) pending = [];
         console.log("Stomp connection lost");
+        activeStompSubscriptions.clear();
+        if (!pending) pending = [];
     }
 });
 
@@ -50,34 +52,27 @@ const activeStompSubscriptions = new Map<string, StompSubscription>();
 
 client.activate();
 
-function executeOrSchedule(func: () => void) {
-    if (!pending || client.connected) {
-        func();
-        return;
-    }
-    pending.push(func);
-}
-
 export function subscribe(path: string, callback: (data: any) => void) {
     if (subscriptionsMap.has(path)) return;
     subscriptionsMap.set(path, {path, callback, hasPrefix: true});
-    executeOrSchedule(() => {
+
+    if (client.connected) {
         const sub = client.subscribe(subscriptionPrefix + path, (response) => callback(JSON.parse(response.body)));
         activeStompSubscriptions.set(path, sub);
-    });
+    }
 }
 
 export function subscribeWithoutUserPrefix(path: string, callback: (data: any) => void) {
     if (subscriptionsMap.has(path)) return;
     subscriptionsMap.set(path, {path, callback, hasPrefix: false});
-    executeOrSchedule(() => {
+
+    if (client.connected) {
         const sub = client.subscribe(path, (response) => callback(JSON.parse(response.body)));
         activeStompSubscriptions.set(path, sub);
-    });
+    }
 }
 
 export function unsubscribe(path: string) {
-    if (!subscriptionsMap.has(path)) return;
     subscriptionsMap.delete(path);
     const sub = activeStompSubscriptions.get(path);
     if (sub) {
@@ -87,5 +82,11 @@ export function unsubscribe(path: string) {
 }
 
 export function send(path: string, data: any) {
-    executeOrSchedule(() => client.publish({destination: "/app/" + path, body: JSON.stringify(data)}));
+    const publish = () => client.publish({destination: "/app/" + path, body: JSON.stringify(data)});
+    if (client.connected) {
+        publish();
+    } else {
+        if (!pending) pending = [];
+        pending.push(publish);
+    }
 }

@@ -41,11 +41,11 @@ public enum Breeds {
     @JsonCreator
     public static Breeds fromId(Byte id) {
         if (id == null) return null;
-        for (Breeds wakfuClass : values()) {
-            if (wakfuClass.id == id) {
-                return wakfuClass;
+        for (Breeds breed : values()) {
+            if (breed.id == id) {
+                return breed;
             }
         }
-        throw new IllegalArgumentException("Unknown WakfuClass id: " + id);
+        return null;
     }
 }
