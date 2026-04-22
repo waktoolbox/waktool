@@ -370,7 +370,23 @@ function DraftViewer() {
                             <Grid item xs={12} sx={{mt: 1}}>
                                 <Typography variant="h5">
                                     {t('draft.currentAction')}
-                                    {turnExpirationTime && ` - ${timerRemaining}s`}
+                                    {turnExpirationTime && (
+                                        <span style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            lineHeight: 1,
+                                            color: timerRemaining <= 10 ? '#e64b4b' : '#4be64b',
+                                            fontWeight: 'bold',
+                                            fontSize: '1.2em',
+                                            marginLeft: '8px',
+                                            padding: '4px 12px',
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(0,0,0,0.2)',
+                                            boxShadow: timerRemaining <= 10 ? '0 0 10px rgba(255, 76, 76, 0.5)' : 'none'
+                                        }}>
+                                            {timerRemaining}s
+                                        </span>
+                                    )}
                                 </Typography>
                                 {currentActionData && <DraftActionView action={currentActionData}/>}
                             </Grid>

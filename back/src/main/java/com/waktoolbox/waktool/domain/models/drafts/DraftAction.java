@@ -1,5 +1,7 @@
 package com.waktoolbox.waktool.domain.models.drafts;
 
+import com.waktoolbox.waktool.domain.models.Breeds;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +16,7 @@ import java.io.Serializable;
 public class DraftAction implements Serializable {
     DraftTeam team;
     DraftActionType type;
-    Byte breed;
+    Breeds breed;
     boolean lockForPickingTeam;
     boolean lockForOpponentTeam;
 

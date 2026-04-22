@@ -1,6 +1,7 @@
 package com.waktoolbox.waktool.domain.controllers.tournaments.phases;
 
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseControllerContext;
+import com.waktoolbox.waktool.domain.models.Breeds;
 import com.waktoolbox.waktool.domain.models.drafts.DraftTeamResult;
 import com.waktoolbox.waktool.domain.models.tournaments.*;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
@@ -191,7 +192,10 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
     private Map<String, DraftTeamResult> collectTeamBreeds(List<TournamentPhaseDataTeam> teams) {
         return context.getTournamentTeamRepository().getTeamsWithIds(teams.stream().map(TournamentPhaseDataTeam::getId).toList())
                 .stream()
-                .collect(Collectors.toMap(Team::getId, team -> new DraftTeamResult(team.getBreeds().toArray(new Byte[0]), new Byte[0])));
+                .collect(Collectors.toMap(Team::getId, team -> new DraftTeamResult(
+                        team.getBreeds().stream().map(Breeds::fromId).filter(Objects::nonNull).toArray(Breeds[]::new),
+                        new Breeds[0]
+                )));
     }
 
     private List<TournamentMatchRound> createRoundsForFinals(TournamentMatch tournamentMatch, TournamentPhaseDataTeam noLoss, TournamentPhaseDataTeam oneLoss) {

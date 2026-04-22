@@ -24,6 +24,16 @@ import static com.waktoolbox.waktool.utils.JwtHelper.USERNAME;
 public class DraftController {
     private final DraftManager _draftManager;
 
+    private String extractUserId(Map<String, Optional<String>> attributes, String simpSessionId) {
+        if (attributes.containsKey(DISCORD_ID) && attributes.get(DISCORD_ID).isPresent()) {
+            return attributes.get(DISCORD_ID).get();
+        }
+        if (attributes.containsKey("guest-id") && attributes.get("guest-id").isPresent()) {
+            return attributes.get("guest-id").get();
+        }
+        return simpSessionId;
+    }
+
     private record DraftIdOnlyMessage(String id) {
     }
 
@@ -33,7 +43,7 @@ public class DraftController {
             @Header("simpSessionAttributes") Map<String, Optional<String>> attributes,
             @Header String simpSessionId
     ) {
-        return new DraftIdOnlyMessage(attributes.get(DISCORD_ID).orElse(simpSessionId));
+        return new DraftIdOnlyMessage(extractUserId(attributes, simpSessionId));
     }
 
     @MessageMapping("/draft::get")
@@ -70,7 +80,7 @@ public class DraftController {
             @Header String simpSessionId,
             DraftActionMessage message
     ) {
-        _draftManager.onAction(message.draftId, attributes.get(DISCORD_ID).orElse(simpSessionId), message.action);
+        _draftManager.onAction(message.draftId, extractUserId(attributes, simpSessionId), message.action);
     }
 
     private record DraftAssignUserMessage(String draftId, String target, DraftTeam team) {
@@ -82,7 +92,7 @@ public class DraftController {
             @Header String simpSessionId,
             DraftAssignUserMessage message
     ) {
-        _draftManager.assignUser(message.draftId, attributes.get(DISCORD_ID).orElse(simpSessionId), message.target, message.team);
+        _draftManager.assignUser(message.draftId, extractUserId(attributes, simpSessionId), message.target, message.team);
     }
 
     private record DraftTeamReadyMessage(String draftId, boolean ready) {
@@ -94,12 +104,12 @@ public class DraftController {
             @Header String simpSessionId,
             DraftTeamReadyMessage message
     ) {
-        _draftManager.onTeamReady(message.draftId, attributes.get(DISCORD_ID).orElse(simpSessionId), message.ready);
+        _draftManager.onTeamReady(message.draftId, extractUserId(attributes, simpSessionId), message.ready);
     }
 
     private DraftUser computeDraftUser(Map<String, Optional<String>> attributes, String simpSessionId) {
-        String id = attributes.get(DISCORD_ID).orElse(simpSessionId);
-        return _draftManager.getUser(id).orElse(new DraftUser(id, attributes.get(USERNAME).orElse(null)));
+        String id = extractUserId(attributes, simpSessionId);
+        return _draftManager.getUser(id).orElse(new DraftUser(id, attributes.getOrDefault(USERNAME, Optional.empty()).orElse(null)));
     }
 
     @EventListener

@@ -10,7 +10,7 @@ public interface TournamentMatchSpringDataRepository extends CrudRepository<Tour
 
     List<TournamentMatchEntity> findAllMatchesByTournamentIdAndPhase(String tournamentId, int phase);
 
-    @Query(value = "SELECT * FROM matches WHERE tournament_id = ?1 AND content->>'teamA' = ?2 OR content->>'teamB' = ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM matches WHERE tournament_id = ?1 AND (content->>'teamA' = ?2 OR content->>'teamB' = ?2)", nativeQuery = true)
     List<TournamentMatchEntity> findAllMatchesByTournamentIdAndTeamId(String tournamentId, String teamId);
 
     @Query(value = """
@@ -22,6 +22,11 @@ public interface TournamentMatchSpringDataRepository extends CrudRepository<Tour
             """, nativeQuery = true)
     int countAllNotDoneMatchesByTournamentIdAndPhaseAndRound(String tournamentId, int phase, String round);
 
-    @Query(value = "SELECT * FROM matches WHERE tournament_id = ?1 AND CAST(content->>'date' AS timestamp with time zone) >= ?2 AND CAST(content->>'date' AS timestamp with time zone) <= ?3", nativeQuery = true)
+    @Query(value = """
+            SELECT * FROM matches
+            WHERE tournament_id = ?1
+            AND (CASE WHEN content->>'date' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'date' AS double precision)) ELSE CAST(content->>'date' AS timestamp with time zone) END) >= ?2
+            AND (CASE WHEN content->>'date' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'date' AS double precision)) ELSE CAST(content->>'date' AS timestamp with time zone) END) <= ?3
+            """, nativeQuery = true)
     List<TournamentMatchEntity> getMatchesToNotify(String tournamentId, Instant minBound, Instant maxBound);
 }

@@ -61,8 +61,8 @@ public class TournamentStatsController {
     private static void manageDraftResultStats(Team team, boolean isWinner, TeamStatsByClass[] statsByClass, TournamentMatch match, TournamentMatchRound round) {
         DraftTeamResult draftResult = team.getId().equals(match.getTeamA()) ? round.getTeamADraft() : round.getTeamBDraft();
         if (draftResult != null) {
-            for (Byte pickedClass : draftResult.getPickedClasses()) {
-                TeamStatsByClass breedStats = getTeamStatsByClass(statsByClass, pickedClass);
+            for (Breeds pickedClass : draftResult.getPickedClasses()) {
+                TeamStatsByClass breedStats = getTeamStatsByClass(statsByClass, pickedClass.getId());
                 breedStats.setPlayed(Optional.ofNullable(breedStats.getPlayed()).orElse(0) + 1);
 
                 if (isWinner) {
@@ -70,8 +70,8 @@ public class TournamentStatsController {
                 }
             }
 
-            for (Byte bannedClass : draftResult.getBannedClasses()) {
-                TeamStatsByClass breedStats = getTeamStatsByClass(statsByClass, bannedClass);
+            for (Breeds bannedClass : draftResult.getBannedClasses()) {
+                TeamStatsByClass breedStats = getTeamStatsByClass(statsByClass, bannedClass.getId());
                 breedStats.setBanned(Optional.ofNullable(breedStats.getPlayed()).orElse(0) + 1);
             }
         }

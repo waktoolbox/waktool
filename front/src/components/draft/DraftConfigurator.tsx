@@ -47,20 +47,20 @@ function DraftConfigurator() {
     }
 
     return (
-        <Grid container className="darkBlueContainer" sx={{alignItems: "center", pt: 2}}>
-            <Grid item xs={6} md={3} order={{xs: 3, md: 1}}>
-                <Button variant="outlined" onClick={() => addAction()}>{t('draft.action.add')}</Button>
+        <Grid container className="darkBlueContainer" sx={{alignItems: "center", pt: 2, pb: 2, px: 2}} spacing={2}>
+            <Grid item xs={6} md={2} order={{xs: 3, md: 1}}>
+                <Button variant="outlined" fullWidth onClick={() => addAction()}>{t('draft.action.add')}</Button>
             </Grid>
-            <Grid item xs={6} md={3} order={{xs: 4, md: 2}}>
-                <TextField size="small" type="number" sx={{float: "right", mr: 1, width: "100%"}}
+            <Grid item xs={6} md={2} order={{xs: 4, md: 2}}>
+                <TextField size="small" type="number" fullWidth
                            value={timerDuration ?? ''}
                            label={t('draft.timerDurationSeconds')} onChange={(e) => {
                     const val = parseInt(e.target.value);
                     setTimerDuration(isNaN(val) ? undefined : val);
                 }}/>
             </Grid>
-            <Grid item xs={12} md={5} order={{xs: 1, md: 3}}>
-                <TextField size="small" sx={{float: "right", mr: 1}} value={draftTemplate as unknown as string}
+            <Grid item xs={10} md={3} order={{xs: 1, md: 3}}>
+                <TextField size="small" fullWidth value={draftTemplate as unknown as string}
                            label={t('draft.template')} select>
                     {DraftTemplates.map((template, index) => (
                         <MenuItem key={index} value={index}
@@ -68,12 +68,12 @@ function DraftConfigurator() {
                     ))}
                 </TextField>
             </Grid>
-            <Grid item xs={2} md={1} order={{xs: 2, md: 4}}>
-                <Button
+            <Grid item xs={2} md={2} order={{xs: 2, md: 4}}>
+                <Button variant="outlined" fullWidth
                     onClick={() => setActions([...DraftTemplates[draftTemplate].actions])}>{t('draft.importTemplate')}</Button>
             </Grid>
-            <Grid item xs={6} md={5} order={{xs: 5, md: 5}} sx={{mt: {xs: 1, md: 0}}}>
-                <Button variant="contained" sx={{height: '100%', width: '100%'}}
+            <Grid item xs={12} md={3} order={{xs: 5, md: 5}}>
+                <Button variant="contained" fullWidth
                         onClick={() => requestDraft()}>{t('draft.start')}</Button>
             </Grid>
             <Grid item xs={12} order={{xs: 6, md: 6}}>

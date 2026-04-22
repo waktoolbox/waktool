@@ -6,6 +6,7 @@ import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseCont
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentPhaseControllerFactory;
 import com.waktoolbox.waktool.domain.controllers.tournaments.TournamentStatsController;
 import com.waktoolbox.waktool.domain.models.Account;
+import com.waktoolbox.waktool.domain.models.Breeds;
 import com.waktoolbox.waktool.domain.models.drafts.DraftTeamResult;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
 import com.waktoolbox.waktool.domain.models.tournaments.TournamentData;
@@ -23,9 +24,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
-import org.testcontainers.shaded.com.google.common.collect.Lists;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -150,7 +151,7 @@ public class TournamentSteps {
                 if (teamA == null) throw new IllegalStateException("Team A not found");
 
                 DraftTeamResult teamADraft = match.getRounds().getFirst().getTeamADraft();
-                List<Byte> teamAClasses = Lists.newArrayList(teamADraft.getPickedClasses());
+                List<Byte> teamAClasses = Arrays.stream(teamADraft.getPickedClasses()).map(Breeds::getId).toList();
                 Assertions.assertTrue(teamAClasses.containsAll(teamA.getBreeds()));
             }
 
@@ -158,7 +159,7 @@ public class TournamentSteps {
                 if (teamB == null) throw new IllegalStateException("Team B not found");
 
                 DraftTeamResult teamBDraft = match.getRounds().getFirst().getTeamBDraft();
-                List<Byte> teamBClasses = Lists.newArrayList(teamBDraft.getPickedClasses());
+                List<Byte> teamBClasses = Arrays.stream(teamBDraft.getPickedClasses()).map(Breeds::getId).toList();
                 Assertions.assertTrue(teamBClasses.containsAll(teamB.getBreeds()));
             }
         });

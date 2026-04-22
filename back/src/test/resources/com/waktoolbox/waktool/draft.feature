@@ -155,7 +155,7 @@ Feature: Draft works as expected
     Given 1 picks 14 for team A true false
     Given 2 picks 15 for team B true false
     Given 1 picks 16 for team A true false
-    Given 2 picks 17 for team B true false
+    Given 2 picks 18 for team B true false
 
     Then draft is over
 
@@ -165,7 +165,7 @@ Feature: Draft works as expected
       | 1 | 6 | 9 |
 
     And pick result for team B is
-      | 4 | 7 | 12 | 13 | 15 | 17 |
+      | 4 | 7 | 12 | 13 | 15 | 18 |
     And ban result for team B is
       | 2 | 5 | 10 |
 
