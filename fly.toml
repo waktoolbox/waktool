@@ -22,11 +22,11 @@ primary_region = "cdg"
     hard_limit = 250
 
 [[http_service.checks]]
-  interval = "30s"
+  interval = "15s"
   timeout = "5s"
-  grace_period = "15s"
+  grace_period = "30s"
   method = "GET"
-  path = "/"
+  path = "/health"
 
 [[vm]]
   size = "shared-cpu-1x"
