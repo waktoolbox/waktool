@@ -13,7 +13,8 @@ auto_stop_machines = false
 auto_start_machines = true
 min_machines_running = 1
 
-[http_service.concurrency]
+[services.concurrency]
 type = "requests"
 hard_limit = 99999
 soft_limit = 99999
+
