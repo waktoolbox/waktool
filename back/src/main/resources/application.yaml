@@ -11,10 +11,6 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:changeme}
 
-  jackson:
-    serialization:
-      WRITE_DATES_AS_TIMESTAMPS: false
-
   sql:
     init:
       mode: always

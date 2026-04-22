@@ -193,7 +193,7 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         return context.getTournamentTeamRepository().getTeamsWithIds(teams.stream().map(TournamentPhaseDataTeam::getId).toList())
                 .stream()
                 .collect(Collectors.toMap(Team::getId, team -> new DraftTeamResult(
-                        team.getBreeds().stream().map(Breeds::fromId).toArray(Breeds[]::new),
+                        team.getBreeds().stream().map(Breeds::fromId).filter(Objects::nonNull).toArray(Breeds[]::new),
                         new Breeds[0]
                 )));
     }
