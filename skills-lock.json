@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "add-cucumber-tests": {
+      "source": "decathlon/tzatziki",
+      "sourceType": "github",
+      "computedHash": "4f7f37d9d4e908df3c614967765ed8d92f671877067b3016bf064bb234945b52"
+    },
+    "java-springboot": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "f1b9c6b1277178fc33e5a612761c1cd1cf6ab5f946d05d69d52026d142c0a0c1"
+    },
+    "typescript-react-reviewer": {
+      "source": "dotneet/claude-code-marketplace",
+      "sourceType": "github",
+      "computedHash": "21fa76f3823df89fbd4e299d03772aaaa5c1d67c586a8b9b51d1888431acd84a"
+    }
+  }
+}
