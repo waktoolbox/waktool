@@ -5,7 +5,7 @@ server:
 spring:
   web:
     resources:
-      add-mappings: false
+      add-mappings: true
   docker:
     compose:
       files: ${DOCKER_COMPOSE_PATH:../docker-compose.yaml}

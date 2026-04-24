@@ -1,21 +1,18 @@
 package com.waktoolbox.waktool.infra.configuration;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
-import java.io.File;
+import java.io.IOException;
 
-@Controller
 @Configuration
-public class StaticResourceConfiguration {
+public class StaticResourceConfiguration implements WebMvcConfigurer {
     @Value("${waktool.resources-path}")
     private String resourcesPath;
 
@@ -32,29 +29,35 @@ public class StaticResourceConfiguration {
         return path;
     }
 
-    @GetMapping("/**")
-    public ResponseEntity<Resource> serveStaticOrFallback(HttpServletRequest request) {
-        String path = request.getRequestURI().substring(1); // remove leading /
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // Forward root path to index.html
+        registry.addViewController("/").setViewName("forward:/index.html");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String fsPath = getFileSystemPath();
 
-        // Try to serve the exact file
-        if (!path.isEmpty()) {
-            File file = new File(fsPath + path);
-            if (file.isFile() && file.canRead()) {
-                Resource resource = new FileSystemResource(file);
-                MediaType mediaType = MediaTypeFactory.getMediaType(resource)
-                        .orElse(MediaType.APPLICATION_OCTET_STREAM);
-                return ResponseEntity.ok().contentType(mediaType).body(resource);
-            }
-        }
+        registry.addResourceHandler("/**")
+                .addResourceLocations("file:" + fsPath)
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver() {
+                    @Override
+                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+                        // Don't serve static files for API, WebSocket, or health paths
+                        if (resourcePath.startsWith("api/") || resourcePath.startsWith("socket") || resourcePath.equals("health")) {
+                            return null;
+                        }
 
-        // SPA fallback: serve index.html
-        File indexFile = new File(fsPath + "index.html");
-        if (indexFile.isFile() && indexFile.canRead()) {
-            Resource resource = new FileSystemResource(indexFile);
-            return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(resource);
-        }
-
-        return ResponseEntity.notFound().build();
+                        Resource requested = location.createRelative(resourcePath);
+                        // Serve the exact file if it exists, otherwise fallback to index.html (SPA routing)
+                        if (requested.exists() && requested.isReadable()) {
+                            return requested;
+                        }
+                        Resource index = new FileSystemResource(fsPath + "index.html");
+                        return index.exists() && index.isReadable() ? index : null;
+                    }
+                });
     }
 }
