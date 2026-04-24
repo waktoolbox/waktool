@@ -183,5 +183,5 @@ Feature: Draft works as expected
     Then the last action should be true
 
     # Next action is team B BAN, it should be possible normally
-    Given 2 bans 5 for team B true true
+    Given 2 bans any valid breed for team B true true
     Then the last action should be true

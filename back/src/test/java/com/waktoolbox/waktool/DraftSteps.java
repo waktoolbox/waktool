@@ -10,7 +10,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -93,6 +95,24 @@ public class DraftSteps implements DraftNotifier {
     public void whenDraftTimerExpires() {
         _controller.expireTimerForTest();
         _lastActionSuccess = true;
+    }
+
+    @Given("{word} {action} any valid breed for team {team} {word} {word}")
+    public void whenActionAnyValidBreed(String user, DraftActionType action, DraftTeam team, String lockForPicking, String lockForOpponent) {
+        // Collect all breeds that have been used (locked) from the draft history
+        Set<Breeds> lockedBreeds = new HashSet<>();
+        for (DraftAction historyAction : _draft.getHistory()) {
+            lockedBreeds.add(historyAction.getBreed());
+        }
+
+        // Find the first breed that is not locked
+        Breeds validBreed = Arrays.stream(Breeds.values())
+                .filter(b -> !lockedBreeds.contains(b))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No valid breed available"));
+
+        DraftAction draftAction = new DraftAction(team, action, validBreed, Boolean.parseBoolean(lockForPicking), Boolean.parseBoolean(lockForOpponent));
+        _lastActionSuccess = _controller.onAction(draftAction, user);
     }
 
     @Then("the last action should be {word}")
