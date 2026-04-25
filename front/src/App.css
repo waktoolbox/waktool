@@ -99,3 +99,12 @@ h6 {
     box-shadow: inset 0 0 0 10px #e64b4b;
     cursor: pointer
 }
+
+.imageBanned {
+    box-shadow: inset 0 0 0 10px #e64b4b;
+    filter: grayscale(0.5);
+}
+
+.imageHoverDisabled {
+    cursor: not-allowed;
+}

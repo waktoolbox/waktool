@@ -30,6 +30,10 @@ export interface TournamentDefinition {
     admins: string[];
     referees: string[];
     streamers: string[];
+
+    requiredBreeds?: number;
+    maxTeamPlayers?: number;
+    requireBannedBreed?: boolean;
 }
 
 export interface TournamentPhaseDefinition {
@@ -55,6 +59,7 @@ export interface TournamentTeamModel {
     players: string[];
     validatedPlayers: string[];
     breeds?: number[];
+    bannedBreed?: number;
     catchPhrase: string;
     displayOnTeamList: boolean;
     stats?: TournamentStatsModel;

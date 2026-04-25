@@ -7,6 +7,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 
+import BlockIcon from '@mui/icons-material/Block';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import HealingIcon from '@mui/icons-material/Healing';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -208,7 +209,7 @@ export default function TournamentTeamView() {
                         <Card>
                             <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
                                 <Button variant="contained" sx={{width: '100%'}} onClick={() => doApplyToTeam()}
-                                        disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled}>{t('tournament.team.apply')}</Button>
+                                        disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled || (tournament.maxTeamPlayers != null && team.validatedPlayers.length >= tournament.maxTeamPlayers)}>{t('tournament.team.apply')}</Button>
                                 {((myTeam && myTeam.leader === me && team.id === myTeam.id) || isAdmin) && (
                                     <Link to={`/tournament/${tournament.id}/tab/8/team/${team.id}`}>
                                         <Button variant="contained"
@@ -256,12 +257,35 @@ export default function TournamentTeamView() {
                             <Typography variant="h4" sx={{
                                 textAlign: "start",
                                 mb: 1
-                            }}>{t('tournament.team.members')}</Typography>
+                            }}>{t('tournament.team.members')} {tournament.maxTeamPlayers != null && <span style={{fontSize: '0.7em', color: '#8299a1'}}>({team.validatedPlayers.length} / {tournament.maxTeamPlayers})</span>}</Typography>
                             {team.validatedPlayers.map(player => (
                                 <User userId={player} key={player} otherProps={{sx: {color: "#8299a1"}}}/>
                             ))}
                         </CardContent>
                     </Card>
+                    {team.bannedBreed != null && (
+                        <Card>
+                            <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
+                                <Typography variant="h4" sx={{textAlign: "start", mb: 1}}>
+                                    {t('tournament.team.bannedBreed')}
+                                </Typography>
+                                <div style={{position: "relative", display: "inline-block", width: 60}}>
+                                    <img src={`/classes/${team.bannedBreed}_0.png`}
+                                         style={{width: "100%", borderRadius: 10, opacity: 0.5}}
+                                         alt={`Banned breed ${team.bannedBreed}`}/>
+                                    <BlockIcon sx={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        fontSize: "2rem",
+                                        color: "#e64b4b",
+                                        pointerEvents: "none",
+                                    }}/>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                     {team && team.stats && team.stats.statsByClass && team.stats.statsByClass.filter(b => b).length > 0 &&
                         <Card>
                             <CardContent

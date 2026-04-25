@@ -1,5 +1,6 @@
 package com.waktoolbox.waktool.domain.models.tournaments;
 
+import com.waktoolbox.waktool.domain.models.Breeds;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,19 +22,26 @@ public class Team implements Serializable {
     String server;
     List<String> players;
     List<Byte> breeds;
+    Byte bannedBreed;
     String tournament;
     String catchPhrase;
     TeamStats stats;
     boolean displayOnTeamList;
     List<String> validatedPlayers;
 
-    public static List<Byte> extractValidBreeds(List<Byte> breeds) {
+    public static List<Byte> extractValidBreeds(List<Byte> breeds, int limit) {
         return ofNullable(breeds)
                 .map(Collection::stream)
                 .map(s -> s.filter(Objects::nonNull))
                 .map(Stream::distinct)
-                .map(s -> s.limit(6))
+                .map(s -> s.limit(limit))
                 .map(s -> s.collect(Collectors.toList()))
                 .orElse(null);
+    }
+
+    public static boolean isValidBannedBreed(Byte bannedBreed, List<Byte> breeds) {
+        if (bannedBreed == null) return false;
+        if (bannedBreed < 1 || bannedBreed > Breeds.MAX_BREED_ID) return false;
+        return breeds == null || !breeds.contains(bannedBreed);
     }
 }

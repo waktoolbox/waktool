@@ -24,7 +24,7 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         TournamentPhaseData tournamentPhaseData = new TournamentPhaseData();
         if (context.getTournamentData().isEmpty()) { // first init
             List<Team> teams = context.getTournamentTeamRepository().getTeamsByTournamentId(context.getTournament().getId());
-            tournamentPhaseData.setTeams(teams.stream().map(team -> new TournamentPhaseDataTeam(team.getId(), team.getBreeds(), 0)).toList());
+            tournamentPhaseData.setTeams(teams.stream().map(team -> new TournamentPhaseDataTeam(team.getId(), team.getBreeds(), team.getBannedBreed(), 0)).toList());
         } else {
             String tournamentId = context.getTournament().getId();
             TournamentData previousPhase = context.getTournamentData().get(context.getPhase() - 1);
@@ -192,10 +192,13 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
     private Map<String, DraftTeamResult> collectTeamBreeds(List<TournamentPhaseDataTeam> teams) {
         return context.getTournamentTeamRepository().getTeamsWithIds(teams.stream().map(TournamentPhaseDataTeam::getId).toList())
                 .stream()
-                .collect(Collectors.toMap(Team::getId, team -> new DraftTeamResult(
-                        team.getBreeds().stream().map(Breeds::fromId).filter(Objects::nonNull).toArray(Breeds[]::new),
-                        new Breeds[0]
-                )));
+                .collect(Collectors.toMap(Team::getId, team -> {
+                    Breeds[] pickedClasses = team.getBreeds().stream().map(Breeds::fromId).filter(Objects::nonNull).toArray(Breeds[]::new);
+                    Breeds[] bannedClasses = team.getBannedBreed() != null
+                            ? new Breeds[]{Breeds.fromId(team.getBannedBreed())}
+                            : new Breeds[0];
+                    return new DraftTeamResult(pickedClasses, bannedClasses);
+                }));
     }
 
     private List<TournamentMatchRound> createRoundsForFinals(TournamentMatch tournamentMatch, TournamentPhaseDataTeam noLoss, TournamentPhaseDataTeam oneLoss) {

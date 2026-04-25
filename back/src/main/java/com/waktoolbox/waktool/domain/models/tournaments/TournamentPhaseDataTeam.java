@@ -13,5 +13,6 @@ import java.util.List;
 public class TournamentPhaseDataTeam implements Serializable {
     String id;
     List<Byte> breeds;
+    Byte bannedBreed;
     Integer lost; // lost matches
 }

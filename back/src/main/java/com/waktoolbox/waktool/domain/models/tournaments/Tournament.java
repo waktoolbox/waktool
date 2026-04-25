@@ -31,4 +31,19 @@ public class Tournament implements Serializable {
     String teamNumber;
     Object description;
     Integer draftAvailableMinutesBeforeMatch;
+    Integer requiredBreeds;
+    Integer maxTeamPlayers;
+    Boolean requireBannedBreed;
+
+    public int getEffectiveRequiredBreeds() {
+        return requiredBreeds != null ? requiredBreeds : 6;
+    }
+
+    public int getEffectiveMaxTeamPlayers() {
+        return maxTeamPlayers != null ? maxTeamPlayers : Integer.MAX_VALUE;
+    }
+
+    public boolean isEffectiveRequireBannedBreed() {
+        return Boolean.TRUE.equals(requireBannedBreed);
+    }
 }
