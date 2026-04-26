@@ -249,6 +249,11 @@ Feature: Team registration with breeds and banned breeds
       | id   | tournamentId | teamId | userId |
       | app1 | t1           | team1  | usr5   |
     Given token is a valid token for lead1
+    Given that posting on "/discord/users/@me/channels" will return a status OK_200 and:
+    """yaml
+    id: dm-channel-1
+    """
+    Given that posting on "/discord/channels/dm-channel-1/messages" will return a status OK_200
     When we post on "/api/tournaments/t1/teams/team1/applications/app1" a Request:
     """yaml
     headers:
