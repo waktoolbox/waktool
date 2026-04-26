@@ -263,26 +263,28 @@ export default function TournamentTeamView() {
                             ))}
                         </CardContent>
                     </Card>
-                    {team.bannedBreed != null && (
+                    {team.bannedBreeds != null && team.bannedBreeds.length > 0 && (
                         <Card>
                             <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
                                 <Typography variant="h4" sx={{textAlign: "start", mb: 1}}>
-                                    {t('tournament.team.bannedBreed')}
+                                    {t('tournament.team.bannedBreeds')}
                                 </Typography>
-                                <div style={{position: "relative", display: "inline-block", width: 60}}>
-                                    <img src={`/classes/${team.bannedBreed}_0.png`}
-                                         style={{width: "100%", borderRadius: 10, opacity: 0.5}}
-                                         alt={`Banned breed ${team.bannedBreed}`}/>
-                                    <BlockIcon sx={{
-                                        position: "absolute",
-                                        top: "50%",
-                                        left: "50%",
-                                        transform: "translate(-50%, -50%)",
-                                        fontSize: "2rem",
-                                        color: "#e64b4b",
-                                        pointerEvents: "none",
-                                    }}/>
-                                </div>
+                                {team.bannedBreeds.map(bannedBreed => (
+                                    <div key={bannedBreed} style={{position: "relative", display: "inline-block", width: 60, marginRight: 8}}>
+                                        <img src={`/classes/${bannedBreed}_0.png`}
+                                             style={{width: "100%", borderRadius: 10, opacity: 0.5}}
+                                             alt={`Banned breed ${bannedBreed}`}/>
+                                        <BlockIcon sx={{
+                                            position: "absolute",
+                                            top: "50%",
+                                            left: "50%",
+                                            transform: "translate(-50%, -50%)",
+                                            fontSize: "2rem",
+                                            color: "#e64b4b",
+                                            pointerEvents: "none",
+                                        }}/>
+                                    </div>
+                                ))}
                             </CardContent>
                         </Card>
                     )}

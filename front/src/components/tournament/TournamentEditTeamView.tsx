@@ -168,7 +168,8 @@ export default function TournamentEditTeamView() {
         if (!servers.includes(team.server || "")) errors.push("error.badServer");
         if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("error.too.big.catchPhrase");
         if (tournament.mustRegisterTeamComposition && (!team.breeds || team.breeds.length !== requiredBreeds)) errors.push("error.badPickedBreeds");
-        if (tournament.requireBannedBreed && (team.bannedBreed == null || (team.breeds && team.breeds.includes(team.bannedBreed)))) errors.push("error.badBannedBreed");
+        const requiredBans = tournament.requiredBannedBreeds ?? 0;
+        if (requiredBans > 0 && (!team.bannedBreeds || team.bannedBreeds.length !== requiredBans || (team.breeds && team.bannedBreeds.some(b => team.breeds!.includes(b))))) errors.push("error.badBannedBreed");
 
         return errors.length <= 0 ? undefined : errors;
     }
@@ -226,7 +227,7 @@ export default function TournamentEditTeamView() {
                         <TournamentTeamComposition team={team} breeds={team.breeds}
                                                    setTeamValidateAndSetErrors={setTeamValidateAndSetErrors}
                                                    maxBreeds={tournament.requiredBreeds ?? 6}
-                                                   requireBannedBreed={tournament.requireBannedBreed ?? false}/>
+                                                   maxBannedBreeds={tournament.requiredBannedBreeds ?? 0}/>
                     }
                     <Grid item xs={12} sx={{p: 1}}>
                         {errors && errors.length > 0 && errors.map(error => (

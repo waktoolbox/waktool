@@ -33,7 +33,7 @@ public class Tournament implements Serializable {
     Integer draftAvailableMinutesBeforeMatch;
     Integer requiredBreeds;
     Integer maxTeamPlayers;
-    Boolean requireBannedBreed;
+    Integer requiredBannedBreeds;
 
     public int getEffectiveRequiredBreeds() {
         return requiredBreeds != null ? requiredBreeds : 6;
@@ -43,7 +43,7 @@ public class Tournament implements Serializable {
         return maxTeamPlayers != null ? maxTeamPlayers : Integer.MAX_VALUE;
     }
 
-    public boolean isEffectiveRequireBannedBreed() {
-        return Boolean.TRUE.equals(requireBannedBreed);
+    public int getEffectiveRequiredBannedBreeds() {
+        return requiredBannedBreeds != null ? requiredBannedBreeds : 0;
     }
 }

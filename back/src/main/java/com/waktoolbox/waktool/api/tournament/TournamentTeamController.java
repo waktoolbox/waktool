@@ -19,8 +19,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.waktoolbox.waktool.domain.models.tournaments.Team.areValidBannedBreeds;
 import static com.waktoolbox.waktool.domain.models.tournaments.Team.extractValidBreeds;
-import static com.waktoolbox.waktool.domain.models.tournaments.Team.isValidBannedBreed;
 
 // TODO refactor to move logic to domain
 
@@ -61,7 +61,7 @@ public class TournamentTeamController {
         if (isAdmin || isTeamMember) return new TeamResponse(team);
 
         team.setBreeds(null);
-        team.setBannedBreed(null);
+        team.setBannedBreeds(null);
         return new TeamResponse(team);
     }
 
@@ -107,12 +107,13 @@ public class TournamentTeamController {
             }
         }
 
-        Byte bannedBreed = null;
-        if (tournament.isEffectiveRequireBannedBreed()) {
-            if (!isValidBannedBreed(requestTeam.getBannedBreed(), validBreeds)) {
+        List<Byte> bannedBreeds = null;
+        int requiredBannedBreeds = tournament.getEffectiveRequiredBannedBreeds();
+        if (requiredBannedBreeds > 0) {
+            if (!areValidBannedBreeds(requestTeam.getBannedBreeds(), validBreeds, requiredBannedBreeds)) {
                 return new PostTeamResponse(false, "error.badBannedBreed", null);
             }
-            bannedBreed = requestTeam.getBannedBreed();
+            bannedBreeds = requestTeam.getBannedBreeds();
         }
 
         Team team = new Team();
@@ -124,7 +125,7 @@ public class TournamentTeamController {
         team.setDisplayOnTeamList(requestTeam.isDisplayOnTeamList());
         team.setValidatedPlayers(new ArrayList<>());
         team.setBreeds(validBreeds);
-        team.setBannedBreed(bannedBreed);
+        team.setBannedBreeds(bannedBreeds);
 
         team.getValidatedPlayers().add(leader);
 
@@ -165,11 +166,12 @@ public class TournamentTeamController {
             List<Byte> validBreeds = extractValidBreeds(requestTeam.getBreeds(), tournament.getEffectiveRequiredBreeds());
             team.setBreeds(validBreeds);
 
-            if (tournament.isEffectiveRequireBannedBreed()) {
-                if (!isValidBannedBreed(requestTeam.getBannedBreed(), validBreeds)) {
+            int requiredBannedBreeds = tournament.getEffectiveRequiredBannedBreeds();
+            if (requiredBannedBreeds > 0) {
+                if (!areValidBannedBreeds(requestTeam.getBannedBreeds(), validBreeds, requiredBannedBreeds)) {
                     return ResponseEntity.badRequest().build();
                 }
-                team.setBannedBreed(requestTeam.getBannedBreed());
+                team.setBannedBreeds(requestTeam.getBannedBreeds());
             }
 
             team.setDisplayOnTeamList(requestTeam.isDisplayOnTeamList());

@@ -33,7 +33,7 @@ export interface TournamentDefinition {
 
     requiredBreeds?: number;
     maxTeamPlayers?: number;
-    requireBannedBreed?: boolean;
+    requiredBannedBreeds?: number;
 }
 
 export interface TournamentPhaseDefinition {
@@ -59,7 +59,7 @@ export interface TournamentTeamModel {
     players: string[];
     validatedPlayers: string[];
     breeds?: number[];
-    bannedBreed?: number;
+    bannedBreeds?: number[];
     catchPhrase: string;
     displayOnTeamList: boolean;
     stats?: TournamentStatsModel;

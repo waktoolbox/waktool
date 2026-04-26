@@ -161,7 +161,7 @@
     "team": {
       "apply": "Postuler",
       "appliants": "Postulant(s)",
-      "bannedBreed": "Classe bannie",
+      "bannedBreeds": "Classes bannies",
       "composition": "Composition",
       "confirmDeletion": "Êtes-vous sûr de vouloir supprimer l'équipe ?",
       "delete": "Supprimer l'équipe",

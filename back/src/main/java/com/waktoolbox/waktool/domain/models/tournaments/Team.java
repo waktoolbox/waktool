@@ -22,7 +22,7 @@ public class Team implements Serializable {
     String server;
     List<String> players;
     List<Byte> breeds;
-    Byte bannedBreed;
+    List<Byte> bannedBreeds;
     String tournament;
     String catchPhrase;
     TeamStats stats;
@@ -39,9 +39,14 @@ public class Team implements Serializable {
                 .orElse(null);
     }
 
-    public static boolean isValidBannedBreed(Byte bannedBreed, List<Byte> breeds) {
-        if (bannedBreed == null) return false;
-        if (bannedBreed < 1 || bannedBreed > Breeds.MAX_BREED_ID) return false;
-        return breeds == null || !breeds.contains(bannedBreed);
+    public static boolean areValidBannedBreeds(List<Byte> bannedBreeds, List<Byte> breeds, int requiredCount) {
+        if (bannedBreeds == null || bannedBreeds.size() != requiredCount) return false;
+        for (Byte banned : bannedBreeds) {
+            if (banned == null) return false;
+            if (banned < 1 || banned > Breeds.MAX_BREED_ID) return false;
+            if (breeds != null && breeds.contains(banned)) return false;
+        }
+        if (bannedBreeds.stream().distinct().count() != requiredCount) return false;
+        return true;
     }
 }

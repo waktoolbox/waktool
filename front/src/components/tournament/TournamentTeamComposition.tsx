@@ -10,7 +10,7 @@ type TournamentTeamCompositionParams = {
     breeds: number[],
     setTeamValidateAndSetErrors: (team: Partial<TournamentTeamModel>) => void,
     maxBreeds?: number,
-    requireBannedBreed?: boolean,
+    maxBannedBreeds?: number,
 };
 
 export default function TournamentTeamComposition(props: TournamentTeamCompositionParams) {
@@ -19,13 +19,13 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
         breeds,
         setTeamValidateAndSetErrors,
         maxBreeds = 6,
-        requireBannedBreed = false,
+        maxBannedBreeds = 0,
     } = props;
 
     const {t} = useTranslation();
 
     const hasPickedBreed = (breed: number) => team.breeds?.includes(breed);
-    const isBannedBreed = (breed: number) => team.bannedBreed === breed;
+    const isBannedBreed = (breed: number) => team.bannedBreeds?.includes(breed) ?? false;
 
     const imageHoverStyle = (breed: number) => {
         if (!team.breeds) return "";
@@ -38,13 +38,15 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
         if (!hasPickedBreed(breed)) {
             if (team.breeds && team.breeds.length >= maxBreeds) return;
 
-            // If picking a breed that was the banned one, clear the ban
-            const newBannedBreed = isBannedBreed(breed) ? undefined : team.bannedBreed;
+            // If picking a breed that was banned, remove it from bans
+            const newBannedBreeds = isBannedBreed(breed)
+                ? (team.bannedBreeds?.filter(b => b !== breed) ?? [])
+                : (team.bannedBreeds ?? []);
 
             const t = {
                 ...team,
                 breeds: team.breeds ? [...team.breeds, breed] : [breed],
-                bannedBreed: newBannedBreed,
+                bannedBreeds: newBannedBreeds.length > 0 ? newBannedBreeds : undefined,
             };
             setTeamValidateAndSetErrors(t);
             return;
@@ -60,12 +62,25 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
     const banOrUnbanBreed = (breed: number) => {
         if (hasPickedBreed(breed)) return; // Cannot ban a picked breed
 
-        const newBannedBreed = isBannedBreed(breed) ? undefined : breed;
-        const t = {
-            ...team,
-            bannedBreed: newBannedBreed,
-        };
-        setTeamValidateAndSetErrors(t);
+        const currentBans = team.bannedBreeds ?? [];
+
+        if (isBannedBreed(breed)) {
+            // Unban
+            const newBannedBreeds = currentBans.filter(b => b !== breed);
+            const t = {
+                ...team,
+                bannedBreeds: newBannedBreeds.length > 0 ? newBannedBreeds : undefined,
+            };
+            setTeamValidateAndSetErrors(t);
+        } else {
+            // Ban (respect max)
+            if (currentBans.length >= maxBannedBreeds) return;
+            const t = {
+                ...team,
+                bannedBreeds: [...currentBans, breed],
+            };
+            setTeamValidateAndSetErrors(t);
+        }
     }
 
     return (
@@ -90,10 +105,10 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
                 ))}
             </Grid>
 
-            {requireBannedBreed && (
+            {maxBannedBreeds > 0 && (
                 <>
                     <Typography variant="h6" sx={{mt: 2}}>
-                        {t('tournament.team.bannedBreed')}
+                        {t('tournament.team.bannedBreeds')} ({team.bannedBreeds?.length ?? 0} / {maxBannedBreeds})
                     </Typography>
                     <Grid container>
                         {BreedsArray.map(breed => (

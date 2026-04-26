@@ -161,7 +161,7 @@
     "team": {
       "apply": "Apply",
       "appliants": "Applier(s)",
-      "bannedBreed": "Banned class",
+      "bannedBreeds": "Banned classes",
       "composition": "Composition",
       "confirmDeletion": "Do you confirm team deletion?",
       "delete": "Delete team",

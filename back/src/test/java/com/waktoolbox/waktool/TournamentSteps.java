@@ -39,8 +39,8 @@ import static com.decathlon.tzatziki.utils.Patterns.*;
 public class TournamentSteps {
     private static final List<Byte> BREEDS_ODD = List.of((byte) 1, (byte) 3, (byte) 5, (byte) 7, (byte) 9, (byte) 11);
     private static final List<Byte> BREEDS_EVEN = List.of((byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10, (byte) 12);
-    private static final Byte BANNED_BREED_ODD = (byte) 2;
-    private static final Byte BANNED_BREED_EVEN = (byte) 1;
+    private static final List<Byte> BANNED_BREEDS_ODD = List.of((byte) 2);
+    private static final List<Byte> BANNED_BREEDS_EVEN = List.of((byte) 1);
 
     private final ObjectSteps _objectSteps;
     private final TeamSpringDataRepository _teamSpringDataRepository;
@@ -75,7 +75,7 @@ public class TournamentSteps {
             team.setServer("Server " + i);
             team.setPlayers(List.of("" + i));
             team.setBreeds(i % 2 == 0 ? BREEDS_EVEN : BREEDS_ODD);
-            team.setBannedBreed(i % 2 == 0 ? BANNED_BREED_EVEN : BANNED_BREED_ODD);
+            team.setBannedBreeds(i % 2 == 0 ? BANNED_BREEDS_EVEN : BANNED_BREEDS_ODD);
             team.setTournament(id);
             team.setCatchPhrase("Catch phrase " + i);
             team.setDisplayOnTeamList(true);

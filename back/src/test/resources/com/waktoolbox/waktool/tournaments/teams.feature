@@ -1,4 +1,4 @@
-zFeature: Team registration with breeds and banned breed
+Feature: Team registration with breeds and banned breeds
 
   Background:
     Given that the current time is 2026-06-01T00:00:00Z
@@ -25,7 +25,7 @@ zFeature: Team registration with breeds and banned breed
       startDate: 2026-07-01T00:00:00Z
       endDate: 2026-07-21T00:00:00Z
       mustRegisterTeamComposition: true
-      requireBannedBreed: true
+      requiredBannedBreeds: 1
       requiredBreeds: 7
       maxTeamPlayers: 5
       phases: []
@@ -43,7 +43,7 @@ zFeature: Team registration with breeds and banned breed
         catchPhrase: GG
         displayOnTeamList: true
         breeds: [1, 3, 5, 7, 9, 11, 13]
-        bannedBreed: 2
+        bannedBreeds: [2]
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -52,7 +52,7 @@ zFeature: Team registration with breeds and banned breed
       name: TestTeam
       server: Pandora
       breeds: [1, 3, 5, 7, 9, 11, 13]
-      bannedBreed: 2
+      bannedBreeds: [2]
     """
 
 
@@ -66,7 +66,7 @@ zFeature: Team registration with breeds and banned breed
       startDate: 2026-07-01T00:00:00Z
       endDate: 2026-07-21T00:00:00Z
       mustRegisterTeamComposition: true
-      requireBannedBreed: true
+      requiredBannedBreeds: 1
       requiredBreeds: 7
       maxTeamPlayers: 5
       phases: []
@@ -84,7 +84,7 @@ zFeature: Team registration with breeds and banned breed
         catchPhrase: Oops
         displayOnTeamList: true
         breeds: [1, 3, 5, 7, 9, 11, 13]
-        bannedBreed: 5
+        bannedBreeds: [5]
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -103,7 +103,7 @@ zFeature: Team registration with breeds and banned breed
       startDate: 2026-07-01T00:00:00Z
       endDate: 2026-07-21T00:00:00Z
       mustRegisterTeamComposition: true
-      requireBannedBreed: true
+      requiredBannedBreeds: 1
       requiredBreeds: 7
       maxTeamPlayers: 5
       phases: []
@@ -121,7 +121,7 @@ zFeature: Team registration with breeds and banned breed
         catchPhrase: Short
         displayOnTeamList: true
         breeds: [1, 3, 5, 7, 9, 11]
-        bannedBreed: 2
+        bannedBreeds: [2]
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -130,7 +130,7 @@ zFeature: Team registration with breeds and banned breed
     """
 
 
-  Scenario: Fail to create team without a banned breed when required
+  Scenario: Fail to create team without banned breeds when required
     Given the tournaments table will contain:
     """yml
     id: t1
@@ -140,7 +140,7 @@ zFeature: Team registration with breeds and banned breed
       startDate: 2026-07-01T00:00:00Z
       endDate: 2026-07-21T00:00:00Z
       mustRegisterTeamComposition: true
-      requireBannedBreed: true
+      requiredBannedBreeds: 1
       requiredBreeds: 7
       maxTeamPlayers: 5
       phases: []
@@ -176,7 +176,7 @@ zFeature: Team registration with breeds and banned breed
       startDate: 2026-07-01T00:00:00Z
       endDate: 2026-07-21T00:00:00Z
       mustRegisterTeamComposition: true
-      requireBannedBreed: true
+      requiredBannedBreeds: 1
       requiredBreeds: 7
       maxTeamPlayers: 5
       admins: [admin1]
@@ -185,6 +185,7 @@ zFeature: Team registration with breeds and banned breed
     Given the teams table will contain:
     """yml
     - id: team1
+      createdAt: 2026-06-15T00:00:00Z
       content:
         id: team1
         tournament: t1
@@ -194,7 +195,7 @@ zFeature: Team registration with breeds and banned breed
         catchPhrase: Full
         displayOnTeamList: true
         breeds: [1, 3, 5, 7, 9, 11, 13]
-        bannedBreed: 2
+        bannedBreeds: [2]
         validatedPlayers: [lead1, usr2, usr3, usr4, usr5]
     """
     Given the applications table will contain:
@@ -222,7 +223,7 @@ zFeature: Team registration with breeds and banned breed
       startDate: 2026-07-01T00:00:00Z
       endDate: 2026-07-21T00:00:00Z
       mustRegisterTeamComposition: true
-      requireBannedBreed: true
+      requiredBannedBreeds: 1
       requiredBreeds: 7
       maxTeamPlayers: 5
       admins: [admin1]
@@ -231,6 +232,7 @@ zFeature: Team registration with breeds and banned breed
     Given the teams table will contain:
     """yml
     - id: team1
+      createdAt: 2026-06-15T00:00:00Z
       content:
         id: team1
         tournament: t1
@@ -240,7 +242,7 @@ zFeature: Team registration with breeds and banned breed
         catchPhrase: Almost
         displayOnTeamList: true
         breeds: [1, 3, 5, 7, 9, 11, 13]
-        bannedBreed: 2
+        bannedBreeds: [2]
         validatedPlayers: [lead1, usr2, usr3, usr4]
     """
     Given the applications table will contain:
@@ -294,10 +296,7 @@ zFeature: Team registration with breeds and banned breed
     team:
       name: LegacyTeam
       breeds: [1, 3, 5, 7, 9, 11]
-      bannedBreed: ?isNull
+      bannedBreeds: ?isNull
     """
-
-
-
 
 
