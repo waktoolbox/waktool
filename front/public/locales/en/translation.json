@@ -42,12 +42,14 @@
   "error": {
     "ankamaName": "Ankama nickname is mandatory and must be valid",
     "ankamaDiscriminator": "Ankama tag is mandatory and must be valid (without #)",
+    "badBannedBreed": "Banned class is invalid (must be selected and different from picked classes)",
     "badPickedBreeds": "Selected classes are not valid",
     "badServer": "Invalid server",
     "missing.name": "Name is mandatory",
     "mustBeOnDiscordToCreateTeam": "You must be on tournament's Discord to create a team",
     "mustBeOnDiscordToJoinTournament": "You must be on tournament's Discord to register",
     "twitchUrl": "Twitch URL must be valid (formatted as https://www.twitch.tv/<pseudo>)",
+    "teamTooBig": "Team has too many players",
     "too.big.catchPhrase": "Too long catch phrase (75 characters maximum)",
     "too.big.name": "Too long name (25 characters maximum)"
   },
@@ -159,6 +161,7 @@
     "team": {
       "apply": "Apply",
       "appliants": "Applier(s)",
+      "bannedBreeds": "Banned classes",
       "composition": "Composition",
       "confirmDeletion": "Do you confirm team deletion?",
       "delete": "Delete team",

@@ -3,6 +3,7 @@ package com.waktoolbox.waktool.api.tournament;
 import com.waktoolbox.waktool.api.models.*;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
+import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
 import com.waktoolbox.waktool.domain.repositories.*;
 import com.waktoolbox.waktool.utils.TranslatorKey;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.waktoolbox.waktool.domain.models.tournaments.Team.areValidBannedBreeds;
 import static com.waktoolbox.waktool.domain.models.tournaments.Team.extractValidBreeds;
 
 // TODO refactor to move logic to domain
@@ -59,6 +61,7 @@ public class TournamentTeamController {
         if (isAdmin || isTeamMember) return new TeamResponse(team);
 
         team.setBreeds(null);
+        team.setBannedBreeds(null);
         return new TeamResponse(team);
     }
 
@@ -92,6 +95,27 @@ public class TournamentTeamController {
             return new PostTeamResponse(false, "error.mustBeOnDiscordToCreateTeam", null);
         }
 
+        Optional<Tournament> optTournament = _tournamentRepository.getTournament(tournamentId);
+        if (optTournament.isEmpty()) return new PostTeamResponse(false, null, null);
+        Tournament tournament = optTournament.get();
+
+        List<Byte> validBreeds = extractValidBreeds(requestTeam.getBreeds(), tournament.getEffectiveRequiredBreeds());
+
+        if (Boolean.TRUE.equals(tournament.getMustRegisterTeamComposition())) {
+            if (validBreeds == null || validBreeds.size() != tournament.getEffectiveRequiredBreeds()) {
+                return new PostTeamResponse(false, "error.badPickedBreeds", null);
+            }
+        }
+
+        List<Byte> bannedBreeds = null;
+        int requiredBannedBreeds = tournament.getEffectiveRequiredBannedBreeds();
+        if (requiredBannedBreeds > 0) {
+            if (!areValidBannedBreeds(requestTeam.getBannedBreeds(), validBreeds, requiredBannedBreeds)) {
+                return new PostTeamResponse(false, "error.badBannedBreed", null);
+            }
+            bannedBreeds = requestTeam.getBannedBreeds();
+        }
+
         Team team = new Team();
         team.setTournament(tournamentId);
         team.setName(requestTeam.getName());
@@ -100,7 +124,8 @@ public class TournamentTeamController {
         team.setLeader(leader);
         team.setDisplayOnTeamList(requestTeam.isDisplayOnTeamList());
         team.setValidatedPlayers(new ArrayList<>());
-        team.setBreeds(extractValidBreeds(requestTeam.getBreeds()));
+        team.setBreeds(validBreeds);
+        team.setBannedBreeds(bannedBreeds);
 
         team.getValidatedPlayers().add(leader);
 
@@ -129,13 +154,27 @@ public class TournamentTeamController {
 
         boolean tournamentStarted = _tournamentRepository.isTournamentStarted(tournamentId);
 
+        Optional<Tournament> optTournament = _tournamentRepository.getTournament(tournamentId);
+        if (optTournament.isEmpty()) return ResponseEntity.badRequest().build();
+        Tournament tournament = optTournament.get();
+
         if (isAdmin) {
             team.setName(requestTeam.getName());
         }
 
         if (!tournamentStarted || isAdmin) {
+            List<Byte> validBreeds = extractValidBreeds(requestTeam.getBreeds(), tournament.getEffectiveRequiredBreeds());
+            team.setBreeds(validBreeds);
+
+            int requiredBannedBreeds = tournament.getEffectiveRequiredBannedBreeds();
+            if (requiredBannedBreeds > 0) {
+                if (!areValidBannedBreeds(requestTeam.getBannedBreeds(), validBreeds, requiredBannedBreeds)) {
+                    return ResponseEntity.badRequest().build();
+                }
+                team.setBannedBreeds(requestTeam.getBannedBreeds());
+            }
+
             team.setDisplayOnTeamList(requestTeam.isDisplayOnTeamList());
-            team.setBreeds(extractValidBreeds(requestTeam.getBreeds()));
         }
 
         team.setCatchPhrase(requestTeam.getCatchPhrase());
@@ -221,6 +260,14 @@ public class TournamentTeamController {
 
         if (!Objects.equals(team.getLeader(), userId) && !_tournamentRepository.isAdmin(tournamentId, userId))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        Optional<Tournament> optTournament = _tournamentRepository.getTournament(tournamentId);
+        if (optTournament.isPresent()) {
+            int maxPlayers = optTournament.get().getEffectiveMaxTeamPlayers();
+            if (team.getValidatedPlayers().size() >= maxPlayers) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
 
         if (!team.getValidatedPlayers().contains(applicationUserId.get())) {
             team.getValidatedPlayers().add(applicationUserId.get());

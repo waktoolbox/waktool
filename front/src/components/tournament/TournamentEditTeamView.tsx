@@ -159,13 +159,17 @@ export default function TournamentEditTeamView() {
 
     function validateTournamentTeam(team: Partial<TournamentTeamModel>): string[] | undefined {
         const errors = [];
+        const requiredBreeds = tournament.requiredBreeds ?? 6;
+        const maxTeamPlayers = tournament.maxTeamPlayers;
 
         if (!team.name || team.name.length <= 0) errors.push("error.missing.name");
         if (team.name && team.name.length > 25) errors.push("error.too.big.name");
-        if (team.players && team.players.length > 6) errors.push('error.teamTooBig');
+        if (maxTeamPlayers && team.players && team.players.length > maxTeamPlayers) errors.push('error.teamTooBig');
         if (!servers.includes(team.server || "")) errors.push("error.badServer");
         if (team.catchPhrase && team.catchPhrase.length > 75) errors.push("error.too.big.catchPhrase");
-        if (tournament.mustRegisterTeamComposition && (!team.breeds || team.breeds.length !== 6)) errors.push("error.badPickedBreeds");
+        if (tournament.mustRegisterTeamComposition && (!team.breeds || team.breeds.length !== requiredBreeds)) errors.push("error.badPickedBreeds");
+        const requiredBans = tournament.requiredBannedBreeds ?? 0;
+        if (requiredBans > 0 && (!team.bannedBreeds || team.bannedBreeds.length !== requiredBans || (team.breeds && team.bannedBreeds.some(b => team.breeds!.includes(b))))) errors.push("error.badBannedBreed");
 
         return errors.length <= 0 ? undefined : errors;
     }
@@ -221,7 +225,9 @@ export default function TournamentEditTeamView() {
                     </Grid>
                     {tournament.mustRegisterTeamComposition && team.breeds &&
                         <TournamentTeamComposition team={team} breeds={team.breeds}
-                                                   setTeamValidateAndSetErrors={setTeamValidateAndSetErrors}/>
+                                                   setTeamValidateAndSetErrors={setTeamValidateAndSetErrors}
+                                                   maxBreeds={tournament.requiredBreeds ?? 6}
+                                                   maxBannedBreeds={tournament.requiredBannedBreeds ?? 0}/>
                     }
                     <Grid item xs={12} sx={{p: 1}}>
                         {errors && errors.length > 0 && errors.map(error => (

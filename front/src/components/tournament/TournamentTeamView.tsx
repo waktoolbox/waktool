@@ -208,7 +208,7 @@ export default function TournamentTeamView() {
                         <Card>
                             <CardContent sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>
                                 <Button variant="contained" sx={{width: '100%'}} onClick={() => doApplyToTeam()}
-                                        disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled}>{t('tournament.team.apply')}</Button>
+                                        disabled={(myTeam !== undefined && myTeam !== null) || applyDisabled || (tournament.maxTeamPlayers != null && team.validatedPlayers.length >= tournament.maxTeamPlayers)}>{t('tournament.team.apply')}</Button>
                                 {((myTeam && myTeam.leader === me && team.id === myTeam.id) || isAdmin) && (
                                     <Link to={`/tournament/${tournament.id}/tab/8/team/${team.id}`}>
                                         <Button variant="contained"
@@ -256,7 +256,7 @@ export default function TournamentTeamView() {
                             <Typography variant="h4" sx={{
                                 textAlign: "start",
                                 mb: 1
-                            }}>{t('tournament.team.members')}</Typography>
+                            }}>{t('tournament.team.members')} {tournament.maxTeamPlayers != null && <span style={{fontSize: '0.7em', color: '#8299a1'}}>({team.validatedPlayers.length} / {tournament.maxTeamPlayers})</span>}</Typography>
                             {team.validatedPlayers.map(player => (
                                 <User userId={player} key={player} otherProps={{sx: {color: "#8299a1"}}}/>
                             ))}
