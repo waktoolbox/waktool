@@ -59,6 +59,15 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
         setTeamValidateAndSetErrors(t);
     }
 
+    const isBanMaxReached = () => (team.bannedBreeds?.length ?? 0) >= maxBannedBreeds;
+
+    const banImageStyle = (breed: number) => {
+        if (hasPickedBreed(breed)) return "imageDisabled";
+        if (isBannedBreed(breed)) return "imageBanned";
+        if (isBanMaxReached()) return "imageDisabled";
+        return "imageHover";
+    }
+
     const banOrUnbanBreed = (breed: number) => {
         if (hasPickedBreed(breed)) return; // Cannot ban a picked breed
 
@@ -85,7 +94,7 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
 
     return (
         <Grid item xs={12} sx={{p: 1}}>
-            <Typography variant="h6">{t('tournament.team.composition')}</Typography>
+            <Typography variant="h6">{t('tournament.team.composition')} ({team.breeds?.length ?? 0} / {maxBreeds})</Typography>
             <Grid container>
                 {BreedsArray.map(breed => (
                     <Grid item key={breed} xs={2}>
@@ -97,9 +106,7 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
                                              ${hasPickedBreed(breed) ? "imagePicked" : ""}
                                              ${imageHoverStyle(breed)}
                                              `}
-                                 onClick={() => {
-                                     pickOrUnpickBreed(breed)
-                                 }}/>
+                                 onClick={() => pickOrUnpickBreed(breed)}/>
                         </div>
                     </Grid>
                 ))}
@@ -121,21 +128,15 @@ export default function TournamentTeamComposition(props: TournamentTeamCompositi
                                              borderRadius: 15,
                                              opacity: hasPickedBreed(breed) ? 0.2 : 1,
                                          }}
-                                         className={`draftImage
-                                                     ${hasPickedBreed(breed) ? "imageDisabled" : ""}
-                                                     ${isBannedBreed(breed) ? "imageBanned" : ""}
-                                                     ${!hasPickedBreed(breed) && !isBannedBreed(breed) ? "imageHover" : ""}
-                                                     `}
-                                         onClick={() => {
-                                             banOrUnbanBreed(breed)
-                                         }}/>
+                                         className={`draftImage ${banImageStyle(breed)}`}
+                                         onClick={() => banOrUnbanBreed(breed)}/>
                                     {isBannedBreed(breed) && (
                                         <BlockIcon sx={{
                                             position: "absolute",
                                             top: "50%",
                                             left: "50%",
                                             transform: "translate(-50%, -50%)",
-                                            fontSize: "2.5rem",
+                                            fontSize: "6rem",
                                             color: "#e64b4b",
                                             pointerEvents: "none",
                                         }}/>
