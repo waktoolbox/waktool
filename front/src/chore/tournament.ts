@@ -43,6 +43,7 @@ export interface TournamentPhaseDefinition {
 
     poolSize?: number;
     poolNumber?: number;
+    autoRefereeing?: boolean;
 }
 
 export interface TournamentRoundDefinition {
@@ -141,4 +142,20 @@ export enum TournamentPhaseType {
     WAKFU_WARRIORS_ROUND_ROBIN,
     WAKFU_WARRIORS_BRACKET_TOURNAMENT,
     WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT
+}
+
+export interface MatchReportModel {
+    matchId: string;
+    round: number;
+    tournamentId: string;
+    teamAReportedWinner?: string;
+    teamAReporterId?: string;
+    teamAScreenshot?: string;
+    teamADisputeExplanation?: string;
+    teamBReportedWinner?: string;
+    teamBReporterId?: string;
+    teamBScreenshot?: string;
+    teamBDisputeExplanation?: string;
+    disputed: boolean;
+    createdAt?: string;
 }

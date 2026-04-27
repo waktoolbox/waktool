@@ -1,6 +1,8 @@
 import dayjs, {Dayjs} from 'dayjs';
 
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Checkbox from "@mui/material/Checkbox";
@@ -8,6 +10,7 @@ import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
+import IconButton from "@mui/material/IconButton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Tooltip from "@mui/material/Tooltip";
@@ -16,11 +19,19 @@ import Typography from "@mui/material/Typography";
 import CancelIcon from '@mui/icons-material/Cancel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LooksOneIcon from '@mui/icons-material/LooksOne';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import SendIcon from '@mui/icons-material/Send';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import {Link, useLoaderData, useNavigate, useParams} from "react-router-dom";
 import {SyntheticEvent, useEffect, useState} from "react";
 import {
     getMatch,
+    getMatchReports,
     getTeamPlayers,
     refereeRoundDraftFirstPicker,
     refereeRoundRerollMap,
@@ -29,12 +40,14 @@ import {
     refereeSetMatchDate,
     refereeSetMeAsReferee,
     refereeValidateMatchResult,
+    reportRoundResult,
     streamerRemoveStreamer,
     streamerSetMeAsStreamer,
     teamSearch,
     userStartDraft
 } from "../../services/tournament.ts";
 import {
+    MatchReportModel,
     TournamentDefinition,
     TournamentMatchHistoryEntry,
     TournamentMatchModel,
@@ -84,6 +97,15 @@ export default function TournamentMatchView() {
     const [tab, setTab] = useState(0);
     const [match, setMatch] = useState<TournamentMatchModel | undefined>(undefined);
     const [fight, setFight] = useState<TournamentMatchRoundModel | undefined>(undefined);
+
+    // Match report state
+    const [matchReports, setMatchReports] = useState<MatchReportModel[]>([]);
+    const [reportSubmitting, setReportSubmitting] = useState(false);
+    const [screenshotBase64, setScreenshotBase64] = useState<string | undefined>(undefined);
+    const [screenshotName, setScreenshotName] = useState<string | undefined>(undefined);
+    const [screenshotCleared, setScreenshotCleared] = useState(false);
+    const [selectedWinner, setSelectedWinner] = useState<string | undefined>(undefined);
+    const [disputeText, setDisputeText] = useState("");
 
     useEffect(() => {
         if (!matchId) return;
@@ -142,6 +164,15 @@ export default function TournamentMatchView() {
     useEffect(() => {
         setPresentPlayers(new Set([...(fight?.history?.players || [])]));
     }, [fight])
+
+    useEffect(() => {
+        if (!id || !matchId || !match) return;
+        if (isAutoRefereeing) {
+            getMatchReports(id, matchId).then(response => {
+                if (response?.reports) setMatchReports(response.reports);
+            });
+        }
+    }, [match, id, matchId, tab])
 
     function matchText() {
         if (!match || !tournament) return;
@@ -319,6 +350,77 @@ export default function TournamentMatchView() {
         setCurrentHistoryEntry({team: undefined, source: undefined, target: undefined})
     }
 
+    // === Auto-refereeing helpers ===
+    const currentPhase = match ? tournament.phases.find(p => p.phase === match.phase) : undefined;
+    const isAutoRefereeing = currentPhase?.autoRefereeing ?? false;
+    const myTeamSide = me && match ? (teamAPlayers.has(me) ? "A" : teamBPlayers.has(me) ? "B" : null) : null;
+    const isTeamMember = myTeamSide !== null;
+    const matchDatePassed = match?.date ? Date.parse(match.date) < Date.now() : false;
+
+    const currentReport = matchReports.find(r => r.round === tab);
+    const myReportedWinner = myTeamSide === "A" ? currentReport?.teamAReportedWinner : currentReport?.teamBReportedWinner;
+    const opponentReportedWinner = myTeamSide === "A" ? currentReport?.teamBReportedWinner : currentReport?.teamAReportedWinner;
+    const myScreenshot = myTeamSide === "A" ? currentReport?.teamAScreenshot : currentReport?.teamBScreenshot;
+    const bothReported = !!(currentReport?.teamAReportedWinner && currentReport?.teamBReportedWinner);
+    const bothAgree = bothReported && currentReport?.teamAReportedWinner === currentReport?.teamBReportedWinner;
+    const isDisputed = currentReport?.disputed ?? false;
+    const wouldDispute = !!(opponentReportedWinner && selectedWinner && selectedWinner !== opponentReportedWinner);
+    const showDisputeField = isDisputed || wouldDispute;
+
+    // Pre-fill form when reports and team side are both available
+    useEffect(() => {
+        if (!myTeamSide || matchReports.length === 0) return;
+        const report = matchReports.find(r => r.round === tab);
+        if (!report) return;
+        const winner = myTeamSide === "A" ? report.teamAReportedWinner : report.teamBReportedWinner;
+        const explanation = myTeamSide === "A" ? report.teamADisputeExplanation : report.teamBDisputeExplanation;
+        if (winner) setSelectedWinner(winner);
+        setDisputeText(explanation || "");
+        setScreenshotCleared(false);
+        setScreenshotBase64(undefined);
+        setScreenshotName(undefined);
+    }, [matchReports, myTeamSide, tab])
+
+    function loadReports() {
+        if (!id || !matchId) return;
+        getMatchReports(id, matchId).then(response => {
+            if (response?.reports) setMatchReports(response.reports);
+        });
+    }
+
+    const effectiveScreenshot = screenshotBase64 || (myScreenshot && !screenshotCleared ? myScreenshot : undefined);
+
+    function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) { setScreenshotBase64(undefined); setScreenshotName(undefined); return; }
+        if (file.size > 2 * 1024 * 1024) {
+            setSnackValue({ severity: "error", message: t('tournament.match.report.screenshotTooBig') as string, open: true });
+            e.target.value = "";
+            return;
+        }
+        setScreenshotName(file.name);
+        setScreenshotCleared(false);
+        const reader = new FileReader();
+        reader.onload = () => setScreenshotBase64(reader.result as string);
+        reader.readAsDataURL(file);
+    }
+
+    function clearScreenshot() {
+        setScreenshotBase64(undefined);
+        setScreenshotName(undefined);
+        setScreenshotCleared(true);
+    }
+
+    function submitReport() {
+        if (!id || !matchId || !selectedWinner || reportSubmitting) return;
+        setReportSubmitting(true);
+        reportRoundResult(id, matchId, tab, selectedWinner, screenshotBase64, disputeText || undefined).then(response => {
+            notificationPopup(response);
+            setReportSubmitting(false);
+            loadReports();
+        });
+    }
+
     // TODO externalize this
     const TeamColumn = ({fight, team}: { fight: TournamentMatchRoundModel, team: DraftTeam }) => {
         if (!match) return (<div>No match</div>);
@@ -359,18 +461,18 @@ export default function TournamentMatchView() {
                                 <b>{teams.get(appropriateTeam)}</b></Typography>
                         </Link>
                     </Grid>
-                    <Grid item xs={12} sx={{p: 3}}>
-                        <Grid container>
+                    <Grid item xs={12} sx={{px: 2, pt: 2}}>
+                        <Grid container spacing={1} sx={{justifyContent: 'center'}}>
                             {appropriateDraft && appropriateDraft.pickedClasses && appropriateDraft.pickedClasses.map(c => (
-                                <Grid item xs={4} key={c}>
-                                    <img src={`/classes/${c}_0.png`} style={{width: "100%"}} alt={`Breed ${c}`}/>
+                                <Grid item xs={3} key={c} sx={{display: 'flex', justifyContent: 'center'}}>
+                                    <img src={`/classes/${c}_0.png`} style={{width: "100%", maxWidth: 80, borderRadius: 6}} alt={`Breed ${c}`}/>
                                 </Grid>
                             ))}
                         </Grid>
-                        <Grid container sx={{p: 3}}>
+                        <Grid container spacing={1} sx={{mt: 1, justifyContent: 'center'}}>
                             {appropriateDraft && appropriateDraft.bannedClasses && appropriateDraft.bannedClasses.map(c => (
-                                <Grid item xs={4} key={c}>
-                                    <img src={`/classes/${c}_0.png`} style={{width: "100%", filter: "grayscale(1)"}}
+                                <Grid item xs={3} key={c} sx={{display: 'flex', justifyContent: 'center'}}>
+                                    <img src={`/classes/${c}_0.png`} style={{width: "100%", maxWidth: 64, filter: "grayscale(1)", opacity: 0.7, borderRadius: 6}}
                                          alt={`Breed ${c}`}/>
                                 </Grid>
                             ))}
@@ -448,20 +550,21 @@ export default function TournamentMatchView() {
                             {matchText()}
                         </Typography>
                     </Grid>
-                    <Grid item xs={12} sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, ml: 2, mr: 2}}>
+                    <Grid item xs={12} sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, ml: 2, mr: 2, pb: 1}}>
                         <Tabs value={tab} onChange={onTabChange}>
                             {match.rounds && match.rounds.map((_, index) => (
                                 <Tab key={index} label={t('tournament.match.matchNb', {nb: index + 1})}/>
                             ))}
                         </Tabs>
                         <Grid container>
-                            <Grid item xs={8} sx={{
-                                display: "flex",
-                                alignItems: fight.teamADraft ? "start" : "center",
-                                justifyContent: "center"
-                            }}>
+                            <Grid item xs={8}>
                                 {/*TODO v2 bind draft link & draft results & winner */}
-                                <Grid container>
+                                <Grid container sx={{
+                                    textAlign: "center",
+                                    justifyContent: "center",
+                                    alignItems: fight.teamADraft ? "start" : "center",
+                                    minHeight: fight.teamADraft ? undefined : 200
+                                }}>
                                     <Grid item xs={12}>
                                         {!match.done && match.date && fight.draftFirstPicker && !fight.teamADraft &&
                                             <Typography sx={{mb: 2}}
@@ -503,7 +606,153 @@ export default function TournamentMatchView() {
                                         }
                                     </Grid>
                                 </Grid>
+
+                                {/* Auto-refereeing: Player report section */}
+                                {isAutoRefereeing && isTeamMember && !match.done && matchDatePassed &&
+                                    <Card sx={{backgroundColor: '#213943', borderRadius: 3, mt: 2, mx: 1}}>
+                                        <CardContent sx={{p: 2, "&:last-child": {pb: 2}}}>
+                                            <Typography variant="h6" sx={{mb: 2}}>{t('tournament.match.report.title')}</Typography>
+
+                                            {/* Unified status block */}
+                                            {(myReportedWinner || opponentReportedWinner) && (() => {
+                                                const bgColor = isDisputed ? '#2b1a1a' : bothAgree ? '#0d2b2b' : '#1a2e38';
+                                                const textColor = isDisputed ? '#e64b4b' : bothAgree ? '#07c6b6' : '#8299a1';
+                                                const StatusIcon = isDisputed ? WarningAmberIcon : bothAgree ? CheckCircleIcon : HourglassEmptyIcon;
+
+                                                let statusLabel = '';
+                                                if (isDisputed) statusLabel = t('tournament.match.report.disputed') as string;
+                                                else if (bothAgree) statusLabel = t('tournament.match.report.bothAgree') as string;
+                                                else if (myReportedWinner && !opponentReportedWinner) statusLabel = t('tournament.match.report.waitingForOpponent') as string;
+                                                else if (!myReportedWinner && opponentReportedWinner) statusLabel = t('tournament.match.report.opponentHasReported') as string;
+
+                                                let summaryText = '';
+                                                if (myReportedWinner && opponentReportedWinner) {
+                                                    summaryText = t('tournament.match.report.reportSummaryBoth', {
+                                                        myTeam: teams.get(myReportedWinner) || myReportedWinner,
+                                                        opponentTeam: teams.get(opponentReportedWinner) || opponentReportedWinner
+                                                    }) as string;
+                                                } else if (myReportedWinner) {
+                                                    summaryText = t('tournament.match.report.reportSummaryMine', {
+                                                        team: teams.get(myReportedWinner) || myReportedWinner
+                                                    }) as string;
+                                                } else if (opponentReportedWinner) {
+                                                    summaryText = t('tournament.match.report.reportSummaryOpponent', {
+                                                        team: teams.get(opponentReportedWinner) || opponentReportedWinner
+                                                    }) as string;
+                                                }
+
+                                                return (
+                                                    <Box sx={{mb: 2, p: 1.5, borderRadius: 1, backgroundColor: bgColor, textAlign: 'center'}}>
+                                                        <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1}}>
+                                                            <StatusIcon sx={{color: textColor, fontSize: '1.2rem'}}/>
+                                                            <Typography variant="body2" sx={{color: textColor, fontWeight: 500}}>{statusLabel}</Typography>
+                                                        </Box>
+                                                        {summaryText && (
+                                                            <Typography variant="body2" sx={{color: textColor, mt: 0.5, opacity: 0.85}}>
+                                                                {summaryText}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                );
+                                            })()}
+
+                                            {/* Winner selection */}
+                                            <Typography variant="body2" sx={{mb: 1, fontWeight: 500}}>{t('tournament.match.report.selectWinner')}</Typography>
+                                            <ButtonGroup fullWidth sx={{mb: 2}}>
+                                                <Button
+                                                    variant={selectedWinner === match.teamA ? "contained" : "outlined"}
+                                                    onClick={() => setSelectedWinner(match.teamA)}
+                                                    sx={selectedWinner === match.teamA ? {backgroundColor: '#017d7f', '&:hover': {backgroundColor: '#015d5f'}} : {}}
+                                                >
+                                                    {teams.get(match.teamA) || match.teamA}
+                                                </Button>
+                                                <Button
+                                                    variant={selectedWinner === match.teamB ? "contained" : "outlined"}
+                                                    onClick={() => setSelectedWinner(match.teamB)}
+                                                    sx={selectedWinner === match.teamB ? {backgroundColor: '#017d7f', '&:hover': {backgroundColor: '#015d5f'}} : {}}
+                                                >
+                                                    {teams.get(match.teamB) || match.teamB}
+                                                </Button>
+                                            </ButtonGroup>
+
+                                            {/* Screenshot upload */}
+                                            <Typography variant="body2" sx={{mb: 1, fontWeight: 500}}>{t('tournament.match.report.screenshot')}</Typography>
+                                            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2}}>
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    component="label"
+                                                    startIcon={<AttachFileIcon/>}
+                                                    sx={{textTransform: 'none'}}
+                                                >
+                                                    {screenshotName || t('tournament.match.report.chooseFile')}
+                                                    <input type="file" hidden accept="image/jpeg,image/png" onChange={handleScreenshotChange}/>
+                                                </Button>
+                                                {(effectiveScreenshot) && (
+                                                    <Tooltip
+                                                        title={<img src={effectiveScreenshot} alt="Preview" style={{maxWidth: 854, maxHeight: 480, borderRadius: 4}}/>}
+                                                        placement="top"
+                                                        arrow
+                                                    >
+                                                        <VisibilityIcon sx={{color: '#8299a1', cursor: 'pointer', fontSize: '1.3rem'}}/>
+                                                    </Tooltip>
+                                                )}
+                                                {effectiveScreenshot && (
+                                                    <IconButton size="small" color="error"
+                                                            onClick={() => clearScreenshot()}>
+                                                        <DeleteIcon sx={{fontSize: '1.2rem'}}/>
+                                                    </IconButton>
+                                                )}
+                                            </Box>
+
+                                            {/* Dispute explanation — inline when disputed or would dispute */}
+                                            {showDisputeField && (
+                                                <Box sx={{mb: 2}}>
+                                                    {wouldDispute && !isDisputed && (
+                                                        <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1, p: 1, borderRadius: 1, backgroundColor: '#2b1a1a'}}>
+                                                            <WarningAmberIcon sx={{color: '#e64b4b', fontSize: '1.2rem'}}/>
+                                                            <Typography variant="body2" sx={{color: '#e64b4b', fontWeight: 500}}>
+                                                                {t('tournament.match.report.willDispute')}
+                                                            </Typography>
+                                                        </Box>
+                                                    )}
+                                                    <Typography variant="body2" sx={{mb: 1, fontWeight: 500}}>{t('tournament.match.report.addExplanation')}</Typography>
+                                                    <Box sx={{display: 'flex', alignItems: 'flex-start', gap: 1}}>
+                                                        <TextField
+                                                            multiline rows={2} fullWidth size="small"
+                                                            placeholder={t('tournament.match.report.explanationPlaceholder') as string}
+                                                            value={disputeText}
+                                                            onChange={(e) => setDisputeText(e.target.value)}
+                                                        />
+                                                        {disputeText && (
+                                                            <IconButton size="small" color="error"
+                                                                    onClick={() => setDisputeText("")}
+                                                                    sx={{mt: 0.5}}>
+                                                                <DeleteIcon sx={{fontSize: '1.2rem'}}/>
+                                                            </IconButton>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+                                            )}
+
+                                            {/* Submit button */}
+                                            <Button
+                                                variant="contained"
+                                                fullWidth
+                                                disabled={!selectedWinner || reportSubmitting}
+                                                onClick={() => submitReport()}
+                                                endIcon={<SendIcon/>}
+                                                sx={{backgroundColor: '#017d7f', '&:hover': {backgroundColor: '#015d5f'}}}
+                                            >
+                                                {t('tournament.match.report.submit')}
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                }
+
                             </Grid>
+
+
                             <Grid item xs={4}>
                                 {fight.teamAStats &&
                                     <Card sx={{backgroundColor: '#017d7f', borderRadius: 3, mb: 2}}>
@@ -790,6 +1039,73 @@ export default function TournamentMatchView() {
 
                             <Grid container sx={{mt: 1, p: 1, borderRadius: 3, backgroundColor: '#162329'}}
                                   hidden={match?.referee !== me}>
+
+                                {/* Auto-refereeing reports for admin */}
+                                {isAutoRefereeing && matchReports.length > 0 && (
+                                    <>
+                                        <Grid item xs={12} sx={{mb: 1}}>
+                                            <Typography variant="h6" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                                {t('tournament.admin.viewReports')}
+                                                {matchReports.some(r => r.disputed) &&
+                                                    <WarningAmberIcon sx={{color: '#e64b4b'}}/>
+                                                }
+                                            </Typography>
+                                        </Grid>
+                                        {matchReports.map((report) => (
+                                            <Grid item xs={12} key={`report_${report.round}`} sx={{mb: 1, p: 1, backgroundColor: '#0f1c22', borderRadius: 2}}>
+                                                <Typography variant="subtitle2">
+                                                    {t('tournament.match.matchNb', {nb: report.round + 1})}
+                                                    {report.disputed && <WarningAmberIcon sx={{ml: 1, color: '#e64b4b', verticalAlign: 'middle', fontSize: '1rem'}}/>}
+                                                </Typography>
+                                                {report.teamAReportedWinner && (
+                                                    <Typography variant="body2" color="#8299a1">
+                                                        {t('tournament.admin.teamAReport')}: {teams.get(report.teamAReportedWinner) || report.teamAReportedWinner}
+                                                    </Typography>
+                                                )}
+                                                {report.teamBReportedWinner && (
+                                                    <Typography variant="body2" color="#8299a1">
+                                                        {t('tournament.admin.teamBReport')}: {teams.get(report.teamBReportedWinner) || report.teamBReportedWinner}
+                                                    </Typography>
+                                                )}
+                                                {report.teamADisputeExplanation && (
+                                                    <Typography variant="body2" color="#e6a74b" sx={{mt: 0.5}}>
+                                                        {t('tournament.admin.teamA')} — {t('tournament.admin.disputeExplanation')}: {report.teamADisputeExplanation}
+                                                    </Typography>
+                                                )}
+                                                {report.teamBDisputeExplanation && (
+                                                    <Typography variant="body2" color="#e6a74b" sx={{mt: 0.5}}>
+                                                        {t('tournament.admin.teamB')} — {t('tournament.admin.disputeExplanation')}: {report.teamBDisputeExplanation}
+                                                    </Typography>
+                                                )}
+                                                {report.teamAScreenshot && (
+                                                    <Box sx={{display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.5}}>
+                                                        <Typography variant="caption">{t('tournament.admin.teamA')} — {t('tournament.admin.reportScreenshot')}</Typography>
+                                                        <Tooltip
+                                                            title={<img src={report.teamAScreenshot} alt="Team A screenshot" style={{maxWidth: 600, maxHeight: 450, borderRadius: 4}}/>}
+                                                            placement="top"
+                                                            arrow
+                                                        >
+                                                            <VisibilityIcon sx={{color: '#8299a1', cursor: 'pointer', fontSize: '1.1rem'}}/>
+                                                        </Tooltip>
+                                                    </Box>
+                                                )}
+                                                {report.teamBScreenshot && (
+                                                    <Box sx={{display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 0.5, ml: 2}}>
+                                                        <Typography variant="caption">{t('tournament.admin.teamB')} — {t('tournament.admin.reportScreenshot')}</Typography>
+                                                        <Tooltip
+                                                            title={<img src={report.teamBScreenshot} alt="Team B screenshot" style={{maxWidth: 854, maxHeight: 480, borderRadius: 4}}/>}
+                                                            placement="top"
+                                                            arrow
+                                                        >
+                                                            <VisibilityIcon sx={{color: '#8299a1', cursor: 'pointer', fontSize: '1.1rem'}}/>
+                                                        </Tooltip>
+                                                    </Box>
+                                                )}
+                                            </Grid>
+                                        ))}
+                                    </>
+                                )}
+
                                 <Grid item xs={3.5}>
                                     <Button variant="outlined"
                                             onClick={() => setMatchWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.matchWinnerTeamA')}</Button>

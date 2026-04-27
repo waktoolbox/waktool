@@ -107,7 +107,16 @@
       "teamA": "Team A",
       "teamB": "Team B",
       "validateMatchAndSendStats": "Valider le match et calculer les stats",
-      "validateMatchDate": "Valider la date du match"
+      "validateMatchDate": "Valider la date du match",
+      "viewReports": "Voir les reports",
+      "resolveDispute": "Résoudre le litige",
+      "disputeAlert": "Litige",
+      "reportScreenshot": "Capture d'écran",
+      "noReports": "Aucun report",
+      "teamAReport": "Report équipe A",
+      "teamBReport": "Report équipe B",
+      "reportedWinner": "Vainqueur déclaré",
+      "disputeExplanation": "Explication du litige"
     },
     "admins": "Organisateurs",
     "description": "Description",
@@ -143,7 +152,29 @@
       "pool": "Poule {{pool}}",
       "round": "Round {{round}}",
       "roundRobinPhaseTitle": "<span>Étape</span> {{nb}}",
-      "watchStream": "Regarder le stream"
+      "watchStream": "Regarder le stream",
+      "report": {
+        "title": "Reporter le résultat",
+        "selectWinner": "Qui a gagné ce round ?",
+        "screenshot": "Capture d'écran de victoire",
+        "chooseFile": "Choisir un fichier...",
+        "screenshotTooBig": "La capture d'écran est trop volumineuse (max 2 Mo)",
+        "submit": "Soumettre le report",
+        "waitingForOpponent": "En attente du report adverse",
+        "opponentHasReported": "L'adversaire a reporté ; à votre tour",
+        "bothAgree": "Les reports concordent ; en attente de validation",
+        "disputed": "Litige : vainqueurs différents déclarés",
+        "willDispute": "Votre choix diffère de celui de l'adversaire ; un litige sera ouvert",
+        "addExplanation": "Ajouter une explication",
+        "explanationPlaceholder": "Expliquez le litige...",
+        "submitExplanation": "Envoyer l'explication",
+        "yourReport": "Votre équipe a reporté : {{team}} gagne",
+        "opponentReport": "L'adversaire a reporté : {{team}} gagne",
+        "reportSummaryBoth": "Vous : {{myTeam}} · Adversaire : {{opponentTeam}}",
+        "reportSummaryMine": "Vous avez reporté : {{team}}",
+        "reportSummaryOpponent": "L'adversaire a reporté : {{team}}",
+        "alreadyDone": "Ce match est déjà validé"
+      }
     },
     "menu": {
       "home": "Informations",

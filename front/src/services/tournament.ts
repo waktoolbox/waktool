@@ -135,3 +135,15 @@ export async function refereeRoundSendStats(tournamentId: string, matchId: strin
 export async function userStartDraft(tournamentId: string, matchId: string, round: number, team: DraftTeam | undefined) {
     return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/user-start-draft`, {team: team});
 }
+
+export async function reportRoundResult(tournamentId: string, matchId: string, round: number, winner: string, screenshot?: string, disputeExplanation?: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/report`, {
+        winner: winner,
+        screenshot: screenshot,
+        disputeExplanation: disputeExplanation || null
+    });
+}
+
+export async function getMatchReports(tournamentId: string, matchId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/reports`);
+}
