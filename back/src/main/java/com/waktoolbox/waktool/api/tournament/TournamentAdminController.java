@@ -10,6 +10,7 @@ import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchHistory;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 import com.waktoolbox.waktool.domain.repositories.DraftRepository;
+import com.waktoolbox.waktool.domain.repositories.MatchReportRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class TournamentAdminController {
 
     private final DraftManager _draftManager;
     private final DraftRepository _draftRepository;
+    private final MatchReportRepository _matchReportRepository;
     private final TournamentRepository _tournamentRepository;
     private final TournamentMatchRepository _tournamentMatchRepository;
     private final TournamentPhaseControllerFactory _phaseControllerFactory;
@@ -145,6 +147,8 @@ public class TournamentAdminController {
         _tournamentStatsController.fillStats(match, match.getTeamA());
         _tournamentStatsController.fillStats(match, match.getTeamB());
         _tournamentMatchRepository.save(tournamentId, match);
+
+        _matchReportRepository.deleteByMatchId(matchId);
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }

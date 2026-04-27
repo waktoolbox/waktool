@@ -13,4 +13,9 @@ public class TournamentPhase implements Serializable {
     int phaseType;
     int poolNumber;
     TournamentRoundModel[] roundModel;
+    Boolean autoRefereeing;
+
+    public boolean isEffectiveAutoRefereeing() {
+        return autoRefereeing != null && autoRefereeing;
+    }
 }

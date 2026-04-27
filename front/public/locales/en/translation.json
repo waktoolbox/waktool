@@ -107,7 +107,16 @@
       "teamA": "Team A",
       "teamB": "Team B",
       "validateMatchAndSendStats": "Validate match and compute stats",
-      "validateMatchDate": "Validate match date"
+      "validateMatchDate": "Validate match date",
+      "viewReports": "View reports",
+      "resolveDispute": "Resolve dispute",
+      "disputeAlert": "Dispute",
+      "reportScreenshot": "Screenshot",
+      "noReports": "No reports",
+      "teamAReport": "Team A report",
+      "teamBReport": "Team B report",
+      "reportedWinner": "Reported winner",
+      "disputeExplanation": "Dispute explanation"
     },
     "admins": "Organizers",
     "description": "Description",
@@ -143,7 +152,23 @@
       "pool": "Pool {{pool}}",
       "round": "Round {{round}}",
       "roundRobinPhaseTitle": "<span>Step</span> {{nb}}",
-      "watchStream": "Watch stream"
+      "watchStream": "Watch stream",
+      "report": {
+        "title": "Report result",
+        "selectWinner": "Who won this round?",
+        "screenshot": "Victory screenshot",
+        "chooseFile": "Choose a file...",
+        "screenshotTooBig": "Screenshot is too large (max 2 MB)",
+        "submit": "Submit report",
+        "waitingForOpponent": "Your report has been submitted — waiting for the opponent",
+        "bothAgree": "Both teams agree: waiting for referee validation",
+        "disputed": "Dispute: teams reported different winners",
+        "addExplanation": "Add an explanation",
+        "explanationPlaceholder": "Explain the dispute...",
+        "submitExplanation": "Submit explanation",
+        "yourReport": "Your team reported: {{team}} wins",
+        "alreadyDone": "This match is already validated"
+      }
     },
     "menu": {
       "home": "Informations",

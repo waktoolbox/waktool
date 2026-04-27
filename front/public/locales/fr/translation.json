@@ -107,7 +107,16 @@
       "teamA": "Team A",
       "teamB": "Team B",
       "validateMatchAndSendStats": "Valider le match et calculer les stats",
-      "validateMatchDate": "Valider la date du match"
+      "validateMatchDate": "Valider la date du match",
+      "viewReports": "Voir les reports",
+      "resolveDispute": "Résoudre le litige",
+      "disputeAlert": "Litige",
+      "reportScreenshot": "Capture d'écran",
+      "noReports": "Aucun report",
+      "teamAReport": "Report équipe A",
+      "teamBReport": "Report équipe B",
+      "reportedWinner": "Vainqueur déclaré",
+      "disputeExplanation": "Explication du litige"
     },
     "admins": "Organisateurs",
     "description": "Description",
@@ -143,7 +152,23 @@
       "pool": "Poule {{pool}}",
       "round": "Round {{round}}",
       "roundRobinPhaseTitle": "<span>Étape</span> {{nb}}",
-      "watchStream": "Regarder le stream"
+      "watchStream": "Regarder le stream",
+      "report": {
+        "title": "Reporter le résultat",
+        "selectWinner": "Qui a gagné ce round ?",
+        "screenshot": "Capture d'écran de victoire",
+        "chooseFile": "Choisir un fichier...",
+        "screenshotTooBig": "La capture d'écran est trop volumineuse (max 2 Mo)",
+        "submit": "Soumettre le report",
+        "waitingForOpponent": "Votre report a été soumis — en attente de l'adversaire",
+        "bothAgree": "Les reports concordent : en attente de validation par l'arbitre",
+        "disputed": "Litige : les équipes ont reporté des vainqueurs différents",
+        "addExplanation": "Ajouter une explication",
+        "explanationPlaceholder": "Expliquez le litige...",
+        "submitExplanation": "Envoyer l'explication",
+        "yourReport": "Votre équipe a reporté : {{team}} gagne",
+        "alreadyDone": "Ce match est déjà validé"
+      }
     },
     "menu": {
       "home": "Informations",
