@@ -163,7 +163,7 @@
         "waitingForOpponent": "En attente du report adverse",
         "opponentHasReported": "L'adversaire a reporté ; à votre tour",
         "bothAgree": "Les reports concordent ; en attente de validation",
-        "disputed": "Litige — vainqueurs différents déclarés",
+        "disputed": "Litige : vainqueurs différents déclarés",
         "willDispute": "Votre choix diffère de celui de l'adversaire ; un litige sera ouvert",
         "addExplanation": "Ajouter une explication",
         "explanationPlaceholder": "Expliquez le litige...",

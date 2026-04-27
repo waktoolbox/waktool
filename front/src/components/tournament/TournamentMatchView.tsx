@@ -103,6 +103,7 @@ export default function TournamentMatchView() {
     const [reportSubmitting, setReportSubmitting] = useState(false);
     const [screenshotBase64, setScreenshotBase64] = useState<string | undefined>(undefined);
     const [screenshotName, setScreenshotName] = useState<string | undefined>(undefined);
+    const [screenshotCleared, setScreenshotCleared] = useState(false);
     const [selectedWinner, setSelectedWinner] = useState<string | undefined>(undefined);
     const [disputeText, setDisputeText] = useState("");
 
@@ -375,6 +376,9 @@ export default function TournamentMatchView() {
         const explanation = myTeamSide === "A" ? report.teamADisputeExplanation : report.teamBDisputeExplanation;
         if (winner) setSelectedWinner(winner);
         setDisputeText(explanation || "");
+        setScreenshotCleared(false);
+        setScreenshotBase64(undefined);
+        setScreenshotName(undefined);
     }, [matchReports, myTeamSide, tab])
 
     function loadReports() {
@@ -383,6 +387,8 @@ export default function TournamentMatchView() {
             if (response?.reports) setMatchReports(response.reports);
         });
     }
+
+    const effectiveScreenshot = screenshotBase64 || (myScreenshot && !screenshotCleared ? myScreenshot : undefined);
 
     function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -393,9 +399,16 @@ export default function TournamentMatchView() {
             return;
         }
         setScreenshotName(file.name);
+        setScreenshotCleared(false);
         const reader = new FileReader();
         reader.onload = () => setScreenshotBase64(reader.result as string);
         reader.readAsDataURL(file);
+    }
+
+    function clearScreenshot() {
+        setScreenshotBase64(undefined);
+        setScreenshotName(undefined);
+        setScreenshotCleared(true);
     }
 
     function submitReport() {
@@ -448,18 +461,18 @@ export default function TournamentMatchView() {
                                 <b>{teams.get(appropriateTeam)}</b></Typography>
                         </Link>
                     </Grid>
-                    <Grid item xs={12} sx={{p: 3}}>
-                        <Grid container>
+                    <Grid item xs={12} sx={{px: 2, pt: 2}}>
+                        <Grid container spacing={1} sx={{justifyContent: 'center'}}>
                             {appropriateDraft && appropriateDraft.pickedClasses && appropriateDraft.pickedClasses.map(c => (
-                                <Grid item xs={4} key={c}>
-                                    <img src={`/classes/${c}_0.png`} style={{width: "100%"}} alt={`Breed ${c}`}/>
+                                <Grid item xs={3} key={c} sx={{display: 'flex', justifyContent: 'center'}}>
+                                    <img src={`/classes/${c}_0.png`} style={{width: "100%", maxWidth: 80, borderRadius: 6}} alt={`Breed ${c}`}/>
                                 </Grid>
                             ))}
                         </Grid>
-                        <Grid container sx={{p: 3}}>
+                        <Grid container spacing={1} sx={{mt: 1, justifyContent: 'center'}}>
                             {appropriateDraft && appropriateDraft.bannedClasses && appropriateDraft.bannedClasses.map(c => (
-                                <Grid item xs={4} key={c}>
-                                    <img src={`/classes/${c}_0.png`} style={{width: "100%", filter: "grayscale(1)"}}
+                                <Grid item xs={3} key={c} sx={{display: 'flex', justifyContent: 'center'}}>
+                                    <img src={`/classes/${c}_0.png`} style={{width: "100%", maxWidth: 64, filter: "grayscale(1)", opacity: 0.7, borderRadius: 6}}
                                          alt={`Breed ${c}`}/>
                                 </Grid>
                             ))}
@@ -675,18 +688,18 @@ export default function TournamentMatchView() {
                                                     {screenshotName || t('tournament.match.report.chooseFile')}
                                                     <input type="file" hidden accept="image/jpeg,image/png" onChange={handleScreenshotChange}/>
                                                 </Button>
-                                                {(screenshotBase64 || myScreenshot) && (
+                                                {(effectiveScreenshot) && (
                                                     <Tooltip
-                                                        title={<img src={screenshotBase64 || myScreenshot} alt="Preview" style={{maxWidth: 854, maxHeight: 480, borderRadius: 4}}/>}
+                                                        title={<img src={effectiveScreenshot} alt="Preview" style={{maxWidth: 854, maxHeight: 480, borderRadius: 4}}/>}
                                                         placement="top"
                                                         arrow
                                                     >
                                                         <VisibilityIcon sx={{color: '#8299a1', cursor: 'pointer', fontSize: '1.3rem'}}/>
                                                     </Tooltip>
                                                 )}
-                                                {screenshotBase64 && (
+                                                {effectiveScreenshot && (
                                                     <IconButton size="small" color="error"
-                                                            onClick={() => { setScreenshotBase64(undefined); setScreenshotName(undefined); }}>
+                                                            onClick={() => clearScreenshot()}>
                                                         <DeleteIcon sx={{fontSize: '1.2rem'}}/>
                                                     </IconButton>
                                                 )}

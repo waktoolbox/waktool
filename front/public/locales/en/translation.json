@@ -163,7 +163,7 @@
         "waitingForOpponent": "Waiting for opponent's report",
         "opponentHasReported": "Opponent has reported ; your turn",
         "bothAgree": "Reports match ; waiting for validation",
-        "disputed": "Dispute ; different winners reported",
+        "disputed": "Dispute: different winners reported",
         "willDispute": "Your choice differs from the opponent's ; a dispute will be opened",
         "addExplanation": "Add an explanation",
         "explanationPlaceholder": "Explain the dispute...",
