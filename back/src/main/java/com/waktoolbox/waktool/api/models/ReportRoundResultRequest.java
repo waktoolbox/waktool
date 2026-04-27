@@ -1,5 +1,5 @@
 package com.waktoolbox.waktool.api.models;
 
-public record ReportRoundResultRequest(String winner, String screenshot) {
+public record ReportRoundResultRequest(String winner, String screenshot, String disputeExplanation) {
 }
 

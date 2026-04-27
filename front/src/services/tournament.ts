@@ -136,16 +136,11 @@ export async function userStartDraft(tournamentId: string, matchId: string, roun
     return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/user-start-draft`, {team: team});
 }
 
-export async function reportRoundResult(tournamentId: string, matchId: string, round: number, winner: string, screenshot?: string) {
+export async function reportRoundResult(tournamentId: string, matchId: string, round: number, winner: string, screenshot?: string, disputeExplanation?: string) {
     return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/report`, {
         winner: winner,
-        screenshot: screenshot
-    });
-}
-
-export async function addDisputeExplanation(tournamentId: string, matchId: string, round: number, explanation: string) {
-    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/dispute-explanation`, {
-        explanation: explanation
+        screenshot: screenshot,
+        disputeExplanation: disputeExplanation || null
     });
 }
 

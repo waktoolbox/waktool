@@ -1,6 +1,5 @@
 package com.waktoolbox.waktool.api.tournament;
 
-import com.waktoolbox.waktool.api.models.DisputeExplanationRequest;
 import com.waktoolbox.waktool.api.models.MatchReportsResponse;
 import com.waktoolbox.waktool.api.models.ReportRoundResultRequest;
 import com.waktoolbox.waktool.api.models.SuccessResponse;
@@ -19,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -79,46 +79,17 @@ public class TournamentMatchReportController {
             report.setTeamAReportedWinner(request.winner());
             report.setTeamAReporterId(discordId.get());
             report.setTeamAScreenshot(request.screenshot());
+            report.setTeamADisputeExplanation(request.disputeExplanation());
         } else {
             report.setTeamBReportedWinner(request.winner());
             report.setTeamBReporterId(discordId.get());
             report.setTeamBScreenshot(request.screenshot());
+            report.setTeamBDisputeExplanation(request.disputeExplanation());
         }
 
         // Auto-dispute detection: if both sides filled and they disagree
         if (report.getTeamAReportedWinner() != null && report.getTeamBReportedWinner() != null) {
             report.setDisputed(!report.getTeamAReportedWinner().equals(report.getTeamBReportedWinner()));
-        }
-
-        _matchReportRepository.save(report);
-        return ResponseEntity.ok(new SuccessResponse(true));
-    }
-
-    @PostMapping("/tournaments/{tournamentId}/matches/{matchId}/rounds/{round}/dispute-explanation")
-    public ResponseEntity<SuccessResponse> addDisputeExplanation(
-            @RequestAttribute Optional<String> discordId,
-            @PathVariable String tournamentId,
-            @PathVariable String matchId,
-            @PathVariable int round,
-            @RequestBody DisputeExplanationRequest request
-    ) {
-        if (discordId.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
-
-        TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
-        if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
-
-        String callerTeamSide = resolveCallerTeamSide(discordId.get(), match);
-        if (callerTeamSide == null) return ResponseEntity.ok(new SuccessResponse(false));
-
-        Optional<MatchReport> optReport = _matchReportRepository.findByMatchIdAndRound(matchId, round);
-        if (optReport.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
-
-        MatchReport report = optReport.get();
-
-        if ("A".equals(callerTeamSide)) {
-            report.setTeamADisputeExplanation(request.explanation());
-        } else {
-            report.setTeamBDisputeExplanation(request.explanation());
         }
 
         _matchReportRepository.save(report);
@@ -135,9 +106,38 @@ public class TournamentMatchReportController {
 
         boolean isReferee = _tournamentRepository.isReferee(tournamentId, discordId.get());
         boolean isAdmin = _tournamentRepository.isAdmin(tournamentId, discordId.get());
-        if (!isReferee && !isAdmin) return ResponseEntity.ok(new MatchReportsResponse(null));
 
-        return ResponseEntity.ok(new MatchReportsResponse(_matchReportRepository.findByMatchId(matchId)));
+        // Team members can also view reports (but screenshots are stripped)
+        TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
+        if (match == null) return ResponseEntity.ok(new MatchReportsResponse(null));
+
+        String callerTeamSide = resolveCallerTeamSide(discordId.get(), match);
+        boolean isTeamMember = callerTeamSide != null;
+
+        if (!isReferee && !isAdmin && !isTeamMember) return ResponseEntity.ok(new MatchReportsResponse(null));
+
+        List<MatchReport> reports = _matchReportRepository.findByMatchId(matchId);
+
+        // Strip screenshots for non-admin/non-referee
+        if (!isReferee && !isAdmin) {
+            reports = reports.stream().map(r -> {
+                MatchReport stripped = new MatchReport();
+                stripped.setMatchId(r.getMatchId());
+                stripped.setRound(r.getRound());
+                stripped.setTournamentId(r.getTournamentId());
+                stripped.setTeamAReportedWinner(r.getTeamAReportedWinner());
+                stripped.setTeamAReporterId(r.getTeamAReporterId());
+                stripped.setTeamADisputeExplanation(r.getTeamADisputeExplanation());
+                stripped.setTeamBReportedWinner(r.getTeamBReportedWinner());
+                stripped.setTeamBReporterId(r.getTeamBReporterId());
+                stripped.setTeamBDisputeExplanation(r.getTeamBDisputeExplanation());
+                stripped.setDisputed(r.isDisputed());
+                stripped.setCreatedAt(r.getCreatedAt());
+                return stripped;
+            }).toList();
+        }
+
+        return ResponseEntity.ok(new MatchReportsResponse(reports));
     }
 
     /**
@@ -165,4 +165,3 @@ public class TournamentMatchReportController {
                 .orElse(null);
     }
 }
-

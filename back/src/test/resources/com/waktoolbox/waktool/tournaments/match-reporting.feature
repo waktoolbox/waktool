@@ -209,13 +209,14 @@ Feature: Match reporting and auto-refereeing
     """
     Then we receive a status OK_200
 
-    When we post on "/api/tournaments/t1/matches/match-1/rounds/0/dispute-explanation" a Request:
+    When we post on "/api/tournaments/t1/matches/match-1/rounds/0/report" a Request:
     """yaml
     headers:
       Cookie: token={{token}}
     body:
       payload:
-        explanation: The opponent disconnected before the end
+        winner: team-a
+        disputeExplanation: The opponent disconnected before the end
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -385,7 +386,7 @@ Feature: Match reporting and auto-refereeing
     """
 
 
-  Scenario: Non-referee cannot view reports
+  Scenario: Non-referee non-member cannot view reports
     Given token is a valid token for leader-a
     When we post on "/api/tournaments/t1/matches/match-1/rounds/0/report" a Request:
     """yaml
@@ -407,4 +408,34 @@ Feature: Match reporting and auto-refereeing
     """yaml
     reports: ?isNull
     """
+
+
+  Scenario: Team member can view reports without screenshots
+    Given token is a valid token for leader-a
+    When we post on "/api/tournaments/t1/matches/match-1/rounds/0/report" a Request:
+    """yaml
+    headers:
+      Cookie: token={{token}}
+    body:
+      payload:
+        winner: team-a
+        screenshot: data:image/png;base64,fakedata
+    """
+    Then we receive a status OK_200
+
+    Given tokenB is a valid token for leader-b
+    When we gets on "/api/tournaments/t1/matches/match-1/reports" a Request:
+    """yaml
+    headers:
+      Cookie: token={{tokenB}}
+    """
+    Then we receive a status OK_200 and:
+    """yaml
+    reports:
+      - matchId: match-1
+        round: 0
+        teamAReportedWinner: team-a
+        teamAScreenshot: ?isNull
+    """
+
 
