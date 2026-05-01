@@ -188,4 +188,89 @@ public class TournamentSteps {
 
         Assertions.assertTrue(matches.stream().allMatch(m -> m.getRounds().get(matchRound.intValue()).getDraftFirstPicker() != null));
     }
+
+    @Then("^(?:that )?all matches of tournament (\\S+) phase (\\d+) have date \"([^\"]+)\"$")
+    public void allMatchesHaveDate(String id, int phase, String expectedDate) {
+        List<TournamentData> tournamentData = _tournamentPhaseRepository.getTournamentData(id);
+        TournamentData currentPhase = tournamentData.stream()
+                .filter(d -> d.getPhase() == phase)
+                .findFirst().orElseThrow();
+        int currentRound = currentPhase.getContent().getCurrentRound();
+
+        List<TournamentMatch> matches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase)
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .filter(m -> m.getRound() == currentRound)
+                .filter(m -> !m.isDone())
+                .toList();
+
+        Instant expected = Instant.parse(expectedDate);
+        Assertions.assertFalse(matches.isEmpty(), "No matches found");
+        matches.forEach(match ->
+                Assertions.assertEquals(expected, match.getDate(), "Match " + match.getId() + " has wrong date")
+        );
+    }
+
+    @Then(THAT + "all matches of tournament " + VARIABLE + " phase " + NUMBER + " have draft dates$")
+    public void allMatchesHaveDraftDates(String id, Number phase) {
+        List<TournamentData> tournamentData = _tournamentPhaseRepository.getTournamentData(id);
+        TournamentData currentPhase = tournamentData.stream()
+                .filter(d -> d.getPhase() == phase.intValue())
+                .findFirst().orElseThrow();
+        int currentRound = currentPhase.getContent().getCurrentRound();
+
+        List<TournamentMatch> matches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase.intValue())
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .filter(m -> m.getRound() == currentRound)
+                .filter(m -> !m.isDone())
+                .toList();
+
+        Assertions.assertFalse(matches.isEmpty(), "No matches found");
+        matches.forEach(match -> {
+            Assertions.assertNotNull(match.getRounds().getFirst().getDraftDate(), "Match " + match.getId() + " has no draft date");
+            Assertions.assertNotNull(match.getRounds().getFirst().getDraftJoinDeadline(), "Match " + match.getId() + " has no draft join deadline");
+            Assertions.assertNotNull(match.getRounds().getFirst().getMatchStartDeadline(), "Match " + match.getId() + " has no match start deadline");
+        });
+    }
+
+    @Then(THAT + "the matches have " + NUMBER + " rounds in tournament " + VARIABLE + " phase " + NUMBER + "$")
+    public void matchesHaveNRounds(Number expectedRounds, String id, Number phase) {
+        List<TournamentData> tournamentData = _tournamentPhaseRepository.getTournamentData(id);
+        TournamentData currentPhase = tournamentData.stream()
+                .filter(d -> d.getPhase() == phase.intValue())
+                .findFirst().orElseThrow();
+        int currentRound = currentPhase.getContent().getCurrentRound();
+
+        List<TournamentMatch> matches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase.intValue())
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .filter(m -> m.getRound() == currentRound)
+                .filter(m -> !m.isDone())
+                .toList();
+
+        Assertions.assertFalse(matches.isEmpty(), "No matches found");
+        matches.forEach(match ->
+                Assertions.assertEquals(expectedRounds.intValue(), match.getRounds().size(), "Match " + match.getId() + " has wrong number of rounds")
+        );
+    }
+
+    @Then(THAT + "there is a third place match in tournament " + VARIABLE + " phase " + NUMBER + "$")
+    public void thereIsAThirdPlaceMatch(String id, Number phase) {
+        List<TournamentData> tournamentData = _tournamentPhaseRepository.getTournamentData(id);
+        TournamentData currentPhase = tournamentData.stream()
+                .filter(d -> d.getPhase() == phase.intValue())
+                .findFirst().orElseThrow();
+        int currentRound = currentPhase.getContent().getCurrentRound();
+
+        List<TournamentMatch> matches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase.intValue())
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .filter(m -> m.getRound() == currentRound)
+                .filter(m -> !m.isDone())
+                .toList();
+
+        boolean hasThirdPlaceMatch = matches.stream().anyMatch(m -> Boolean.TRUE.equals(m.getThirdPlaceMatch()));
+        Assertions.assertTrue(hasThirdPlaceMatch, "No third place match found in current round");
+    }
 }

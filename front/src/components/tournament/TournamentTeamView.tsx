@@ -262,7 +262,7 @@ export default function TournamentTeamView() {
                             ))}
                         </CardContent>
                     </Card>
-                    {team && team.stats && team.stats.statsByClass && team.stats.statsByClass.filter(b => b).length > 0 &&
+                    {!tournament.hideClassStats && team && team.stats && team.stats.statsByClass && team.stats.statsByClass.filter(b => b).length > 0 &&
                         <Card>
                             <CardContent
                                 sx={{backgroundColor: '#213943', textAlign: "start", pl: 3}}>

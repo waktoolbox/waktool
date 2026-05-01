@@ -26,6 +26,11 @@ public class MatchReportRepositoryImpl implements MatchReportRepository {
     }
 
     @Override
+    public List<MatchReport> findDisputedByTournamentId(String tournamentId) {
+        return _repository.findAllByTournamentIdAndDisputedTrue(tournamentId).stream().map(this::toDomain).toList();
+    }
+
+    @Override
     public void save(MatchReport report) {
         MatchReportEntity entity = new MatchReportEntity();
         entity.setMatchId(report.getMatchId());
@@ -48,6 +53,12 @@ public class MatchReportRepositoryImpl implements MatchReportRepository {
     @Transactional
     public void deleteByMatchId(String matchId) {
         _repository.deleteAllByMatchId(matchId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByMatchIdAndRound(String matchId, int round) {
+        _repository.deleteByMatchIdAndRound(matchId, round);
     }
 
     private MatchReport toDomain(MatchReportEntity entity) {

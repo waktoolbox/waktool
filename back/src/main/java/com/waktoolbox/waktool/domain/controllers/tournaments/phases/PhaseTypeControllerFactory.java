@@ -17,6 +17,10 @@ public class PhaseTypeControllerFactory {
                     throw new IllegalArgumentException("Sorry, this phase type is not implemented yet (WAKFU_WARRIORS_BRACKET_TOURNAMENT)");
             case WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT ->
                     new WWDoubleEliminationPhaseController(tpc.getContext());
+            case WAKFU_CHAMPIONS_QUALIFICATION ->
+                    new WCQualificationPhaseController(tpc.getContext());
+            case WAKFU_CHAMPIONS_BRACKET ->
+                    new WCBracketPhaseController(tpc.getContext());
         };
     }
 }

@@ -13,8 +13,6 @@ import {myTournamentTeamState} from "../../atoms/atoms-tournament.ts";
 import {languageState, loginIdState} from "../../atoms/atoms-header.ts";
 import Button from "@mui/material/Button";
 import {useEffect, useState} from "react";
-import TournamentAdminDialog from "./admin/TournamentAdminDialog.tsx";
-import TournamentHomeAdmin from "./admin/TournamentHomeAdmin.tsx";
 import {User} from "../common/User.tsx";
 
 type LoaderResponse = {
@@ -137,13 +135,6 @@ export default function TournamentInformationsView() {
                     }
                 </Stack>
             </Grid>
-
-            <div hidden={!(me && tournament.admins?.find(admin => admin === me))}
-                 style={{position: 'fixed', bottom: 3, right: 3}}>
-                <TournamentAdminDialog buttonText="Open admin" title="Tournament admin">
-                    <TournamentHomeAdmin/>
-                </TournamentAdminDialog>
-            </div>
         </Grid>
     )
 }

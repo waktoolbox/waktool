@@ -3,11 +3,13 @@ package com.waktoolbox.waktool.api.tournament;
 import com.waktoolbox.waktool.api.models.MatchReportsResponse;
 import com.waktoolbox.waktool.api.models.ReportRoundResultRequest;
 import com.waktoolbox.waktool.api.models.SuccessResponse;
+import com.waktoolbox.waktool.domain.controllers.tournaments.MatchCompletionService;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
 import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
 import com.waktoolbox.waktool.domain.models.tournaments.TournamentPhase;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.MatchReport;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
+import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 import com.waktoolbox.waktool.domain.repositories.MatchReportRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
@@ -26,6 +28,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 @Validated
 public class TournamentMatchReportController {
+    private final MatchCompletionService _matchCompletionService;
     private final MatchReportRepository _matchReportRepository;
     private final TournamentMatchRepository _tournamentMatchRepository;
     private final TournamentRepository _tournamentRepository;
@@ -93,6 +96,22 @@ public class TournamentMatchReportController {
         }
 
         _matchReportRepository.save(report);
+
+        // Auto-agreement: if both sides agree, set the round winner and clean up the report
+        if (!report.isDisputed() && report.getTeamAReportedWinner() != null && report.getTeamBReportedWinner() != null) {
+            Optional<TournamentMatchRound> optMatchRound = match.getRounds().stream()
+                    .filter(r -> r.getRound() == round)
+                    .findFirst();
+            if (optMatchRound.isPresent()) {
+                optMatchRound.get().setWinner(report.getTeamAReportedWinner());
+                _tournamentMatchRepository.save(tournamentId, match);
+                _matchReportRepository.deleteByMatchIdAndRound(matchId, round);
+
+                // Try to auto-complete the match if enough rounds are won
+                _matchCompletionService.tryAutoCompleteMatch(tournamentId, match);
+            }
+        }
+
         return ResponseEntity.ok(new SuccessResponse(true));
     }
 

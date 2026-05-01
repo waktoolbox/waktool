@@ -10,8 +10,12 @@ public interface MatchReportRepository {
 
     List<MatchReport> findByMatchId(String matchId);
 
+    List<MatchReport> findDisputedByTournamentId(String tournamentId);
+
     void save(MatchReport report);
 
     void deleteByMatchId(String matchId);
+
+    void deleteByMatchIdAndRound(String matchId, int round);
 }
 

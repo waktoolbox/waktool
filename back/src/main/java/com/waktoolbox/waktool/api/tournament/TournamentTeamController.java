@@ -1,6 +1,7 @@
 package com.waktoolbox.waktool.api.tournament;
 
 import com.waktoolbox.waktool.api.models.*;
+import com.waktoolbox.waktool.domain.controllers.tournaments.DiscordRoleService;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
 import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
@@ -36,6 +37,7 @@ public class TournamentTeamController {
     private final AccountRepository _accountRepository;
     private final ApplicationRepository _applicationRepository;
     private final DiscordRepository _discordRepository;
+    private final DiscordRoleService _discordRoleService;
     private final TournamentTeamRepository _tournamentTeamRepository;
     private final TournamentRepository _tournamentRepository;
     private final NotificationRepository _notifier;
@@ -48,7 +50,7 @@ public class TournamentTeamController {
     }
 
     @GetMapping("/tournaments/{tournamentId}/teams/{teamId}")
-    public TeamResponse getTeam(@RequestAttribute Optional<String> discordId, @PathVariable String teamId) {
+    public TeamResponse getTeam(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String teamId) {
         if (teamId == null) return null;
         Optional<Team> optTeam = _tournamentTeamRepository.getTeam(teamId);
 
@@ -62,6 +64,15 @@ public class TournamentTeamController {
 
         team.setBreeds(null);
         team.setBannedBreeds(null);
+
+        // Hide class stats if tournament option is enabled
+        Optional<Tournament> optTournament = _tournamentRepository.getTournament(tournamentId);
+        if (optTournament.isPresent() && Boolean.TRUE.equals(optTournament.get().getHideClassStats())) {
+            if (team.getStats() != null) {
+                team.getStats().setStatsByClass(null);
+            }
+        }
+
         return new TeamResponse(team);
     }
 
@@ -273,6 +284,7 @@ public class TournamentTeamController {
             team.getValidatedPlayers().add(applicationUserId.get());
             _tournamentTeamRepository.saveTeam(team);
             _notifier.notifyUser(applicationUserId.get(), TranslatorKey.TOURNAMENT_USER_APPLICATION_ACCEPTED, team.getName());
+            _discordRoleService.syncTeamRole(tournamentId, team);
         }
         _applicationRepository.deleteApplication(tournamentId, teamId, applicationId);
         return ResponseEntity.ok().build();
@@ -312,6 +324,7 @@ public class TournamentTeamController {
 
         team.getValidatedPlayers().remove(playerId);
         _tournamentTeamRepository.saveTeam(team);
+        _discordRoleService.removeUserFromTeamRole(tournamentId, team, playerId);
 
         return ResponseEntity.ok().build();
     }
@@ -325,6 +338,7 @@ public class TournamentTeamController {
         if (!_tournamentRepository.isAdmin(tournamentId, userId))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
+        _tournamentTeamRepository.getTeam(teamId).ifPresent(team -> _discordRoleService.deleteTeamRole(tournamentId, team));
         _tournamentTeamRepository.deleteTeam(teamId);
 
         return ResponseEntity.ok().build();

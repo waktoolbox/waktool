@@ -167,6 +167,8 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         };
 
         Map<String, DraftTeamResult> breedsByTeam = numberOfTeams > 16 ? collectTeamBreeds(teams) : new HashMap<>();
+        boolean mustUseDifferentMaps = getCurrentPhase().isEffectiveMustUseDifferentMapsPerRound();
+        Set<Integer> usedMaps = new HashSet<>();
 
         for (int round = 0; round < roundsCount; round++) {
             TournamentMatchRound matchRound = new TournamentMatchRound();
@@ -175,7 +177,9 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
                 matchRound.setDraftFirstPicker(tournamentMatch.getTeamA());
             }
 
-            matchRound.setMap(rollMap());
+            int map = rollMap(mustUseDifferentMaps ? usedMaps : null);
+            matchRound.setMap(map);
+            usedMaps.add(map);
             matchRound.setRound(round);
             if (numberOfTeams > 16) {
                 matchRound.setTeamADraft(breedsByTeam.get(tournamentMatch.getTeamA()));
@@ -203,6 +207,9 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
 
     private List<TournamentMatchRound> createRoundsForFinals(TournamentMatch tournamentMatch, TournamentPhaseDataTeam noLoss, TournamentPhaseDataTeam oneLoss) {
         List<TournamentMatchRound> rounds = new ArrayList<>();
+        boolean mustUseDifferentMaps = getCurrentPhase().isEffectiveMustUseDifferentMapsPerRound();
+        Set<Integer> usedMaps = new HashSet<>();
+
         for (int round = 0; round < 5; round++) {
             TournamentMatchRound matchRound = new TournamentMatchRound();
 
@@ -211,7 +218,9 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
             } else if (round == 1) {
                 matchRound.setDraftFirstPicker(RANDOM.nextInt(2) == 0 ? noLoss.getId() : oneLoss.getId());
             }
-            matchRound.setMap(rollMap());
+            int map = rollMap(mustUseDifferentMaps ? usedMaps : null);
+            matchRound.setMap(map);
+            usedMaps.add(map);
             matchRound.setRound(round);
             matchRound.setDraftId(tournamentMatch.getId() + "_" + round);
 
@@ -220,9 +229,22 @@ public class WWDoubleEliminationPhaseController extends PhaseTypeController {
         return rounds;
     }
 
-    private int rollMap() {
-        int[] maps = context.getTournament().getMaps();
-        return maps[RANDOM.nextInt(maps.length)];
+    private int rollMap(Set<Integer> excludedMaps) {
+        int[] allMaps = context.getTournament().getMaps();
+        if (excludedMaps != null && !excludedMaps.isEmpty()) {
+            int[] available = java.util.Arrays.stream(allMaps).filter(m -> !excludedMaps.contains(m)).toArray();
+            if (available.length > 0) {
+                return available[RANDOM.nextInt(available.length)];
+            }
+        }
+        return allMaps[RANDOM.nextInt(allMaps.length)];
+    }
+
+    private TournamentPhase getCurrentPhase() {
+        return context.getTournament().getPhases().stream()
+                .filter(p -> p.getPhase() == context.getPhase() - 1)
+                .findFirst()
+                .orElse(new TournamentPhase());
     }
 
     private void updateLostCount(List<TournamentPhaseDataTeam> teamsToUpdate) {

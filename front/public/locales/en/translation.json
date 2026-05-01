@@ -90,6 +90,14 @@
       "setMeAsReferee": "Set me as referee",
       "setMeAsStreamer": "Set me as streamer",
       "matchAdmin": "Match admin",
+      "sectionGeneral": "General",
+      "sectionMatchDate": "Match date",
+      "sectionRoundManagement": "Round management",
+      "sectionDraft": "Draft",
+      "sectionRoundResult": "Round result",
+      "sectionKillHistory": "Kill history",
+      "sectionReports": "Auto-refereeing reports",
+      "sectionMatchResult": "Match result",
       "matchDate": "Match date",
       "matchWinnerTeamA": "Team A win match",
       "matchWinnerTeamB": "Team B win match",
@@ -116,7 +124,66 @@
       "teamAReport": "Team A report",
       "teamBReport": "Team B report",
       "reportedWinner": "Reported winner",
-      "disputeExplanation": "Dispute explanation"
+      "disputeExplanation": "Dispute explanation",
+      "disputes": {
+        "title": "Active disputes",
+        "none": "No active disputes",
+        "matchRound": "Match {{matchId}} - Round {{round}}",
+        "viewMatch": "View match",
+        "declareWinner": "Declare winner"
+      },
+      "tournamentControl": {
+        "title": "Tournament Control",
+        "description": "Advance the tournament to the next round or phase, or recompute team statistics.",
+        "goToNextPhase": "Go to next phase / round",
+        "recomputeStats": "Recompute stats",
+        "confirmNextPhase": "Are you sure you want to advance to the next phase/round? This cannot be undone.",
+        "confirmRecomputeStats": "Are you sure you want to recompute all team statistics?",
+        "confirmSetWinner": "Are you sure you want to declare {{team}} as the winner of this match?",
+        "currentPhase": "Current phase",
+        "currentRound": "Current round",
+        "phaseLabel": "Phase {{phase}}/{{total}} - {{type}}",
+        "roundLabel": "Round {{round}}/{{total}}",
+        "notStarted": "Not started yet",
+        "matchStatus": "Match status",
+        "done": "done",
+        "pending": "pending",
+        "roundMatches": "Round {{round}} matches",
+        "viewMatch": "View match",
+        "nextRound": "Next: Round {{round}}",
+        "nextPhase": "Next: Phase {{phase}} - {{type}}",
+        "noNextStep": "No next step available",
+        "pendingWarning": "{{count}} match(es) still pending - all matches must be completed before advancing.",
+        "nextPhasePreview": "Next phase preview",
+        "phasePreviewDetail": "{{type}} - {{rounds}} round(s)",
+        "tournamentComplete": "Tournament is complete: no more phases or rounds.",
+        "loading": "Loading phase overview..."
+      },
+      "discordRoles": {
+        "title": "Discord Roles",
+        "description": "Recompute Discord roles for all teams in this tournament. This will create missing roles and sync team members.",
+        "recompute": "Recompute Discord Roles",
+        "confirmRecompute": "Are you sure you want to recompute all Discord roles? This may take a moment.",
+        "started": "Discord role sync started"
+      },
+      "tabs": {
+        "control": "Control",
+        "disputes": "Disputes",
+        "teams": "Teams",
+        "demo": "Demo"
+      },
+      "teams": {
+        "title": "Teams management",
+        "name": "Name",
+        "server": "Server",
+        "loading": "Loading teams...",
+        "loadingDetail": "Loading...",
+        "none": "No teams registered",
+        "overLimit": "— Over registration limit —",
+        "confirmDelete": "Are you sure you want to delete the team \"{{name}}\"? This action cannot be undone.",
+        "players": "{{count}} player(s)",
+        "noComposition": "No composition registered"
+      }
     },
     "admins": "Organizers",
     "description": "Description",
@@ -174,13 +241,22 @@
         "reportSummaryMine": "You reported: {{team}}",
         "reportSummaryOpponent": "Opponent reported: {{team}}",
         "alreadyDone": "This match is already validated"
+      },
+      "roundDates": {
+        "title": "Round schedule",
+        "draftStart": "Draft opening",
+        "draftJoinDeadline": "Draft join deadline",
+        "joinDeadlineTooltip": "Teams must join the draft before this time (inclusive, e.g. 19:15 means until 19:15:59)",
+        "matchStartDeadline": "Match start deadline"
       }
     },
     "menu": {
       "home": "Informations",
       "teams": "Teams",
       "planning": "Planning",
-      "results": "Results"
+      "results": "Results",
+      "bracket": "Bracket",
+      "admin": "Admin"
     },
     "nbMatchesPlayed": "{{nb}} Matches played",
     "nbVictories": "{{nb}} Victories",
@@ -231,5 +307,23 @@
     }
   },
   "validate": "Validate",
-  "success": "Success"
+  "success": "Success",
+  "bracket": {
+    "standings": "Standings",
+    "team": "Team",
+    "wins": "Wins",
+    "losses": "Losses",
+    "played": "Played",
+    "noStandings": "No standings available yet",
+    "qualification": "Qualification",
+    "bracket": "Bracket",
+    "finale": "Final",
+    "semiFinals": "Semi-Finals",
+    "quarterFinals": "Quarter-Finals",
+    "roundOf16": "Round of 16",
+    "roundOf32": "Round of 32",
+    "roundOf64": "Round of 64",
+    "roundN": "Round {{n}}",
+    "thirdPlace": "3rd Place Match"
+  }
 }

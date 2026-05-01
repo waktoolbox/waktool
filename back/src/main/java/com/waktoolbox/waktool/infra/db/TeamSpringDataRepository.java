@@ -66,7 +66,9 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
     @Query(value = """
                 SELECT
                     id,
-                    content->>('name') as name
+                    content->>('name') as name,
+                    content->('stats')->>('played') as played,
+                    content->('stats')->>('victories') as victories
                     FROM teams
                     WHERE content->>('tournament') = :tournamentId
                     AND id IN :teamIds

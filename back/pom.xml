@@ -147,6 +147,11 @@
 
 		<!--	Tests	-->
 		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
@@ -171,6 +176,10 @@
 					<groupId>io.cucumber</groupId>
 					<artifactId>cucumber-picocontainer</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+					<artifactId>jackson-datatype-jsr310</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -178,6 +187,12 @@
 			<artifactId>tzatziki-common</artifactId>
 			<version>${tzatziki.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+					<artifactId>jackson-datatype-jsr310</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.decathlon.tzatziki</groupId>
@@ -189,6 +204,10 @@
 					<groupId>io.cucumber</groupId>
 					<artifactId>cucumber-picocontainer</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+					<artifactId>jackson-datatype-jsr310</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -196,6 +215,12 @@
 			<artifactId>tzatziki-spring</artifactId>
 			<version>${tzatziki.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+					<artifactId>jackson-datatype-jsr310</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.decathlon.tzatziki</groupId>
@@ -206,6 +231,10 @@
 				<exclusion>
 					<artifactId>jackson-datatype-hibernate5</artifactId>
 					<groupId>com.fasterxml.jackson.datatype</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.datatype</groupId>
+					<artifactId>jackson-datatype-jsr310</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
