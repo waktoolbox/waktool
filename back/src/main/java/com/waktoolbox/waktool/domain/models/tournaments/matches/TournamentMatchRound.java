@@ -17,6 +17,9 @@ public class TournamentMatchRound implements Serializable {
     String draftFirstPicker;
     String winner;
     Instant draftDate;
+    Instant draftStartDate;
+    Instant draftJoinDeadline;
+    Instant matchStartDeadline;
     DraftTeamResult teamADraft;
     TournamentMatchTeamStats teamAStats;
     DraftTeamResult teamBDraft;

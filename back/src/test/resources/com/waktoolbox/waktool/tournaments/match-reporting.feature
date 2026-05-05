@@ -128,22 +128,16 @@ Feature: Match reporting and auto-refereeing
     success: true
     """
 
-    Then the match_reports table contains:
-    """yml
-    matchId: match-1
-    round: 0
-    teamAReportedWinner: team-a
-    teamBReportedWinner: team-a
-    disputed: false
-    """
+    # Auto resolution as both teams agreed
+    Then the match_reports table contains nothing
 
-    # Match should NOT be marked as done (manual validation needed)
+    # Match should be marked as done
     And the matches table contains:
     """yml
     id: match-1
     content:
-      done: false
-      winner: ?isNull
+      done: true
+      winner: team-a
     """
 
 

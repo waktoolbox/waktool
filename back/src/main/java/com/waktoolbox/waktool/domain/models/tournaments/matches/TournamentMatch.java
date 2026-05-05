@@ -22,4 +22,5 @@ public class TournamentMatch implements Serializable {
     String winner;
     String referee;
     String streamer;
+    Boolean thirdPlaceMatch;
 }

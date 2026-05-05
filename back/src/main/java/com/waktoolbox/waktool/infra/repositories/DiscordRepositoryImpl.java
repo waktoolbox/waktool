@@ -197,4 +197,67 @@ public class DiscordRepositoryImpl implements DiscordRepository, NotificationRep
                 Void.class
         );
     }
+
+    private record CreateRoleRequest(String name) {
+    }
+
+    private record RoleResponse(String id) {
+    }
+
+    @Override
+    public String createRole(String guildId, String roleName) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
+
+        ResponseEntity<RoleResponse> response = _discordRestTemplate.exchange(
+                _baseUrl + "/guilds/" + guildId + "/roles",
+                HttpMethod.POST,
+                new HttpEntity<>(new CreateRoleRequest(roleName), httpHeaders),
+                RoleResponse.class
+        );
+
+        if (response.getBody() == null) {
+            throw new IllegalStateException("Failed to create Discord role: null response body");
+        }
+        return response.getBody().id();
+    }
+
+    @Override
+    public void assignRoleToUser(String guildId, String userId, String roleId) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
+
+        _discordRestTemplate.exchange(
+                _baseUrl + "/guilds/" + guildId + "/members/" + userId + "/roles/" + roleId,
+                HttpMethod.PUT,
+                new HttpEntity<>(null, httpHeaders),
+                Void.class
+        );
+    }
+
+    @Override
+    public void removeRoleFromUser(String guildId, String userId, String roleId) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
+
+        _discordRestTemplate.exchange(
+                _baseUrl + "/guilds/" + guildId + "/members/" + userId + "/roles/" + roleId,
+                HttpMethod.DELETE,
+                new HttpEntity<>(httpHeaders),
+                Void.class
+        );
+    }
+
+    @Override
+    public void deleteRole(String guildId, String roleId) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("Authorization", String.format(BOT_TOKEN_AUTHORIZATION, _botToken));
+
+        _discordRestTemplate.exchange(
+                _baseUrl + "/guilds/" + guildId + "/roles/" + roleId,
+                HttpMethod.DELETE,
+                new HttpEntity<>(httpHeaders),
+                Void.class
+        );
+    }
 }

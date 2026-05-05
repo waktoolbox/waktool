@@ -14,8 +14,28 @@ public class TournamentPhase implements Serializable {
     int poolNumber;
     TournamentRoundModel[] roundModel;
     Boolean autoRefereeing;
+    Boolean mustUseDifferentMapsPerRound;
+    Integer draftAvailableBeforeMatchMinutes;
+    Integer draftJoinDeadlineAfterOpenMinutes;
+    Integer matchStartDeadlineAfterMatchMinutes;
 
     public boolean isEffectiveAutoRefereeing() {
         return autoRefereeing != null && autoRefereeing;
+    }
+
+    public boolean isEffectiveMustUseDifferentMapsPerRound() {
+        return mustUseDifferentMapsPerRound != null && mustUseDifferentMapsPerRound;
+    }
+
+    public int getEffectiveDraftAvailableBeforeMatchMinutes() {
+        return draftAvailableBeforeMatchMinutes != null ? draftAvailableBeforeMatchMinutes : 60;
+    }
+
+    public int getEffectiveDraftJoinDeadlineAfterOpenMinutes() {
+        return draftJoinDeadlineAfterOpenMinutes != null ? draftJoinDeadlineAfterOpenMinutes : 15;
+    }
+
+    public int getEffectiveMatchStartDeadlineAfterMatchMinutes() {
+        return matchStartDeadlineAfterMatchMinutes != null ? matchStartDeadlineAfterMatchMinutes : 15;
     }
 }

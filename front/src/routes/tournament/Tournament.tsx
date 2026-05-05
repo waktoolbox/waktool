@@ -1,7 +1,9 @@
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 import {useLoaderData, useNavigate, useParams} from "react-router-dom";
 import {TournamentDefinition} from "../../chore/tournament.ts";
@@ -25,6 +27,9 @@ import TournamentTeamListView from "../../components/tournament/TournamentTeamLi
 import Icon from "@mui/material/Icon";
 import TournamentMatchListView from "../../components/tournament/TournamentMatchListView.tsx";
 import TournamentMatchView from "../../components/tournament/TournamentMatchView.tsx";
+import TournamentAdminTabView from "../../components/tournament/admin/TournamentAdminTabView.tsx";
+import TournamentBracketView from "../../components/tournament/TournamentBracketView.tsx";
+import {loginIdState} from "../../atoms/atoms-header.ts";
 
 const MenuButtonsStyle = {
     marginLeft: 3,
@@ -47,7 +52,8 @@ enum Tabs {
     RESULTS,
     TREE,
     CREATE_TEAM,
-    EDIT_TEAM
+    EDIT_TEAM,
+    ADMIN_TAB
 }
 
 type LoaderResponse = {
@@ -60,10 +66,16 @@ export default function Tournament() {
     const {id, targetTab} = useParams();
     const [accountsCache, setAccounts] = useAtomState(accountCacheState);
     const [_, setMyTournamentTeam] = useAtomState(myTournamentTeamState);
+    const me = useAtomState(loginIdState)[0];
 
     const [tab, setTab] = useState(targetTab ? +targetTab : Tabs.HOME);
     const tournament = (useLoaderData() as LoaderResponse).tournament;
     const navigate = useNavigate();
+
+    const isAdminOrReferee = me != null && (
+        tournament.admins?.includes(me) ||
+        tournament.referees?.includes(me)
+    );
 
     useEffect(() => {
         const accounts = [...tournament.admins, ...tournament.referees, ...tournament.streamers];
@@ -132,7 +144,11 @@ export default function Tournament() {
         },
         {
             tab: Tabs.TREE,
-            menu: false
+            menu: true,
+            content: <TournamentBracketView/>,
+            icon: <AccountTreeIcon sx={{color: (tab === Tabs.TREE ? "017d7f" : "8299a1"), mr: 1}}/>,
+            label: t('tournament.menu.bracket'),
+            disabled: Date.parse(tournament.startDate).toString() > Date.now().toString()
         },
         {
             tab: Tabs.CREATE_TEAM,
@@ -143,6 +159,14 @@ export default function Tournament() {
             tab: Tabs.EDIT_TEAM,
             menu: false,
             content: <TournamentEditTeamView/>,
+        },
+        {
+            tab: Tabs.ADMIN_TAB,
+            menu: isAdminOrReferee,
+            content: <TournamentAdminTabView/>,
+            icon: <AdminPanelSettingsIcon sx={{color: (tab === Tabs.ADMIN_TAB ? "017d7f" : "8299a1"), mr: 1}}/>,
+            label: t('tournament.menu.admin'),
+            disabled: false
         }
     ]
 
@@ -162,6 +186,9 @@ export default function Tournament() {
                 break;
             case Tabs.TREE:
                 navigate(`/tournament/${id}/tab/6`);
+                break;
+            case Tabs.ADMIN_TAB:
+                navigate(`/tournament/${id}/tab/9`);
                 break;
         }
         setTab(newTab)

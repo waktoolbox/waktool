@@ -6,6 +6,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -34,6 +35,9 @@ public class Tournament implements Serializable {
     Integer requiredBreeds;
     Integer maxTeamPlayers;
     Integer requiredBannedBreeds;
+    Boolean hideClassStats;
+    Instant discordRoleStartDate;
+    Map<String, String> demo;
 
     public int getEffectiveRequiredBreeds() {
         return requiredBreeds != null ? requiredBreeds : 6;

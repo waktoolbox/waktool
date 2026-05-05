@@ -90,6 +90,14 @@
       "setMeAsReferee": "Me déclarer arbitre du match",
       "setMeAsStreamer": "Me déclarer streamer du match",
       "matchAdmin": "Admin match",
+      "sectionGeneral": "Général",
+      "sectionMatchDate": "Date du match",
+      "sectionRoundManagement": "Gestion du round",
+      "sectionDraft": "Draft",
+      "sectionRoundResult": "Résultat du round",
+      "sectionKillHistory": "Historique des kills",
+      "sectionReports": "Reports d'auto-arbitrage",
+      "sectionMatchResult": "Résultat du match",
       "matchDate": "Date du match",
       "matchWinnerTeamA": "Équipe A gagne le match",
       "matchWinnerTeamB": "Équipe B gagne le match",
@@ -116,7 +124,66 @@
       "teamAReport": "Report équipe A",
       "teamBReport": "Report équipe B",
       "reportedWinner": "Vainqueur déclaré",
-      "disputeExplanation": "Explication du litige"
+      "disputeExplanation": "Explication du litige",
+      "disputes": {
+        "title": "Litiges en cours",
+        "none": "Aucun litige en cours",
+        "matchRound": "Match {{matchId}} - Round {{round}}",
+        "viewMatch": "Voir le match",
+        "declareWinner": "Déclarer le vainqueur"
+      },
+      "tournamentControl": {
+        "title": "Contrôle du tournoi",
+        "description": "Passer le tournoi au prochain round ou à la prochaine phase, ou recalculer les statistiques des équipes.",
+        "goToNextPhase": "Passer à la prochaine phase / round",
+        "recomputeStats": "Recalculer les stats",
+        "confirmNextPhase": "Êtes-vous sûr de vouloir passer à la prochaine phase/round ? Cette action est irréversible.",
+        "confirmRecomputeStats": "Êtes-vous sûr de vouloir recalculer toutes les statistiques des équipes ?",
+        "confirmSetWinner": "Êtes-vous sûr de vouloir déclarer {{team}} vainqueur de ce match ?",
+        "currentPhase": "Phase actuelle",
+        "currentRound": "Round actuel",
+        "phaseLabel": "Phase {{phase}}/{{total}} - {{type}}",
+        "roundLabel": "Round {{round}}/{{total}}",
+        "notStarted": "Pas encore démarré",
+        "matchStatus": "Statut des matches",
+        "done": "terminé(s)",
+        "pending": "en attente",
+        "roundMatches": "Matches du round {{round}}",
+        "viewMatch": "Voir le match",
+        "nextRound": "Suivant : Round {{round}}",
+        "nextPhase": "Suivant : Phase {{phase}} - {{type}}",
+        "noNextStep": "Aucune étape suivante disponible",
+        "pendingWarning": "{{count}} match(s) encore en attente - tous les matches doivent être terminés avant de passer à la suite.",
+        "nextPhasePreview": "Aperçu de la prochaine phase",
+        "phasePreviewDetail": "{{type}} - {{rounds}} round(s)",
+        "tournamentComplete": "Le tournoi est terminé - plus de phases ni de rounds.",
+        "loading": "Chargement de l'aperçu de la phase..."
+      },
+      "discordRoles": {
+        "title": "Rôles Discord",
+        "description": "Recalculer les rôles Discord pour toutes les équipes de ce tournoi. Cela créera les rôles manquants et synchronisera les membres.",
+        "recompute": "Recalculer les rôles Discord",
+        "confirmRecompute": "Êtes-vous sûr de vouloir recalculer tous les rôles Discord ? Cela peut prendre un moment.",
+        "started": "Synchronisation des rôles Discord lancée"
+      },
+      "tabs": {
+        "control": "Contrôle",
+        "disputes": "Litiges",
+        "teams": "Équipes",
+        "demo": "Démo"
+      },
+      "teams": {
+        "title": "Gestion des équipes",
+        "name": "Nom",
+        "server": "Serveur",
+        "loading": "Chargement des équipes...",
+        "loadingDetail": "Chargement...",
+        "none": "Aucune équipe inscrite",
+        "overLimit": "— Hors limite d'inscription —",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer l'équipe \"{{name}}\" ? Cette action est irréversible.",
+        "players": "{{count}} joueur(s)",
+        "noComposition": "Aucune composition enregistrée"
+      }
     },
     "admins": "Organisateurs",
     "description": "Description",
@@ -174,13 +241,22 @@
         "reportSummaryMine": "Vous avez reporté : {{team}}",
         "reportSummaryOpponent": "L'adversaire a reporté : {{team}}",
         "alreadyDone": "Ce match est déjà validé"
+      },
+      "roundDates": {
+        "title": "Horaires du round",
+        "draftStart": "Ouverture de la draft",
+        "draftJoinDeadline": "Limite pour rejoindre la draft",
+        "joinDeadlineTooltip": "Les équipes doivent rejoindre la draft avant cette heure (incluse, ex : 19h15 signifie jusqu'à 19:15:59)",
+        "matchStartDeadline": "Limite de début de match"
       }
     },
     "menu": {
       "home": "Informations",
       "teams": "Équipes",
       "planning": "Planning",
-      "results": "Résultats"
+      "results": "Résultats",
+      "bracket": "Arbre",
+      "admin": "Admin"
     },
     "nbMatchesPlayed": "{{nb}} Match(s) joué(s)",
     "nbVictories": "{{nb}} Victoire(s)",
@@ -231,5 +307,23 @@
     }
   },
   "validate": "Valider",
-  "success": "Succès"
+  "success": "Succès",
+  "bracket": {
+    "standings": "Classement",
+    "team": "Équipe",
+    "wins": "Victoires",
+    "losses": "Défaites",
+    "played": "Joués",
+    "noStandings": "Aucun classement disponible pour le moment",
+    "qualification": "Qualification",
+    "bracket": "Arbre",
+    "finale": "Finale",
+    "semiFinals": "Demi-finales",
+    "quarterFinals": "Quarts de finale",
+    "roundOf16": "Huitièmes de finale",
+    "roundOf32": "Seizièmes de finale",
+    "roundOf64": "Trente-deuxièmes de finale",
+    "roundN": "Tour {{n}}",
+    "thirdPlace": "Petite finale"
+  }
 }

@@ -28,6 +28,7 @@ public class Team implements Serializable {
     TeamStats stats;
     boolean displayOnTeamList;
     List<String> validatedPlayers;
+    String discordRoleId;
 
     public static List<Byte> extractValidBreeds(List<Byte> breeds, int limit) {
         return ofNullable(breeds)

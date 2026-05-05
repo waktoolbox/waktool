@@ -34,6 +34,9 @@ export interface TournamentDefinition {
     requiredBreeds?: number;
     maxTeamPlayers?: number;
     requiredBannedBreeds?: number;
+    hideClassStats?: boolean;
+    discordRoleStartDate?: string;
+    demo?: Record<string, string>;
 }
 
 export interface TournamentPhaseDefinition {
@@ -44,11 +47,16 @@ export interface TournamentPhaseDefinition {
     poolSize?: number;
     poolNumber?: number;
     autoRefereeing?: boolean;
+    mustUseDifferentMapsPerRound?: boolean;
+    draftAvailableBeforeMatchMinutes?: number;
+    draftJoinDeadlineAfterOpenMinutes?: number;
+    matchStartDeadlineAfterMatchMinutes?: number;
 }
 
 export interface TournamentRoundDefinition {
     round: number;
     bo: number;
+    date?: string;
 }
 
 export interface TournamentTeamModel {
@@ -95,6 +103,7 @@ export interface TournamentMatchModel {
     phase?: number,
     round?: number;
     rounds: TournamentMatchRoundModel[];
+    thirdPlaceMatch?: boolean;
 
     [key: string]: any; // prevent type error through super typing client side
 }
@@ -104,6 +113,9 @@ export interface TournamentMatchRoundModel {
     draftTeamA?: string,
     draftFirstPicker?: string;
     draftDate?: string;
+    draftStartDate?: string;
+    draftJoinDeadline?: string;
+    matchStartDeadline?: string;
     draftId?: string;
     teamADraft?: TournamentDraftResultModel;
     teamAStats?: TournamentFightStatsModel;
@@ -141,7 +153,9 @@ export enum TournamentPhaseType {
     NONE,
     WAKFU_WARRIORS_ROUND_ROBIN,
     WAKFU_WARRIORS_BRACKET_TOURNAMENT,
-    WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT
+    WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT,
+    WAKFU_CHAMPIONS_QUALIFICATION,
+    WAKFU_CHAMPIONS_BRACKET
 }
 
 export interface MatchReportModel {
@@ -159,3 +173,21 @@ export interface MatchReportModel {
     disputed: boolean;
     createdAt?: string;
 }
+
+export interface TournamentPhaseDataTeam {
+    id: string;
+    breeds: number[];
+    bannedBreeds: number[];
+    lost: number; // In swiss, repurposed as wins
+}
+
+export interface TournamentPhaseData {
+    teams: TournamentPhaseDataTeam[];
+    matches: string[];
+    currentRound: number;
+}
+
+export interface TournamentStandingsResponse {
+    phases: TournamentPhaseData[];
+}
+

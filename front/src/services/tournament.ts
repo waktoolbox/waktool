@@ -64,6 +64,10 @@ export async function getPhases(tournamentId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/phases`);
 }
 
+export async function getStandings(tournamentId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/standings`);
+}
+
 export type PostMatchesSearchParameters = {
     type: "PLANNING" | "RESULTS"
     phase: number
@@ -147,3 +151,32 @@ export async function reportRoundResult(tournamentId: string, matchId: string, r
 export async function getMatchReports(tournamentId: string, matchId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/reports`);
 }
+
+export async function getDisputes(tournamentId: string) {
+    return await gfetch(`/api/tournaments/${tournamentId}/disputes`);
+}
+
+export async function resolveDispute(tournamentId: string, matchId: string, round: number, winner: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/resolve-dispute`, {winner});
+}
+
+export async function refereeSetRoundDates(tournamentId: string, matchId: string, round: number, draftStartDate?: string, draftJoinDeadline?: string, matchStartDeadline?: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/rounds/${round}/referee-set-round-dates`, {
+        draftStartDate: draftStartDate || null,
+        draftJoinDeadline: draftJoinDeadline || null,
+        matchStartDeadline: matchStartDeadline || null
+    });
+}
+
+export async function adminSetMatchWinner(tournamentId: string, matchId: string, winner: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/admin-set-match-winner`, {matchId, winner});
+}
+
+export async function recomputeDiscordRoles(tournamentId: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/admin-recompute-discord-roles`, {});
+}
+
+export async function postDemoAction(tournamentId: string, actionKey: string) {
+    return await pfetch(`/api/tournaments/${tournamentId}/demo/${actionKey}`, {});
+}
+

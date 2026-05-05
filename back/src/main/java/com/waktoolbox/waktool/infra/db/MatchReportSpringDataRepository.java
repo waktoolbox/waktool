@@ -9,8 +9,12 @@ public interface MatchReportSpringDataRepository extends CrudRepository<MatchRep
 
     List<MatchReportEntity> findAllByMatchId(String matchId);
 
+    List<MatchReportEntity> findAllByTournamentIdAndDisputedTrue(String tournamentId);
+
     Optional<MatchReportEntity> findByMatchIdAndRound(String matchId, int round);
 
     void deleteAllByMatchId(String matchId);
+
+    void deleteByMatchIdAndRound(String matchId, int round);
 }
 
