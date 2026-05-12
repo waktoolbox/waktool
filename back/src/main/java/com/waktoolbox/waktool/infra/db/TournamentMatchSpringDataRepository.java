@@ -10,6 +10,9 @@ public interface TournamentMatchSpringDataRepository extends CrudRepository<Tour
 
     List<TournamentMatchEntity> findAllMatchesByTournamentIdAndPhase(String tournamentId, int phase);
 
+    @Query(value = "SELECT * FROM matches WHERE tournament_id = ?1 AND content->>'done' = 'false'", nativeQuery = true)
+    List<TournamentMatchEntity> findAllUndoneMatchesByTournamentId(String tournamentId);
+
     @Query(value = "SELECT * FROM matches WHERE tournament_id = ?1 AND (content->>'teamA' = ?2 OR content->>'teamB' = ?2)", nativeQuery = true)
     List<TournamentMatchEntity> findAllMatchesByTournamentIdAndTeamId(String tournamentId, String teamId);
 

@@ -45,6 +45,12 @@ public class TournamentMatchReportController {
         if (discordId.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
         if (request.winner() == null || request.winner().isBlank()) return ResponseEntity.ok(new SuccessResponse(false));
 
+        // Screenshot is mandatory for reports — only allow null when an existing screenshot is already stored
+        boolean isNewReport = _matchReportRepository.findByMatchIdAndRound(matchId, round).isEmpty();
+        if (isNewReport && (request.screenshot() == null || request.screenshot().isBlank())) {
+            return ResponseEntity.ok(new SuccessResponse(false));
+        }
+
         Optional<Tournament> optTournament = _tournamentRepository.getTournament(tournamentId);
         if (optTournament.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
         Tournament tournament = optTournament.get();
@@ -77,16 +83,16 @@ public class TournamentMatchReportController {
                     return r;
                 });
 
-        // Fill in the appropriate team columns
+        // Fill in the appropriate team columns — screenshot: null=keep existing, empty=clear, non-empty=update
         if ("A".equals(callerTeamSide)) {
             report.setTeamAReportedWinner(request.winner());
             report.setTeamAReporterId(discordId.get());
-            report.setTeamAScreenshot(request.screenshot());
+            if (request.screenshot() != null) report.setTeamAScreenshot(request.screenshot().isEmpty() ? null : request.screenshot());
             report.setTeamADisputeExplanation(request.disputeExplanation());
         } else {
             report.setTeamBReportedWinner(request.winner());
             report.setTeamBReporterId(discordId.get());
-            report.setTeamBScreenshot(request.screenshot());
+            if (request.screenshot() != null) report.setTeamBScreenshot(request.screenshot().isEmpty() ? null : request.screenshot());
             report.setTeamBDisputeExplanation(request.disputeExplanation());
         }
 
@@ -163,14 +169,18 @@ public class TournamentMatchReportController {
      * Returns "A" if the caller is a validated player of teamA, "B" for teamB, null otherwise.
      */
     private String resolveCallerTeamSide(String discordId, TournamentMatch match) {
-        Optional<Team> optTeamA = _tournamentTeamRepository.getTeam(match.getTeamA());
-        if (optTeamA.isPresent() && optTeamA.get().getValidatedPlayers().contains(discordId)) {
-            return "A";
+        if (match.getTeamA() != null) {
+            Optional<Team> optTeamA = _tournamentTeamRepository.getTeam(match.getTeamA());
+            if (optTeamA.isPresent() && optTeamA.get().getValidatedPlayers().contains(discordId)) {
+                return "A";
+            }
         }
 
-        Optional<Team> optTeamB = _tournamentTeamRepository.getTeam(match.getTeamB());
-        if (optTeamB.isPresent() && optTeamB.get().getValidatedPlayers().contains(discordId)) {
-            return "B";
+        if (match.getTeamB() != null) {
+            Optional<Team> optTeamB = _tournamentTeamRepository.getTeam(match.getTeamB());
+            if (optTeamB.isPresent() && optTeamB.get().getValidatedPlayers().contains(discordId)) {
+                return "B";
+            }
         }
 
         return null;

@@ -76,8 +76,8 @@ export default function TournamentBracketTree({phase}: { phase: number }) {
                 for (const m of matches) {
                     const bracketMatch: BracketMatch = {
                         match: m,
-                        teamAName: teamsMap.get(m.teamA) || m.teamA || "TBD",
-                        teamBName: teamsMap.get(m.teamB) || m.teamB || "TBD",
+                        teamAName: m.teamA ? (teamsMap.get(m.teamA) || m.teamA) : t('bracket.noOpponent'),
+                        teamBName: m.teamB ? (teamsMap.get(m.teamB) || m.teamB) : t('bracket.noOpponent'),
                     };
 
                     if (m.thirdPlaceMatch) {
@@ -93,6 +93,8 @@ export default function TournamentBracketTree({phase}: { phase: number }) {
                 const sortedRounds = Array.from(roundMap.keys()).sort((a, b) => a - b);
                 const bracketRounds: BracketRound[] = sortedRounds.map(roundNum => {
                     const matchesInRound = roundMap.get(roundNum)!;
+                    // Sort by matchIndex to preserve seed order across rounds
+                    matchesInRound.sort((a, b) => (a.match.matchIndex ?? 0) - (b.match.matchIndex ?? 0));
                     return {
                         round: roundNum,
                         matches: matchesInRound,

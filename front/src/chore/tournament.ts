@@ -104,6 +104,7 @@ export interface TournamentMatchModel {
     round?: number;
     rounds: TournamentMatchRoundModel[];
     thirdPlaceMatch?: boolean;
+    matchIndex?: number;
 
     [key: string]: any; // prevent type error through super typing client side
 }

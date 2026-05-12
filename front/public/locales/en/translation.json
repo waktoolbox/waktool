@@ -324,6 +324,7 @@
     "roundOf32": "Round of 32",
     "roundOf64": "Round of 64",
     "roundN": "Round {{n}}",
-    "thirdPlace": "3rd Place Match"
+    "thirdPlace": "3rd Place Match",
+    "noOpponent": "-"
   }
 }

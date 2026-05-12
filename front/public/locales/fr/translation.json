@@ -324,6 +324,7 @@
     "roundOf32": "Seizièmes de finale",
     "roundOf64": "Trente-deuxièmes de finale",
     "roundN": "Tour {{n}}",
-    "thirdPlace": "Petite finale"
+    "thirdPlace": "Petite finale",
+    "noOpponent": "-"
   }
 }

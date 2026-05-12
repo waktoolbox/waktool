@@ -237,6 +237,9 @@ public class TournamentAdminController {
         matchRound.setWinner(statsRequest.winner());
         _tournamentMatchRepository.save(tournamentId, match);
 
+        // Try to auto-complete the match if enough rounds are won
+        _matchCompletionService.tryAutoCompleteMatch(tournamentId, match);
+
         return ResponseEntity.ok(new SuccessResponse(true));
     }
 
@@ -364,7 +367,7 @@ public class TournamentAdminController {
     }
 
     private boolean isReferee(String tournamentId, Optional<String> discordId) {
-        return discordId.filter(s -> _tournamentRepository.isReferee(tournamentId, s)).isPresent();
+        return discordId.filter(s -> _tournamentRepository.isReferee(tournamentId, s) || _tournamentRepository.isAdmin(tournamentId, s)).isPresent();
     }
 
     private TournamentPhase findPhase(Tournament tournament, int phaseNumber) {

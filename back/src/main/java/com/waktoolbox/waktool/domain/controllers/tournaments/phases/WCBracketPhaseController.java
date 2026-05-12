@@ -136,6 +136,8 @@ public class WCBracketPhaseController extends PhaseTypeController {
             orderedTeams = seedBracket(orderedTeams);
         }
 
+        int matchIndex = 0;
+
         if (orderedTeams.size() % 2 != 0) {
             // Bye for last team
             TournamentPhaseDataTeam byeTeam = orderedTeams.removeLast();
@@ -143,6 +145,7 @@ public class WCBracketPhaseController extends PhaseTypeController {
             byeMatch.setWinner(byeTeam.getId());
             byeMatch.setDone(true);
             byeMatch.setRounds(List.of());
+            byeMatch.setMatchIndex(matchIndex++);
             phaseData.getMatches().add(byeMatch.getId());
             matchesToSave.add(byeMatch);
         }
@@ -157,6 +160,7 @@ public class WCBracketPhaseController extends PhaseTypeController {
             TournamentMatch match = createBaseMatch(phaseData, teamA, teamB);
             match.setDate(roundDate);
             match.setRounds(createDraftRounds(match, bo, roundDate));
+            match.setMatchIndex(matchIndex++);
 
             phaseData.getMatches().add(match.getId());
             matchesToSave.add(match);
@@ -177,6 +181,7 @@ public class WCBracketPhaseController extends PhaseTypeController {
         TournamentMatch finaleMatch = createBaseMatch(phaseData, finalistA, finalistB);
         finaleMatch.setDate(roundDate);
         finaleMatch.setRounds(createDraftRounds(finaleMatch, finaleBo, roundDate));
+        finaleMatch.setMatchIndex(0);
         phaseData.getMatches().add(finaleMatch.getId());
         matchesToSave.add(finaleMatch);
 

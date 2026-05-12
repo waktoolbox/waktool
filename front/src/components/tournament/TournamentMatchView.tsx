@@ -354,6 +354,7 @@ export default function TournamentMatchView() {
     // === Auto-refereeing helpers ===
     const currentPhase = match ? tournament.phases.find(p => p.phase === match.phase) : undefined;
     const isAutoRefereeing = currentPhase?.autoRefereeing ?? false;
+    const isRefereeOrAdmin = !!(me && (tournament.referees?.includes(me) || tournament.admins?.includes(me)));
     const myTeamSide = me && match ? (teamAPlayers.has(me) ? "A" : teamBPlayers.has(me) ? "B" : null) : null;
     const isTeamMember = myTeamSide !== null;
     const matchDatePassed = match?.date ? Date.parse(match.date) < Date.now() : false;
@@ -415,7 +416,9 @@ export default function TournamentMatchView() {
     function submitReport() {
         if (!id || !matchId || !selectedWinner || reportSubmitting) return;
         setReportSubmitting(true);
-        reportRoundResult(id, matchId, tab, selectedWinner, screenshotBase64, disputeText || undefined).then(response => {
+        // Send undefined when user didn't change the screenshot so backend preserves it
+        const screenshotToSend = screenshotCleared ? "" : (screenshotBase64 || undefined);
+        reportRoundResult(id, matchId, tab, selectedWinner, screenshotToSend, disputeText || undefined).then(response => {
             notificationPopup(response);
             setReportSubmitting(false);
             loadReports();
@@ -608,8 +611,8 @@ export default function TournamentMatchView() {
                                     </Grid>
                                 </Grid>
 
-                                {/* Auto-refereeing: Player report section */}
-                                {isAutoRefereeing && isTeamMember && !match.done && matchDatePassed && !fight.winner &&
+                                {/* Auto-refereeing: Player report section — hidden while a required draft is not completed */}
+                                {isAutoRefereeing && isTeamMember && !match.done && matchDatePassed && !fight.winner && (!fight.draftId || fight.teamADraft) &&
                                     <Card sx={{backgroundColor: '#213943', borderRadius: 3, mt: 2, mx: 1}}>
                                         <CardContent sx={{p: 2, "&:last-child": {pb: 2}}}>
                                             <Typography variant="h6" sx={{mb: 2}}>{t('tournament.match.report.title')}</Typography>
@@ -677,7 +680,7 @@ export default function TournamentMatchView() {
                                             </ButtonGroup>
 
                                             {/* Screenshot upload */}
-                                            <Typography variant="body2" sx={{mb: 1, fontWeight: 500}}>{t('tournament.match.report.screenshot')}</Typography>
+                                            <Typography variant="body2" sx={{mb: 1, fontWeight: 500}}>{t('tournament.match.report.screenshot')} *</Typography>
                                             <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2}}>
                                                 <Button
                                                     variant="outlined"
@@ -740,7 +743,7 @@ export default function TournamentMatchView() {
                                             <Button
                                                 variant="contained"
                                                 fullWidth
-                                                disabled={!selectedWinner || reportSubmitting}
+                                                disabled={!selectedWinner || !effectiveScreenshot || reportSubmitting}
                                                 onClick={() => submitReport()}
                                                 endIcon={<SendIcon/>}
                                                 sx={{backgroundColor: '#017d7f', '&:hover': {backgroundColor: '#015d5f'}}}
@@ -884,7 +887,7 @@ export default function TournamentMatchView() {
                 </>
             }
 
-            <div hidden={!(me && tournament.referees?.find(referee => referee === me))}
+            <div hidden={!(me && (tournament.referees?.find(referee => referee === me) || tournament.admins?.find(admin => admin === me)))}
                  style={{position: 'fixed', bottom: 3, right: 3}}>
                 <TournamentAdminDialog buttonText={t('tournament.admin.matchAdmin')} withTitle={false}
                                        title={""}>
@@ -903,7 +906,7 @@ export default function TournamentMatchView() {
                             </Grid>
 
                             {/* ── Section: Match date ── */}
-                            <div hidden={match?.referee !== me}>
+                            <div hidden={!isRefereeOrAdmin}>
                                 <Typography variant="h6" sx={{mb: 1}}>{t('tournament.admin.sectionMatchDate')}</Typography>
                                 <Grid container sx={{borderRadius: 3, mb: 2, p: 1, backgroundColor: '#162329', alignItems: 'center'}}>
                                     <Grid item xs={6}>
@@ -920,7 +923,7 @@ export default function TournamentMatchView() {
                             </div>
 
                             {/* ── Section: Round selector ── */}
-                            <div hidden={match?.referee !== me}>
+                            <div hidden={!isRefereeOrAdmin}>
                                 <Typography variant="h6" sx={{mb: 1}}>{t('tournament.admin.sectionRoundManagement')}</Typography>
                                 <Grid container sx={{borderRadius: 3, mb: 2, p: 1, backgroundColor: '#162329'}}>
                                     <Grid item xs={12}>
@@ -1110,7 +1113,7 @@ export default function TournamentMatchView() {
 
                             {/* ── Section: Auto-refereeing reports ── */}
                             {isAutoRefereeing && matchReports.length > 0 && (
-                                <div hidden={match?.referee !== me}>
+                                <div hidden={!isRefereeOrAdmin}>
                                     <Typography variant="h6" sx={{mb: 1}}>{t('tournament.admin.sectionReports')}</Typography>
                                     <Grid container sx={{borderRadius: 3, mb: 2, p: 1, backgroundColor: '#162329'}}>
                                         <Grid item xs={12} sx={{mb: 1}}>
@@ -1178,7 +1181,7 @@ export default function TournamentMatchView() {
                             )}
 
                             {/* ── Section: Match result ── */}
-                            <div hidden={match?.referee !== me}>
+                            <div hidden={!isRefereeOrAdmin}>
                                 <Typography variant="h6" sx={{mb: 1}}>{t('tournament.admin.sectionMatchResult')}</Typography>
                                 <Grid container sx={{borderRadius: 3, p: 1, backgroundColor: '#162329', alignItems: 'center'}}>
                                     <Grid item xs={3.5}>
