@@ -143,8 +143,9 @@ public class TournamentMatchReportController {
 
         List<MatchReport> reports = _matchReportRepository.findByMatchId(matchId);
 
-        // Strip screenshots for non-admin/non-referee
+        // Strip opponent screenshots for non-admin/non-referee (team members can see their own)
         if (!isReferee && !isAdmin) {
+            final String side = callerTeamSide;
             reports = reports.stream().map(r -> {
                 MatchReport stripped = new MatchReport();
                 stripped.setMatchId(r.getMatchId());
@@ -158,6 +159,9 @@ public class TournamentMatchReportController {
                 stripped.setTeamBDisputeExplanation(r.getTeamBDisputeExplanation());
                 stripped.setDisputed(r.isDisputed());
                 stripped.setCreatedAt(r.getCreatedAt());
+                // Include the caller's own team screenshot
+                if ("A".equals(side)) stripped.setTeamAScreenshot(r.getTeamAScreenshot());
+                if ("B".equals(side)) stripped.setTeamBScreenshot(r.getTeamBScreenshot());
                 return stripped;
             }).toList();
         }

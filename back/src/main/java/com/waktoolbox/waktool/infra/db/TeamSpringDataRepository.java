@@ -79,6 +79,7 @@ public interface TeamSpringDataRepository extends CrudRepository<TeamEntity, Str
                 SELECT *
                 FROM teams
                 WHERE content->>('tournament') = :tournamentId
+                ORDER BY created_at ASC
             """, nativeQuery = true)
     List<TeamEntity> getTeamsByTournamentId(String tournamentId);
 

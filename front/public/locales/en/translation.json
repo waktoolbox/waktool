@@ -212,6 +212,8 @@
       "live": "Live",
       "matchNb": "Fight {{nb}}",
       "more": "Learn more",
+      "byeWinner": "{{team}} qualified without opponent",
+      "byeDescription": "This match had no opponent, qualification is automatic.",
       "noDate": "No date",
       "noMatchPlanned": "No matches to display",
       "noReferee": "No referee",

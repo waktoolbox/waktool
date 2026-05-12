@@ -2,7 +2,6 @@ package com.waktoolbox.waktool.domain.controllers.tournaments;
 
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.repositories.DemoActionRepository;
-import com.waktoolbox.waktool.domain.repositories.MatchReportRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +21,7 @@ public class DemoActionService {
     public DemoActionService(
             DemoActionRepository demoActionRepository,
             TournamentMatchRepository tournamentMatchRepository,
-            TournamentStatsController tournamentStatsController,
-            MatchReportRepository matchReportRepository
+            MatchCompletionService matchCompletionService
     ) {
         _actions = Map.of(
                 "TOURNAMENT_START", tournamentId ->
@@ -31,11 +29,11 @@ public class DemoActionService {
                 "RESET", tournamentId ->
                         demoActionRepository.executeSqlFile("classpath:db/demo/" + tournamentId + "-reset.sql"),
                 "TEAM_A_WIN", tournamentId ->
-                        forceWinAllPendingMatches(tournamentId, "A", tournamentMatchRepository, tournamentStatsController, matchReportRepository),
+                        forceWinAllPendingMatches(tournamentId, "A", tournamentMatchRepository, matchCompletionService),
                 "TEAM_B_WIN", tournamentId ->
-                        forceWinAllPendingMatches(tournamentId, "B", tournamentMatchRepository, tournamentStatsController, matchReportRepository),
+                        forceWinAllPendingMatches(tournamentId, "B", tournamentMatchRepository, matchCompletionService),
                 "RANDOM_TEAM_WIN", tournamentId ->
-                        forceWinAllPendingMatches(tournamentId, "RANDOM", tournamentMatchRepository, tournamentStatsController, matchReportRepository)
+                        forceWinAllPendingMatches(tournamentId, "RANDOM", tournamentMatchRepository, matchCompletionService)
         );
     }
 
@@ -59,8 +57,7 @@ public class DemoActionService {
             String tournamentId,
             String side,
             TournamentMatchRepository matchRepository,
-            TournamentStatsController statsController,
-            MatchReportRepository matchReportRepository
+            MatchCompletionService matchCompletionService
     ) {
         List<TournamentMatch> undoneMatches = matchRepository.getAllUndoneMatches(tournamentId);
 
@@ -83,13 +80,7 @@ public class DemoActionService {
                 };
             }
 
-            match.setWinner(winner);
-            match.setDone(true);
-
-            if (match.getTeamA() != null) statsController.fillStats(match, match.getTeamA());
-            if (match.getTeamB() != null) statsController.fillStats(match, match.getTeamB());
-            matchRepository.save(tournamentId, match);
-            matchReportRepository.deleteByMatchId(match.getId());
+            matchCompletionService.forceCompleteMatch(tournamentId, match, winner);
         }
     }
 }

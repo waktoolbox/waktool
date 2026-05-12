@@ -111,13 +111,13 @@ export default function TournamentMatchView() {
     useEffect(() => {
         if (!matchId) return;
         getMatch(id || "", matchId).then(response => {
-            setFight(response.match.rounds[tab])
+            setFight(response.match.rounds?.[tab])
             setMatch(response.match);
 
             if (!response.match) return;
             const toLoad = []
-            if (!teams.get(response.match.teamA)) toLoad.push(response.match.teamA);
-            if (!teams.get(response.match.teamB)) toLoad.push(response.match.teamB);
+            if (response.match.teamA && !teams.get(response.match.teamA)) toLoad.push(response.match.teamA);
+            if (response.match.teamB && !teams.get(response.match.teamB)) toLoad.push(response.match.teamB);
             if (toLoad.length > 0) {
                 teamSearch(id || "", toLoad).then(response => {
                     const ltc = new Map(teams);
@@ -489,7 +489,7 @@ export default function TournamentMatchView() {
 
     return (
         <Grid container>
-            {match && fight &&
+            {match &&
                 <>
                     <Grid item xs={12} sx={{mt: 3}}>
                         <Typography variant="h4" display="inline" sx={{color: "#fefffa"}}>
@@ -502,7 +502,7 @@ export default function TournamentMatchView() {
                                     color: "#07c6b6"
                                 }}/>
                             }
-                            {match && match.winner === match.teamB &&
+                            {match && match.teamB && match.winner === match.teamB &&
                                 <CancelIcon sx={{
                                     mr: 1,
                                     mb: "3px",
@@ -515,31 +515,38 @@ export default function TournamentMatchView() {
                                 {teams.get(match.teamA)}
                             </Link>
                         </Typography>
-                        <Typography variant="h5" display="inline" className="blueWord"
-                                    sx={{ml: 1, mr: 1}}>vs</Typography>
-                        <Typography variant="h4" display="inline" sx={{color: "#fefffa"}}>
-                            <Link to={`/tournament/${id}/tab/2/team/${match.teamB}`}>
-                                {teams.get(match.teamB)}
-                            </Link>
-                            {match.winner === match.teamB &&
-                                <EmojiEventsIcon sx={{
-                                    ml: 1,
-                                    mb: "3px",
-                                    height: '80px', width: '80px',
-                                    verticalAlign: "middle",
-                                    color: "#07c6b6"
-                                }}/>
-                            }
-                            {match.winner === match.teamA &&
-                                <CancelIcon sx={{
-                                    ml: 1,
-                                    mb: "3px",
-                                    height: '80px', width: '80px',
-                                    verticalAlign: "middle",
-                                    color: "#e64b4b"
-                                }}/>
-                            }
-                        </Typography>
+                        {match.teamB ? (
+                            <>
+                                <Typography variant="h5" display="inline" className="blueWord"
+                                            sx={{ml: 1, mr: 1}}>vs</Typography>
+                                <Typography variant="h4" display="inline" sx={{color: "#fefffa"}}>
+                                    <Link to={`/tournament/${id}/tab/2/team/${match.teamB}`}>
+                                        {teams.get(match.teamB)}
+                                    </Link>
+                                    {match.winner === match.teamB &&
+                                        <EmojiEventsIcon sx={{
+                                            ml: 1,
+                                            mb: "3px",
+                                            height: '80px', width: '80px',
+                                            verticalAlign: "middle",
+                                            color: "#07c6b6"
+                                        }}/>
+                                    }
+                                    {match.winner === match.teamA &&
+                                        <CancelIcon sx={{
+                                            ml: 1,
+                                            mb: "3px",
+                                            height: '80px', width: '80px',
+                                            verticalAlign: "middle",
+                                            color: "#e64b4b"
+                                        }}/>
+                                    }
+                                </Typography>
+                            </>
+                        ) : (
+                            <Typography variant="h5" display="inline" className="blueWord"
+                                        sx={{ml: 1}}>— {t('bracket.noOpponent')}</Typography>
+                        )}
                         <Typography variant="h6" color="#8299a1">{match.date
                             ? t('date', {
                                 date: Date.parse(match.date), formatParams: dateFormat
@@ -554,6 +561,7 @@ export default function TournamentMatchView() {
                             {matchText()}
                         </Typography>
                     </Grid>
+                    {match.rounds && match.rounds.length > 0 && fight ? (
                     <Grid item xs={12} sx={{pr: 2, backgroundColor: '#162329', borderRadius: 3, ml: 2, mr: 2, pb: 1}}>
                         <Tabs value={tab} onChange={onTabChange}>
                             {match.rounds && match.rounds.map((_, index) => (
@@ -884,6 +892,22 @@ export default function TournamentMatchView() {
                             </Grid>
                         </Grid>
                     </Grid>
+                    ) : (
+                    <Grid item xs={12} sx={{backgroundColor: '#162329', borderRadius: 3, ml: 2, mr: 2, pb: 2, pt: 2, textAlign: 'center'}}>
+                        <EmojiEventsIcon sx={{height: '60px', width: '60px', color: '#07c6b6', mb: 1}}/>
+                        <Typography variant="h6" sx={{color: '#8299a1'}}>
+                            {match.winner
+                                ? t('tournament.match.byeWinner', {team: teams.get(match.winner) || match.winner})
+                                : t('bracket.noOpponent')
+                            }
+                        </Typography>
+                        {match.done && (
+                            <Typography variant="body2" sx={{color: '#5a7a84', mt: 1}}>
+                                {t('tournament.match.byeDescription')}
+                            </Typography>
+                        )}
+                    </Grid>
+                    )}
                 </>
             }
 
