@@ -19,7 +19,7 @@ COPY front/vite.config.ts vite.config.ts
 COPY front/src/ src/
 COPY front/public/ public/
 
-RUN pnpm run build
+RUN CI=true pnpm run build
 
 # =============================================================================
 # Stage 2: Build backend with Maven (dependency caching layer)
