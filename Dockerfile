@@ -1,7 +1,7 @@
 # =============================================================================
 # Stage 1: Build frontend with pnpm
 # =============================================================================
-FROM node:20-alpine AS build-front
+FROM node:22-alpine AS build-front
 
 WORKDIR /front
 
