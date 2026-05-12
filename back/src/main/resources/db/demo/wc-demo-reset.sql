@@ -99,7 +99,7 @@ VALUES (
     '{
       "id": "wc-demo",
       "name": "WAKFU Champions - Demo",
-      "logo": "",
+      "logo": "https://raw.githubusercontent.com/waktoolbox/waktool/refs/heads/master/front/public/images/wc/2026.jpg",
       "discordLink": "https://discord.gg/RamVFndNTG",
       "server": "Beta",
       "level": "230",
@@ -122,7 +122,10 @@ VALUES (
       "streamers": [],
       "demo": {
         "tournament-start": "TOURNAMENT_START",
-        "reset": "RESET"
+        "reset": "RESET",
+        "teamAWin": "TEAM_A_WIN",
+        "teamBWin": "TEAM_B_WIN",
+        "randomTeamWin": "RANDOM_TEAM_WIN"
       },
       "phases": [
         {
@@ -158,7 +161,7 @@ VALUES (
       ]
     }',
     false,
-    ''
+    1487802843648888932
 )
 ON CONFLICT (id) DO UPDATE
     SET content = EXCLUDED.content,

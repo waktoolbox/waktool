@@ -142,16 +142,8 @@ public class TournamentAdminController {
 
         TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
         if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
-        if (match.isDone()) return ResponseEntity.ok(new SuccessResponse(false));
 
-        match.setWinner(matchResultRequest.winner());
-        match.setDone(true);
-
-        _tournamentStatsController.fillStats(match, match.getTeamA());
-        _tournamentStatsController.fillStats(match, match.getTeamB());
-        _tournamentMatchRepository.save(tournamentId, match);
-
-        _matchReportRepository.deleteByMatchId(matchId);
+        _matchCompletionService.forceCompleteMatch(tournamentId, match, matchResultRequest.winner());
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }
@@ -236,6 +228,9 @@ public class TournamentAdminController {
         matchRound.setHistory(history);
         matchRound.setWinner(statsRequest.winner());
         _tournamentMatchRepository.save(tournamentId, match);
+
+        // Try to auto-complete the match if enough rounds are won
+        _matchCompletionService.tryAutoCompleteMatch(tournamentId, match);
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }
@@ -341,14 +336,7 @@ public class TournamentAdminController {
         if (!request.winner().equals(match.getTeamA()) && !request.winner().equals(match.getTeamB()))
             return ResponseEntity.ok(new SuccessResponse(false));
 
-        match.setWinner(request.winner());
-        match.setDone(true);
-
-        _tournamentStatsController.fillStats(match, match.getTeamA());
-        _tournamentStatsController.fillStats(match, match.getTeamB());
-        _tournamentMatchRepository.save(tournamentId, match);
-
-        _matchReportRepository.deleteByMatchId(request.matchId());
+        _matchCompletionService.forceCompleteMatch(tournamentId, match, request.winner());
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }
@@ -364,7 +352,7 @@ public class TournamentAdminController {
     }
 
     private boolean isReferee(String tournamentId, Optional<String> discordId) {
-        return discordId.filter(s -> _tournamentRepository.isReferee(tournamentId, s)).isPresent();
+        return discordId.filter(s -> _tournamentRepository.isReferee(tournamentId, s) || _tournamentRepository.isAdmin(tournamentId, s)).isPresent();
     }
 
     private TournamentPhase findPhase(Tournament tournament, int phaseNumber) {

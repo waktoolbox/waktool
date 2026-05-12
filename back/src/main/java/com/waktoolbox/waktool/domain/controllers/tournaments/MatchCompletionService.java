@@ -28,6 +28,20 @@ public class MatchCompletionService {
     private final MatchReportRepository _matchReportRepository;
 
     /**
+     * Forces a match to complete with the given winner. Sets done=true, fills stats for both teams,
+     * saves the match, and deletes any associated reports.
+     */
+    public void forceCompleteMatch(String tournamentId, TournamentMatch match, String winner) {
+        match.setWinner(winner);
+        match.setDone(true);
+
+        if (match.getTeamA() != null) _tournamentStatsController.fillStats(match, match.getTeamA());
+        if (match.getTeamB() != null) _tournamentStatsController.fillStats(match, match.getTeamB());
+        _tournamentMatchRepository.save(tournamentId, match);
+        _matchReportRepository.deleteByMatchId(match.getId());
+    }
+
+    /**
      * Checks if a team has won enough rounds to win the match.
      * If so, marks the match as done, fills stats, deletes remaining reports, and saves.
      *
@@ -60,13 +74,7 @@ public class MatchCompletionService {
         if (winner == null) return false;
 
         log.info("Auto-completing match {} — winner: {}", match.getId(), winner);
-        match.setWinner(winner);
-        match.setDone(true);
-
-        _tournamentStatsController.fillStats(match, match.getTeamA());
-        _tournamentStatsController.fillStats(match, match.getTeamB());
-        _tournamentMatchRepository.save(tournamentId, match);
-        _matchReportRepository.deleteByMatchId(match.getId());
+        forceCompleteMatch(tournamentId, match, winner);
 
         return true;
     }

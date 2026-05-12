@@ -212,6 +212,8 @@
       "live": "Live",
       "matchNb": "Fight {{nb}}",
       "more": "Learn more",
+      "byeWinner": "{{team}} qualified without opponent",
+      "byeDescription": "This match had no opponent, qualification is automatic.",
       "noDate": "No date",
       "noMatchPlanned": "No matches to display",
       "noReferee": "No referee",
@@ -324,6 +326,7 @@
     "roundOf32": "Round of 32",
     "roundOf64": "Round of 64",
     "roundN": "Round {{n}}",
-    "thirdPlace": "3rd Place Match"
+    "thirdPlace": "3rd Place Match",
+    "noOpponent": "-"
   }
 }

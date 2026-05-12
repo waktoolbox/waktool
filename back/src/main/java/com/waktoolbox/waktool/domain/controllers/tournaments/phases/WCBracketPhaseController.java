@@ -134,7 +134,13 @@ public class WCBracketPhaseController extends PhaseTypeController {
         // First round: use seeding (1 vs N, 2 vs N-1, etc.)
         if (phaseData.getCurrentRound() == 1) {
             orderedTeams = seedBracket(orderedTeams);
+        } else {
+            // Subsequent rounds: order teams based on previous round match indices
+            // so the bracket tree stays consistent
+            orderedTeams = orderByPreviousRoundMatchIndex(phaseData, activeTeams);
         }
+
+        int matchIndex = 0;
 
         if (orderedTeams.size() % 2 != 0) {
             // Bye for last team
@@ -143,6 +149,7 @@ public class WCBracketPhaseController extends PhaseTypeController {
             byeMatch.setWinner(byeTeam.getId());
             byeMatch.setDone(true);
             byeMatch.setRounds(List.of());
+            byeMatch.setMatchIndex(matchIndex++);
             phaseData.getMatches().add(byeMatch.getId());
             matchesToSave.add(byeMatch);
         }
@@ -157,6 +164,7 @@ public class WCBracketPhaseController extends PhaseTypeController {
             TournamentMatch match = createBaseMatch(phaseData, teamA, teamB);
             match.setDate(roundDate);
             match.setRounds(createDraftRounds(match, bo, roundDate));
+            match.setMatchIndex(matchIndex++);
 
             phaseData.getMatches().add(match.getId());
             matchesToSave.add(match);
@@ -177,6 +185,7 @@ public class WCBracketPhaseController extends PhaseTypeController {
         TournamentMatch finaleMatch = createBaseMatch(phaseData, finalistA, finalistB);
         finaleMatch.setDate(roundDate);
         finaleMatch.setRounds(createDraftRounds(finaleMatch, finaleBo, roundDate));
+        finaleMatch.setMatchIndex(0);
         phaseData.getMatches().add(finaleMatch.getId());
         matchesToSave.add(finaleMatch);
 
@@ -205,6 +214,47 @@ public class WCBracketPhaseController extends PhaseTypeController {
         }
 
         return matchesToSave;
+    }
+
+    /**
+     * Orders active teams by their previous round match index so that bracket progression
+     * stays consistent (winner of match 0 plays winner of match 1, etc.).
+     */
+    private List<TournamentPhaseDataTeam> orderByPreviousRoundMatchIndex(TournamentPhaseData phaseData, List<TournamentPhaseDataTeam> activeTeams) {
+        int previousRound = phaseData.getCurrentRound() - 1;
+        MatchesSearchParameters params = new MatchesSearchParameters();
+        params.setType(MatchesSearchType.RESULTS);
+        params.setPhase(context.getPhase());
+        List<TournamentMatch> allMatches = context.getTournamentMatchRepository().getMatches(context.getTournament().getId(), params);
+
+        Set<String> activeTeamIds = activeTeams.stream().map(TournamentPhaseDataTeam::getId).collect(Collectors.toSet());
+        Map<String, TournamentPhaseDataTeam> teamById = activeTeams.stream()
+                .collect(Collectors.toMap(TournamentPhaseDataTeam::getId, t -> t));
+
+        // Get previous round matches (excluding third place), sorted by matchIndex
+        List<TournamentMatch> previousRoundMatches = allMatches.stream()
+                .filter(m -> Objects.equals(m.getRound(), previousRound)
+                        && !Boolean.TRUE.equals(m.getThirdPlaceMatch()))
+                .sorted(Comparator.comparingInt(m -> Optional.ofNullable(m.getMatchIndex()).orElse(Integer.MAX_VALUE)))
+                .toList();
+
+        // Build ordered list from winners in matchIndex order
+        List<TournamentPhaseDataTeam> ordered = new ArrayList<>();
+        for (TournamentMatch m : previousRoundMatches) {
+            if (m.getWinner() != null && activeTeamIds.contains(m.getWinner())) {
+                TournamentPhaseDataTeam team = teamById.remove(m.getWinner());
+                if (team != null) ordered.add(team);
+            }
+        }
+
+        // Append any remaining active teams (shouldn't happen, but safety)
+        for (TournamentPhaseDataTeam remaining : activeTeams) {
+            if (teamById.containsKey(remaining.getId())) {
+                ordered.add(remaining);
+            }
+        }
+
+        return ordered;
     }
 
     /**
@@ -366,5 +416,4 @@ public class WCBracketPhaseController extends PhaseTypeController {
         teamsToUpdate.forEach(team -> team.setLost(lostCount.getOrDefault(team.getId(), 0)));
     }
 }
-
 

@@ -35,7 +35,9 @@ public class WCQualificationPhaseController extends PhaseTypeController {
         TournamentPhaseData tournamentPhaseData = new TournamentPhaseData();
         if (context.getTournamentData().isEmpty()) {
             List<Team> teams = context.getTournamentTeamRepository().getTeamsByTournamentId(context.getTournament().getId());
-            tournamentPhaseData.setTeams(teams.stream().map(team -> new TournamentPhaseDataTeam(team.getId(), team.getBreeds(), team.getBannedBreeds(), 0)).toList());
+            int maxTeams = 64;
+            List<Team> capped = teams.size() > maxTeams ? teams.subList(0, maxTeams) : teams;
+            tournamentPhaseData.setTeams(capped.stream().map(team -> new TournamentPhaseDataTeam(team.getId(), team.getBreeds(), team.getBannedBreeds(), 0)).toList());
         } else {
             String tournamentId = context.getTournament().getId();
             TournamentData previousPhase = context.getTournamentData().get(context.getPhase() - 1);

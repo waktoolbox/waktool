@@ -108,6 +108,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -122,6 +123,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -150,6 +152,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -164,6 +167,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-b
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -189,6 +193,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200
 
@@ -200,6 +205,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-b
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200
 
@@ -234,6 +240,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200
 
@@ -271,6 +278,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -287,6 +295,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -303,6 +312,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -327,6 +337,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200
 
@@ -338,6 +349,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-b
+        screenshot: data:image/png;base64,fakedata2
     """
     Then we receive a status OK_200 and:
     """yaml
@@ -362,6 +374,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200
 
@@ -389,6 +402,7 @@ Feature: Match reporting and auto-refereeing
     body:
       payload:
         winner: team-a
+        screenshot: data:image/png;base64,fakedata
     """
     Then we receive a status OK_200
 

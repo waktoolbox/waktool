@@ -75,4 +75,11 @@ public class TournamentMatchRepositoryImpl implements TournamentMatchRepository 
             return entity;
         }).toList());
     }
+
+    @Override
+    public List<TournamentMatch> getAllUndoneMatches(String tournamentId) {
+        return _repository.findAllUndoneMatchesByTournamentId(tournamentId).stream()
+                .map(TournamentMatchEntity::getContent)
+                .toList();
+    }
 }

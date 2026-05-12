@@ -20,4 +20,6 @@ public interface TournamentMatchRepository {
     void save(String tournamentId, TournamentMatch match);
 
     void saveAll(String tournamentId, List<TournamentMatch> matchesToSave);
+
+    List<TournamentMatch> getAllUndoneMatches(String tournamentId);
 }
