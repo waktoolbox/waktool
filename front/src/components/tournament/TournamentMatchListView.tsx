@@ -10,7 +10,6 @@ import TournamentPhaseButton from "./TournamentPhaseButton.tsx";
 import {TournamentDefinition, TournamentMatchModel, TournamentPhaseType} from "../../chore/tournament.ts";
 import TournamentRoundRobinListView from "./TournamentRoundRobinListView.tsx";
 import TournamentRawListView from "./TournamentRawListView.tsx";
-import TournamentBracketTree from "./TournamentBracketTree.tsx";
 
 type TournamentMatchListViewProps = {
     tab: "PLANNING" | "RESULTS"
@@ -91,10 +90,8 @@ export default function TournamentMatchListView(props: TournamentMatchListViewPr
             case TournamentPhaseType.WAKFU_WARRIORS_BRACKET_TOURNAMENT:
             case TournamentPhaseType.WAKFU_WARRIORS_DOUBLE_ELIMINATION_TOURNAMENT:
             case TournamentPhaseType.WAKFU_CHAMPIONS_QUALIFICATION:
-                setTournamentPhaseComponent(<TournamentRawListView matches={matchesToDisplay}/>)
-                break;
             case TournamentPhaseType.WAKFU_CHAMPIONS_BRACKET:
-                setTournamentPhaseComponent(<TournamentBracketTree phase={displayedPhase}/>)
+                setTournamentPhaseComponent(<TournamentRawListView matches={matchesToDisplay}/>)
                 break;
         }
     }, [matchesToDisplay])

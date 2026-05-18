@@ -9,6 +9,7 @@ import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchR
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,6 +123,8 @@ public class WCQualificationPhaseController extends PhaseTypeController {
                             Instant matchStartDeadline = roundDate.plusSeconds((long) deadlineMinutes * 60);
                             // Store deadline on match rounds
                             match.setRounds(createRoundsWithDeadlines(teams, match, null, matchStartDeadline));
+
+                            match.setNotificationDate(roundDate.minus(15, ChronoUnit.MINUTES));
                         } else {
                             match.setRounds(createRoundsWithDeadlines(teams, match, null, null));
                         }

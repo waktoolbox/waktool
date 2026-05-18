@@ -91,6 +91,26 @@ function DraftViewer() {
     const [pickedBreed, setPickedBreed] = useState<Breeds | undefined>(undefined);
     const [hoveredBreed, setHoveredBreed] = useState<Breeds | undefined>(undefined);
     const [usersToAssign, setUsersToAssign] = useState<DraftUser[]>([]);
+    const [currentTime, setCurrentTime] = useState<string>('');
+
+    // Real-time clock in Europe/Paris timezone for dispute evidence
+    useEffect(() => {
+        function updateClock() {
+            setCurrentTime(new Date().toLocaleTimeString('fr-FR', {
+                timeZone: 'Europe/Paris',
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }));
+        }
+        updateClock();
+        const interval = setInterval(updateClock, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         if (location.pathname !== "/draft/" + draftId) {
@@ -292,6 +312,17 @@ function DraftViewer() {
 
     return (
         <>
+            {/* Real-time clock for dispute evidence */}
+            <Grid item xs={12} order={{xs: 1, lg: 0}} sx={{textAlign: 'center', pb: 1}}>
+                <Typography variant="body2" sx={{
+                    color: '#8299a1',
+                    fontFamily: 'monospace',
+                    fontSize: '1rem',
+                    letterSpacing: '0.05em',
+                }}>
+                    {currentTime} (UTC+2)
+                </Typography>
+            </Grid>
             <Grid item xs={6} lg={3} order={{xs: 2, lg: 1}} sx={{pb: 2}}>
                 {teamA &&
                     <DraftTeamColumn

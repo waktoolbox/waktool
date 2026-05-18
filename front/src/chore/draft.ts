@@ -38,12 +38,35 @@ export const WAKFU_WARRIORS_DRAFT_ACTIONS: DraftAction[] = [
     {type: DraftActionType.PICK, team: DraftTeam.TEAM_B, lockForPickingTeam: true},
 ];
 
+export const WAKFU_CHAMPIONS_DRAFT_ACTIONS: DraftAction[] = [
+    {type: DraftActionType.BAN, team: DraftTeam.TEAM_A, lockForPickingTeam: true, lockForOpponentTeam: true},
+    {type: DraftActionType.BAN, team: DraftTeam.TEAM_B, lockForPickingTeam: true, lockForOpponentTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_A, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_B, lockForPickingTeam: true},
+    {type: DraftActionType.BAN, team: DraftTeam.TEAM_B, lockForPickingTeam: true, lockForOpponentTeam: true},
+    {type: DraftActionType.BAN, team: DraftTeam.TEAM_A, lockForPickingTeam: true, lockForOpponentTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_B, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_A, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_B, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_A, lockForPickingTeam: true},
+    {type: DraftActionType.BAN, team: DraftTeam.TEAM_A, lockForPickingTeam: true, lockForOpponentTeam: true},
+    {type: DraftActionType.BAN, team: DraftTeam.TEAM_B, lockForPickingTeam: true, lockForOpponentTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_A, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_B, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_B, lockForPickingTeam: true},
+    {type: DraftActionType.PICK, team: DraftTeam.TEAM_A, lockForPickingTeam: true},
+];
+
 export type DraftTemplate = {
     name: string;
     actions: DraftAction[]
 };
 
 export const DraftTemplates: DraftTemplate[] = [
+    {
+        name: "Wakfu Champions",
+        actions: WAKFU_CHAMPIONS_DRAFT_ACTIONS
+    },
     {
         name: "Wakfu Warriors",
         actions: WAKFU_WARRIORS_DRAFT_ACTIONS

@@ -51,6 +51,8 @@ export interface TournamentPhaseDefinition {
     draftAvailableBeforeMatchMinutes?: number;
     draftJoinDeadlineAfterOpenMinutes?: number;
     matchStartDeadlineAfterMatchMinutes?: number;
+    draftTurnDurationSeconds?: number;
+    draftModel?: string;
 }
 
 export interface TournamentRoundDefinition {

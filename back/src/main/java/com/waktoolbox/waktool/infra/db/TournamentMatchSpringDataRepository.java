@@ -28,8 +28,18 @@ public interface TournamentMatchSpringDataRepository extends CrudRepository<Tour
     @Query(value = """
             SELECT * FROM matches
             WHERE tournament_id = ?1
-            AND (CASE WHEN content->>'date' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'date' AS double precision)) ELSE CAST(content->>'date' AS timestamp with time zone) END) >= ?2
-            AND (CASE WHEN content->>'date' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'date' AS double precision)) ELSE CAST(content->>'date' AS timestamp with time zone) END) <= ?3
+            AND (CASE
+                WHEN content->>'notificationDate' IS NOT NULL THEN
+                    CASE WHEN content->>'notificationDate' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'notificationDate' AS double precision)) ELSE CAST(content->>'notificationDate' AS timestamp with time zone) END
+                ELSE
+                    CASE WHEN content->>'date' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'date' AS double precision)) ELSE CAST(content->>'date' AS timestamp with time zone) END
+                END) >= ?2
+            AND (CASE
+                WHEN content->>'notificationDate' IS NOT NULL THEN
+                    CASE WHEN content->>'notificationDate' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'notificationDate' AS double precision)) ELSE CAST(content->>'notificationDate' AS timestamp with time zone) END
+                ELSE
+                    CASE WHEN content->>'date' ~ '^[0-9.]+$' THEN to_timestamp(CAST(content->>'date' AS double precision)) ELSE CAST(content->>'date' AS timestamp with time zone) END
+                END) <= ?3
             """, nativeQuery = true)
     List<TournamentMatchEntity> getMatchesToNotify(String tournamentId, Instant minBound, Instant maxBound);
 }

@@ -18,6 +18,8 @@ public class TournamentPhase implements Serializable {
     Integer draftAvailableBeforeMatchMinutes;
     Integer draftJoinDeadlineAfterOpenMinutes;
     Integer matchStartDeadlineAfterMatchMinutes;
+    Integer draftTurnDurationSeconds;
+    String draftModel;
 
     public boolean isEffectiveAutoRefereeing() {
         return autoRefereeing != null && autoRefereeing;
@@ -37,5 +39,13 @@ public class TournamentPhase implements Serializable {
 
     public int getEffectiveMatchStartDeadlineAfterMatchMinutes() {
         return matchStartDeadlineAfterMatchMinutes != null ? matchStartDeadlineAfterMatchMinutes : 15;
+    }
+
+    public int getEffectiveDraftTurnDurationSeconds() {
+        return draftTurnDurationSeconds != null ? draftTurnDurationSeconds : 45;
+    }
+
+    public String getEffectiveDraftModel() {
+        return draftModel != null ? draftModel : "WAKFU_CHAMPIONS";
     }
 }

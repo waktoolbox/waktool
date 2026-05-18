@@ -30,6 +30,29 @@ public enum DraftDefaultModels {
                     new DraftAction(TEAM_B, PICK, true, false),
             };
         }
+    },
+    WAKFU_CHAMPIONS() {
+        @Override
+        public DraftAction[] getActions() {
+            return new DraftAction[]{
+                    new DraftAction(TEAM_A, BAN, true, true),
+                    new DraftAction(TEAM_B, BAN, true, true),
+                    new DraftAction(TEAM_A, PICK, true, false),
+                    new DraftAction(TEAM_B, PICK, true, false),
+                    new DraftAction(TEAM_B, BAN, true, true),
+                    new DraftAction(TEAM_A, BAN, true, true),
+                    new DraftAction(TEAM_B, PICK, true, false),
+                    new DraftAction(TEAM_A, PICK, true, false),
+                    new DraftAction(TEAM_B, PICK, true, false),
+                    new DraftAction(TEAM_A, PICK, true, false),
+                    new DraftAction(TEAM_A, BAN, true, true),
+                    new DraftAction(TEAM_B, BAN, true, true),
+                    new DraftAction(TEAM_A, PICK, true, false),
+                    new DraftAction(TEAM_B, PICK, true, false),
+                    new DraftAction(TEAM_B, PICK, true, false),
+                    new DraftAction(TEAM_A, PICK, true, false),
+            };
+        }
     };
 
     public abstract DraftAction[] getActions();
