@@ -99,7 +99,7 @@ VALUES (
     '{
       "id": "wc-demo",
       "name": "WAKFU Champions – Ignemikhal''s Fury (Demo)",
-      "logo": "https://raw.githubusercontent.com/waktoolbox/waktool/refs/heads/master/front/public/images/wc/2026.jpg",
+      "logo": "https://www.waktool.com/images/wc/2026.jpg",
       "discordLink": "https://discord.gg/RamVFndNTG",
       "server": "Beta",
       "level": "230",
