@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {useAtomState} from "@zedux/react";
@@ -62,6 +62,7 @@ export default function TournamentAdminControlTab({tournament, active}: Tourname
     const [standings, setStandings] = useState<TournamentStandingsResponse | null>(null);
     const [currentPhaseMatches, setCurrentPhaseMatches] = useState<TournamentMatchModel[]>([]);
     const [loadingOverview, setLoadingOverview] = useState(false);
+    const loadGenerationRef = useRef(0);
 
     useEffect(() => {
         if (!id || !active) return;
@@ -72,42 +73,55 @@ export default function TournamentAdminControlTab({tournament, active}: Tourname
         if (!id) return;
         setLoadingOverview(true);
 
-        getStandings(id).then(standingsResponse => {
-            setStandings(standingsResponse);
+        // Increment generation so any in-flight older call is ignored when it resolves
+        const generation = ++loadGenerationRef.current;
 
-            if (standingsResponse?.phases?.length > 0) {
-                const currentPhaseIndex = standingsResponse.phases.length;
+        getStandings(id).then(async standingsResponse => {
+            if (generation !== loadGenerationRef.current) return;
 
-                postMatchesSearch(id, {type: "PLANNING", phase: currentPhaseIndex}).then(planningRes => {
-                    postMatchesSearch(id, {type: "RESULTS", phase: currentPhaseIndex}).then(resultsRes => {
-                        const allMatches = [
-                            ...(planningRes?.matches || []),
-                            ...(resultsRes?.matches || [])
-                        ];
-
-                        setCurrentPhaseMatches(allMatches);
-
-                        const teamIds = new Set<string>();
-                        for (const m of allMatches) {
-                            if (m.teamA) teamIds.add(m.teamA);
-                            if (m.teamB) teamIds.add(m.teamB);
-                        }
-                        const toLoad = Array.from(teamIds).filter(tid => !teams.get(tid));
-                        if (toLoad.length > 0) {
-                            teamSearch(id, toLoad).then(res => {
-                                const ltc = new Map(teams);
-                                for (const team of res.teams) {
-                                    ltc.set(team.id, team.name);
-                                }
-                                setTeamsCache(ltc);
-                            });
-                        }
-                        setLoadingOverview(false);
-                    });
-                });
-            } else {
+            if (!standingsResponse?.phases?.length) {
+                setStandings(standingsResponse);
                 setLoadingOverview(false);
+                return;
             }
+
+            const currentPhaseIndex = standingsResponse.phases.length;
+
+            const [planningRes, resultsRes] = await Promise.all([
+                postMatchesSearch(id, {type: "PLANNING", phase: currentPhaseIndex}),
+                postMatchesSearch(id, {type: "RESULTS", phase: currentPhaseIndex}),
+            ]);
+
+            if (generation !== loadGenerationRef.current) return;
+
+            const allMatches = [
+                ...(planningRes?.matches || []),
+                ...(resultsRes?.matches || []),
+            ];
+
+            // Batch both updates in the same render so currentRound and
+            // currentPhaseMatches are always in sync (avoids a flash of
+            // empty matches when standings has already moved to the new round
+            // but the matches state still holds data from the previous round).
+            setStandings(standingsResponse);
+            setCurrentPhaseMatches(allMatches);
+
+            const teamIds = new Set<string>();
+            for (const m of allMatches) {
+                if (m.teamA) teamIds.add(m.teamA);
+                if (m.teamB) teamIds.add(m.teamB);
+            }
+            const toLoad = Array.from(teamIds).filter(tid => !teams.get(tid));
+            if (toLoad.length > 0) {
+                teamSearch(id, toLoad).then(res => {
+                    const ltc = new Map(teams);
+                    for (const team of res.teams) {
+                        ltc.set(team.id, team.name);
+                    }
+                    setTeamsCache(ltc);
+                });
+            }
+            setLoadingOverview(false);
         });
     }
 

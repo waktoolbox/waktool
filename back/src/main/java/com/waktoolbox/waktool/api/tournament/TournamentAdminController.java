@@ -146,7 +146,14 @@ public class TournamentAdminController {
         TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
         if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
 
+        boolean wasAlreadyDone = match.isDone();
         _matchCompletionService.forceCompleteMatch(tournamentId, match, matchResultRequest.winner());
+
+        // If the match was already completed, forceCompleteMatch added stats on top of existing ones.
+        // A full recompute ensures stats are always consistent regardless of how many times this is called.
+        if (wasAlreadyDone) {
+            _tournamentStatsController.recomputeStats(tournamentId);
+        }
 
         return ResponseEntity.ok(new SuccessResponse(true));
     }
