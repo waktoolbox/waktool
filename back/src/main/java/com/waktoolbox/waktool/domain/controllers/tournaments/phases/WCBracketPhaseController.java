@@ -9,6 +9,7 @@ import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchR
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -166,6 +167,12 @@ public class WCBracketPhaseController extends PhaseTypeController {
             match.setRounds(createDraftRounds(match, bo, roundDate));
             match.setMatchIndex(matchIndex++);
 
+            // Set notification date to draft open time for bracket phase (notify before draft, not match)
+            if (roundDate != null) {
+                int draftBeforeMinutes = getCurrentPhase().getEffectiveDraftAvailableBeforeMatchMinutes();
+                match.setNotificationDate(roundDate.minus(15 + draftBeforeMinutes, ChronoUnit.MINUTES));
+            }
+
             phaseData.getMatches().add(match.getId());
             matchesToSave.add(match);
         }
@@ -186,6 +193,10 @@ public class WCBracketPhaseController extends PhaseTypeController {
         finaleMatch.setDate(roundDate);
         finaleMatch.setRounds(createDraftRounds(finaleMatch, finaleBo, roundDate));
         finaleMatch.setMatchIndex(0);
+        if (roundDate != null) {
+            int draftBeforeMinutes = getCurrentPhase().getEffectiveDraftAvailableBeforeMatchMinutes();
+            finaleMatch.setNotificationDate(roundDate.minus(15 + draftBeforeMinutes, ChronoUnit.MINUTES));
+        }
         phaseData.getMatches().add(finaleMatch.getId());
         matchesToSave.add(finaleMatch);
 
@@ -209,6 +220,10 @@ public class WCBracketPhaseController extends PhaseTypeController {
             petiteFinaleMatch.setDate(petiteFinaleDate);
             petiteFinaleMatch.setThirdPlaceMatch(Boolean.TRUE);
             petiteFinaleMatch.setRounds(createDraftRounds(petiteFinaleMatch, petiteFinaleBo, petiteFinaleDate));
+            if (petiteFinaleDate != null) {
+                int draftBeforeMinutes = getCurrentPhase().getEffectiveDraftAvailableBeforeMatchMinutes();
+                finaleMatch.setNotificationDate(petiteFinaleDate.minus(15 + draftBeforeMinutes, ChronoUnit.MINUTES));
+            }
             phaseData.getMatches().add(petiteFinaleMatch.getId());
             matchesToSave.add(petiteFinaleMatch);
         }
@@ -302,9 +317,9 @@ public class WCBracketPhaseController extends PhaseTypeController {
             int draftJoinAfterMinutes = currentPhase.getEffectiveDraftJoinDeadlineAfterOpenMinutes();
             int matchDeadlineAfterMinutes = currentPhase.getEffectiveMatchStartDeadlineAfterMatchMinutes();
 
-            draftDate = matchDate.minusSeconds((long) draftBeforeMinutes * 60);
-            draftJoinDeadline = draftDate.plusSeconds((long) draftJoinAfterMinutes * 60);
-            matchStartDeadline = matchDate.plusSeconds((long) matchDeadlineAfterMinutes * 60);
+            draftDate = matchDate.minus(draftBeforeMinutes, ChronoUnit.MINUTES);
+            draftJoinDeadline = draftDate.plus(draftJoinAfterMinutes, ChronoUnit.MINUTES);
+            matchStartDeadline = matchDate.plus(matchDeadlineAfterMinutes, ChronoUnit.MINUTES);
         }
 
         for (int round = 0; round < bo; round++) {

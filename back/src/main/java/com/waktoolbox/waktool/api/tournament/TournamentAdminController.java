@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 
@@ -127,7 +128,9 @@ public class TournamentAdminController {
         TournamentMatch match = _tournamentMatchRepository.getMatch(matchId);
         if (match == null) return ResponseEntity.ok(new SuccessResponse(false));
 
-        match.setDate(Instant.parse(matchDateRequest.date()));
+        Instant matchDate = Instant.parse(matchDateRequest.date());
+        match.setDate(matchDate);
+        match.setNotificationDate(matchDate.minus(15, ChronoUnit.MINUTES));
         _tournamentMatchRepository.save(tournamentId, match);
 
         return ResponseEntity.ok(new SuccessResponse(true));

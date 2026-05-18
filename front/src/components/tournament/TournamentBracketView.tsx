@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {useLoaderData, useParams} from "react-router-dom";
+import {Link, useLoaderData, useParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -195,7 +195,18 @@ export default function TournamentBracketView() {
                                                 <TableCell sx={{
                                                     color: '#e0e0e0',
                                                     fontWeight: 'bold'
-                                                }}>{team.name}</TableCell>
+                                                }}>
+                                                    <Link to={`/tournament/${id}/tab/2/team/${team.id}`}
+                                                          style={{
+                                                              color: '#e0e0e0',
+                                                              textDecoration: 'none',
+                                                          }}
+                                                          onMouseEnter={e => (e.currentTarget.style.color = '#00ead1')}
+                                                          onMouseLeave={e => (e.currentTarget.style.color = '#e0e0e0')}
+                                                    >
+                                                        {team.name}
+                                                    </Link>
+                                                </TableCell>
                                                 <TableCell align="center"
                                                            sx={{color: '#4caf50'}}>{team.wins}</TableCell>
                                                 <TableCell align="center"

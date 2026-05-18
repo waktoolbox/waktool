@@ -8,11 +8,14 @@ import com.waktoolbox.waktool.domain.controllers.draft.DraftManager;
 import com.waktoolbox.waktool.domain.models.Account;
 import com.waktoolbox.waktool.domain.models.drafts.*;
 import com.waktoolbox.waktool.domain.models.tournaments.Team;
+import com.waktoolbox.waktool.domain.models.tournaments.Tournament;
+import com.waktoolbox.waktool.domain.models.tournaments.TournamentPhase;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.MatchesSearchParameters;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatch;
 import com.waktoolbox.waktool.domain.models.tournaments.matches.TournamentMatchRound;
 import com.waktoolbox.waktool.domain.repositories.AccountRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentMatchRepository;
+import com.waktoolbox.waktool.domain.repositories.TournamentRepository;
 import com.waktoolbox.waktool.domain.repositories.TournamentTeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,7 @@ public class TournamentMatchController {
     private final AccountRepository _accountRepository;
     private final DraftManager _draftManager;
     private final TournamentMatchRepository _repository;
+    private final TournamentRepository _tournamentRepository;
     private final TournamentTeamRepository _teamRepository;
 
     @PostMapping("/tournaments/{tournamentId}/matches-search")
@@ -104,8 +108,26 @@ public class TournamentMatchController {
 
         DraftConfiguration configuration = new DraftConfiguration();
         configuration.setProvidedByServer(true);
-        // TODO late pass through config
-        configuration.setActions(DraftDefaultModels.WAKFU_WARRIORS.getActions());
+
+        // Resolve draft model and timer from tournament phase config
+        DraftDefaultModels draftModel = DraftDefaultModels.WAKFU_CHAMPIONS;
+        int turnDurationSeconds = 45;
+        Tournament tournament = _tournamentRepository.getTournament(tournamentId).orElse(null);
+        if (tournament != null && match.getPhase() != null) {
+            TournamentPhase phase = tournament.getPhases().stream()
+                    .filter(p -> p.getPhase() == match.getPhase())
+                    .findFirst().orElse(null);
+            if (phase != null) {
+                try {
+                    draftModel = DraftDefaultModels.valueOf(phase.getEffectiveDraftModel());
+                } catch (IllegalArgumentException ignored) {
+                    // fallback to WAKFU_CHAMPIONS
+                }
+                turnDurationSeconds = phase.getEffectiveDraftTurnDurationSeconds();
+            }
+        }
+        configuration.setActions(draftModel.getActions());
+        configuration.setTurnDurationSeconds(turnDurationSeconds);
 
         Draft draft = new Draft();
         draft.setId(matchRound.getDraftId());

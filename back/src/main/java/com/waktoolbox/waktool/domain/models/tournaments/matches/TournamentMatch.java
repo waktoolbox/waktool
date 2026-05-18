@@ -24,4 +24,5 @@ public class TournamentMatch implements Serializable {
     String streamer;
     Boolean thirdPlaceMatch;
     Integer matchIndex;
+    Instant notificationDate;
 }

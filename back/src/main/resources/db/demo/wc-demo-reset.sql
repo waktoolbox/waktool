@@ -98,12 +98,12 @@ VALUES (
     'wc-demo',
     '{
       "id": "wc-demo",
-      "name": "WAKFU Champions - Demo",
+      "name": "WAKFU Champions – Ignemikhal''s Fury (Demo)",
       "logo": "https://raw.githubusercontent.com/waktoolbox/waktool/refs/heads/master/front/public/images/wc/2026.jpg",
       "discordLink": "https://discord.gg/RamVFndNTG",
       "server": "Beta",
       "level": "230",
-      "startDate": "2026-05-28T16:00:00Z",
+      "startDate": "2026-05-20T14:00:00Z",
       "endDate": "2026-06-21T20:00:00Z",
       "mustRegisterTeamComposition": true,
       "requiredBreeds": 7,
@@ -113,10 +113,10 @@ VALUES (
       "teamSize": "5",
       "teamNumber": "64",
       "draftAvailableMinutesBeforeMatch": 60,
-      "description": "Tournament demo for WAKFU Champions - use the Demo admin tab to control state.",
-      "rules": "Demo rules.",
+      "description": "Tournament demo for WAKFU Champions – Ignemikhal''s Fury. Use the Demo admin tab to control state.",
+      "rules": "Demo rules",
       "rewards": "Demo rewards",
-      "maps": [968, 969, 970, 971, 972, 973, 975, 976],
+      "maps": [968, 969, 970, 971, 972, 973, 974, 975, 976, 1479, 1482, 1485],
       "admins": ["166226448598695936", "144187368952299529", "234710417123835905", "1034079924492972032", "295506634208313345", "1000840852052131891"],
       "referees": [],
       "streamers": [],
@@ -135,9 +135,9 @@ VALUES (
           "mustUseDifferentMapsPerRound": true,
           "matchStartDeadlineAfterMatchMinutes": 15,
           "roundModel": [
-            {"round": 1, "bo": 1},
-            {"round": 2, "bo": 1},
-            {"round": 3, "bo": 1}
+            {"round": 1, "bo": 1, "date": "2026-05-30T16:00:00Z"},
+            {"round": 2, "bo": 1, "date": "2026-05-30T19:00:00Z"},
+            {"round": 3, "bo": 1, "date": "2026-05-31T16:00:00Z"}
           ]
         },
         {
@@ -149,13 +149,15 @@ VALUES (
           "draftAvailableBeforeMatchMinutes": 60,
           "draftJoinDeadlineAfterOpenMinutes": 15,
           "matchStartDeadlineAfterMatchMinutes": 15,
+          "draftTurnDurationSeconds": 45,
+          "draftModel": "WAKFU_CHAMPIONS",
           "roundModel": [
-            {"round": 1, "bo": 1},
-            {"round": 2, "bo": 1},
-            {"round": 3, "bo": 3},
-            {"round": 4, "bo": 3},
-            {"round": 5, "bo": 5},
-            {"round": 6, "bo": 3}
+            {"round": 1, "bo": 1, "date": "2026-06-06T17:00:00Z"},
+            {"round": 2, "bo": 1, "date": "2026-06-07T17:00:00Z"},
+            {"round": 3, "bo": 3, "date": "2026-06-13T17:00:00Z"},
+            {"round": 4, "bo": 3, "date": "2026-06-14T17:00:00Z"},
+            {"round": 5, "bo": 5, "date": "2026-06-21T15:00:00Z"},
+            {"round": 6, "bo": 3, "date": "2026-06-20T17:00:00Z"}
           ]
         }
       ]
