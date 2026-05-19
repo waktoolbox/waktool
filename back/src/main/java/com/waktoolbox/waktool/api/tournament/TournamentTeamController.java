@@ -142,6 +142,7 @@ public class TournamentTeamController {
 
         Team createdTeam = _tournamentTeamRepository.createTeam(team);
 
+        _discordRoleService.syncTeamRole(tournamentId, createdTeam);
         _applicationRepository.deleteUserApplications(tournamentId, leader);
 
         return new PostTeamResponse(true, null, createdTeam);
