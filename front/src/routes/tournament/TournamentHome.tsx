@@ -85,14 +85,14 @@ export default function TournamentHome() {
                 </div>
             </Grid>
 
-            <Grid container spacing={2} sx={{width: {xs: '100%', md: '80%'}, margin: 'auto'}}>
+            <Grid container spacing={2} sx={{width: {xs: '100%'}, margin: 'auto'}}>
                 <Grid item xl={4} xs={12} sx={{margin: 'auto', mb: 2}}>
                     <Typography sx={{mb: 2}} variant="h5">
                         <Trans i18nKey="tournament.home.featured.title"
                                components={{span: <span className="firstWord"/>}}/>
                     </Typography>
                     {home && home.featuredTournament && (
-                        <TournamentCardView tournament={home.featuredTournament} width={400} height={500}
+                        <TournamentCardView tournament={home.featuredTournament} width={600} height={500}
                                             logoHeight={350}/>
                     )}
                     {(!home || !home.featuredTournament) && (
@@ -100,7 +100,7 @@ export default function TournamentHome() {
                             mr: "auto",
                             ml: "auto",
                             height: '500px',
-                            width: '400px',
+                            width: '600px',
                             borderRadius: "8px",
                             boxShadow: "5px 5px 15px -10px #000000"
                         }}/>
