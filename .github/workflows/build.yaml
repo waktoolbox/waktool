@@ -78,10 +78,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          if [ -n "${SONAR_TOKEN:-}" ] && curl -fsS -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/authentication/validate" | grep -q '"valid"[[:space:]]*:[[:space:]]*true'; then
-            set -- org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=waktoolbox_waktool -Dsonar.scanner.skipJreProvisioning=true
-          else
-            echo "SONAR_TOKEN is not set or invalid; skipping SonarCloud analysis."
+          if [ -z "${SONAR_TOKEN:-}" ]; then
+            echo "SONAR_TOKEN is not set; skipping SonarCloud analysis."
             set --
+          else
+            if sonar_validation_response="$(curl -fsS -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/authentication/validate")" && echo "$sonar_validation_response" | grep -q '"valid"[[:space:]]*:[[:space:]]*true'; then
+              set -- org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=waktoolbox_waktool -Dsonar.scanner.skipJreProvisioning=true
+            else
+              if [ -z "${sonar_validation_response:-}" ]; then
+                echo "SONAR_TOKEN validation request failed; skipping SonarCloud analysis."
+              else
+                echo "SONAR_TOKEN is invalid; skipping SonarCloud analysis."
+              fi
+              set --
+            fi
           fi
           mvn -B verify "$@"
