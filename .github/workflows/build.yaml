@@ -79,7 +79,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           if [ -n "${SONAR_TOKEN:-}" ]; then
-            set -- org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=waktoolbox_waktool
+            set -- org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=waktoolbox_waktool -Dsonar.scanner.skipJreProvisioning=true
           else
             echo "SONAR_TOKEN is not set; skipping SonarCloud analysis."
             set --
