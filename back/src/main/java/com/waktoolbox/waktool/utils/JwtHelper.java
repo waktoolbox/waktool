@@ -52,6 +52,7 @@ public class JwtHelper {
 
     public Claims decodeJwt(String token) throws RuntimeException {
         Claims payload = Jwts.parser()
+                .clock(() -> Date.from(clock.instant()))
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
