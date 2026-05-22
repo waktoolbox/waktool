@@ -66,22 +66,8 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
       - name: Build & verify
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          if [ -n "${SONAR_TOKEN:-}" ]; then
-            set -- org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=waktoolbox_waktool -Dsonar.scanner.skipJreProvisioning=true
-          else
-            echo "SONAR_TOKEN is not set; skipping SonarCloud analysis."
-            set --
-          fi
           mvn -B verify "$@"
