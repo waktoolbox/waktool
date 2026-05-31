@@ -13,12 +13,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Service
 @RequiredArgsConstructor
 public class DraftManager {
     private final Map<String, DraftController> _currentDrafts = new HashMap<>();
     private final Map<String, DraftUser> _users = new HashMap<>();
+    private final ScheduledExecutorService _sharedScheduler = Executors.newScheduledThreadPool(2);
     private final DraftRepository _draftRepository;
     private final DraftNotifierFactory _draftNotifierFactory;
     private final TournamentMatchRepository _matchRepository;
@@ -29,6 +32,7 @@ public class DraftManager {
         _currentDrafts.entrySet().removeIf(entry -> {
             if (entry.getValue().isExpired()) {
                 entry.getValue().shutdown();
+                entry.getValue().getDraft().getUsers().forEach(u -> removeDraftFromUser(u, entry.getKey()));
                 return true;
             }
             return false;
@@ -55,7 +59,7 @@ public class DraftManager {
 
         if (!canAccessDraft(draft)) return null;
 
-        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()), _sharedScheduler);
         setupControllerCallbacks(controller);
         controller.restore();
         _currentDrafts.put(draft.getId(), controller);
@@ -75,7 +79,7 @@ public class DraftManager {
         draft.setTeamAInfo(new DraftTeamInfo("1", "Team A"));
         draft.setTeamBInfo(new DraftTeamInfo("2", "Team B"));
 
-        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()), _sharedScheduler);
         setupControllerCallbacks(controller);
         _currentDrafts.put(draft.getId(), controller);
         return joinDraft(user, draft.getId());
@@ -98,7 +102,7 @@ public class DraftManager {
     }
 
     public void createDraftByServer(Draft draft) {
-        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()));
+        DraftController controller = new DraftController(draft, _draftNotifierFactory.create(draft.getId()), _sharedScheduler);
         setupControllerCallbacks(controller);
         _currentDrafts.put(draft.getId(), controller);
         saveDraft(controller);

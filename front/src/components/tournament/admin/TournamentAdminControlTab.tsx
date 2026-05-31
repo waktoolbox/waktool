@@ -28,6 +28,7 @@ import {
 } from "../../../chore/tournament.ts";
 import {
     adminSetMatchWinner,
+    getMatchIdsWithReports,
     getStandings,
     postGoToNextPhase,
     postMatchesSearch,
@@ -35,6 +36,7 @@ import {
     recomputeDiscordRoles,
     teamSearch
 } from "../../../services/tournament.ts";
+import MatchReportDialog from "./MatchReportDialog.tsx";
 import {teamCacheState} from "../../../atoms/atoms-tournament.ts";
 import {snackState} from "../../../atoms/atoms-snackbar.ts";
 
@@ -61,6 +63,7 @@ export default function TournamentAdminControlTab({tournament, active}: Tourname
 
     const [standings, setStandings] = useState<TournamentStandingsResponse | null>(null);
     const [currentPhaseMatches, setCurrentPhaseMatches] = useState<TournamentMatchModel[]>([]);
+    const [matchIdsWithReports, setMatchIdsWithReports] = useState<Set<string>>(new Set());
     const [loadingOverview, setLoadingOverview] = useState(false);
     const loadGenerationRef = useRef(0);
 
@@ -87,9 +90,10 @@ export default function TournamentAdminControlTab({tournament, active}: Tourname
 
             const currentPhaseIndex = standingsResponse.phases.length;
 
-            const [planningRes, resultsRes] = await Promise.all([
+            const [planningRes, resultsRes, reportMatchIds] = await Promise.all([
                 postMatchesSearch(id, {type: "PLANNING", phase: currentPhaseIndex}),
                 postMatchesSearch(id, {type: "RESULTS", phase: currentPhaseIndex}),
+                getMatchIdsWithReports(id),
             ]);
 
             if (generation !== loadGenerationRef.current) return;
@@ -105,6 +109,7 @@ export default function TournamentAdminControlTab({tournament, active}: Tourname
             // but the matches state still holds data from the previous round).
             setStandings(standingsResponse);
             setCurrentPhaseMatches(allMatches);
+            setMatchIdsWithReports(new Set(reportMatchIds));
 
             const teamIds = new Set<string>();
             for (const m of allMatches) {
@@ -324,6 +329,9 @@ export default function TournamentAdminControlTab({tournament, active}: Tourname
                                             </Box>
                                         </Grid>
                                         <Grid item xs={6} sx={{textAlign: 'right'}}>
+                                            {matchIdsWithReports.has(match.id!) && (
+                                                <MatchReportDialog tournamentId={id!} matchId={match.id!}/>
+                                            )}
                                             <Button
                                                 size="small"
                                                 variant="text"

@@ -153,6 +153,8 @@
         "pending": "en attente",
         "roundMatches": "Matches du round {{round}}",
         "viewMatch": "Voir le match",
+        "viewReport": "Voir le report",
+        "noReports": "Aucun report pour ce match",
         "nextRound": "Suivant : Round {{round}}",
         "nextPhase": "Suivant : Phase {{phase}} - {{type}}",
         "noNextStep": "Aucune étape suivante disponible",

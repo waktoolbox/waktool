@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,6 +29,11 @@ public class MatchReportRepositoryImpl implements MatchReportRepository {
     @Override
     public List<MatchReport> findDisputedByTournamentId(String tournamentId) {
         return _repository.findAllByTournamentIdAndDisputedTrue(tournamentId).stream().map(this::toDomain).toList();
+    }
+
+    @Override
+    public Set<String> findMatchIdsWithReports(String tournamentId) {
+        return _repository.findDistinctMatchIdsByTournamentId(tournamentId);
     }
 
     @Override

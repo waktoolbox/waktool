@@ -395,7 +395,7 @@ export default function TournamentMatchView() {
     function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) { setScreenshotBase64(undefined); setScreenshotName(undefined); return; }
-        if (file.size > 2 * 1024 * 1024) {
+        if (file.size > 5 * 1024 * 1024) {
             setSnackValue({ severity: "error", message: t('tournament.match.report.screenshotTooBig') as string, open: true });
             e.target.value = "";
             return;

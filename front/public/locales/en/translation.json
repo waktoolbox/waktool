@@ -153,6 +153,8 @@
         "pending": "pending",
         "roundMatches": "Round {{round}} matches",
         "viewMatch": "View match",
+        "viewReport": "View report",
+        "noReports": "No reports for this match",
         "nextRound": "Next: Round {{round}}",
         "nextPhase": "Next: Phase {{phase}} - {{type}}",
         "noNextStep": "No next step available",

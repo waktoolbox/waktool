@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -21,6 +23,7 @@ public class DraftSteps implements DraftNotifier {
     private Draft _draft;
     private DraftController _controller;
     private boolean _lastActionSuccess;
+    private final ScheduledExecutorService _scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @ParameterType("A|B")
     public DraftTeam team(String team) {
@@ -40,7 +43,7 @@ public class DraftSteps implements DraftNotifier {
         _draft = new Draft();
         _draft.setConfiguration(configuration);
 
-        _controller = new DraftController(_draft, this);
+        _controller = new DraftController(_draft, this, _scheduler);
     }
 
     @Given("a Wakfu Warrior draft with a {int}s timer")
@@ -52,7 +55,7 @@ public class DraftSteps implements DraftNotifier {
         _draft = new Draft();
         _draft.setConfiguration(configuration);
 
-        _controller = new DraftController(_draft, this);
+        _controller = new DraftController(_draft, this, _scheduler);
     }
 
     @Given("draft is now server provided {word}")

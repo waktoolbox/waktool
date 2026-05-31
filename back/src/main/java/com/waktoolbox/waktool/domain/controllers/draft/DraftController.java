@@ -3,19 +3,16 @@ package com.waktoolbox.waktool.domain.controllers.draft;
 import com.waktoolbox.waktool.domain.models.Breeds;
 import com.waktoolbox.waktool.domain.models.drafts.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-@RequiredArgsConstructor
 @Accessors(prefix = "_")
 public class DraftController {
     private static final int MAX_TEAM_SIZE = 6;
@@ -23,11 +20,17 @@ public class DraftController {
     @Getter
     private final Draft _draft;
     private final DraftNotifier _notifier;
+    private final ScheduledExecutorService _scheduler;
     private final Instant _startDate = Instant.now();
 
-    private final ScheduledExecutorService _scheduler = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> _timerTask;
     private final Random _random = new Random();
+
+    public DraftController(Draft draft, DraftNotifier notifier, ScheduledExecutorService scheduler) {
+        _draft = draft;
+        _notifier = notifier;
+        _scheduler = scheduler;
+    }
 
     @Setter
     private Runnable _onDraftUpdatedCallback;
@@ -123,7 +126,7 @@ public class DraftController {
         } else {
             _draft.setTurnExpirationTime(null);
             _notifier.onTimerUpdated(null);
-            _scheduler.shutdown();
+            if (_timerTask != null) _timerTask.cancel(false);
         }
 
         if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();
@@ -189,7 +192,7 @@ public class DraftController {
     }
 
     public void shutdown() {
-        _scheduler.shutdownNow();
+        if (_timerTask != null) _timerTask.cancel(false);
     }
 
     // *****************************************************************************************************************
@@ -244,7 +247,7 @@ public class DraftController {
         } else {
             _draft.setTurnExpirationTime(null);
             _notifier.onTimerUpdated(null);
-            _scheduler.shutdown();
+            if (_timerTask != null) _timerTask.cancel(false);
         }
 
         if (_onDraftUpdatedCallback != null) _onDraftUpdatedCallback.run();

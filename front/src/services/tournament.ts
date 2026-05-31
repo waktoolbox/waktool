@@ -152,6 +152,10 @@ export async function getMatchReports(tournamentId: string, matchId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/matches/${matchId}/reports`);
 }
 
+export async function getMatchIdsWithReports(tournamentId: string): Promise<string[]> {
+    return await gfetch(`/api/tournaments/${tournamentId}/match-ids-with-reports`) || [];
+}
+
 export async function getDisputes(tournamentId: string) {
     return await gfetch(`/api/tournaments/${tournamentId}/disputes`);
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -167,6 +168,20 @@ public class TournamentMatchReportController {
         }
 
         return ResponseEntity.ok(new MatchReportsResponse(reports));
+    }
+
+    @GetMapping("/tournaments/{tournamentId}/match-ids-with-reports")
+    public ResponseEntity<Set<String>> getMatchIdsWithReports(
+            @RequestAttribute Optional<String> discordId,
+            @PathVariable String tournamentId
+    ) {
+        if (discordId.isEmpty()) return ResponseEntity.status(401).build();
+        boolean isAdmin = _tournamentRepository.isAdmin(tournamentId, discordId.get());
+        boolean isReferee = _tournamentRepository.isReferee(tournamentId, discordId.get());
+        if (!isAdmin && !isReferee) return ResponseEntity.status(403).build();
+
+        Set<String> matchIds = _matchReportRepository.findMatchIdsWithReports(tournamentId);
+        return ResponseEntity.ok(matchIds);
     }
 
     /**
