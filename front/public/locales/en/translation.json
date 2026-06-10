@@ -119,6 +119,7 @@
       "teamB": "Team B",
       "validateMatchAndSendStats": "Validate match and compute stats",
       "validateMatchDate": "Validate match date",
+      "validateRoundDates": "Validate round dates",
       "viewReports": "View reports",
       "resolveDispute": "Resolve dispute",
       "disputeAlert": "Dispute",

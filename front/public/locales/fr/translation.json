@@ -119,6 +119,7 @@
       "teamB": "Team B",
       "validateMatchAndSendStats": "Valider le match et calculer les stats",
       "validateMatchDate": "Valider la date du match",
+      "validateRoundDates": "Valider les dates du round",
       "viewReports": "Voir les reports",
       "resolveDispute": "Résoudre le litige",
       "disputeAlert": "Litige",

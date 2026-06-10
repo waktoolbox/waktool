@@ -40,6 +40,7 @@ import {
     refereeRoundSendStats,
     refereeSetMatchDate,
     refereeSetMeAsReferee,
+    refereeSetRoundDates,
     refereeValidateMatchResult,
     reportRoundResult,
     streamerRemoveStreamer,
@@ -108,6 +109,10 @@ export default function TournamentMatchView() {
     const [selectedWinner, setSelectedWinner] = useState<string | undefined>(undefined);
     const [disputeText, setDisputeText] = useState("");
 
+    const [roundDraftDate, setRoundDraftDate] = useState<Dayjs | null>(null);
+    const [roundDraftJoinDeadline, setRoundDraftJoinDeadline] = useState<Dayjs | null>(null);
+    const [roundMatchStartDeadline, setRoundMatchStartDeadline] = useState<Dayjs | null>(null);
+
     useEffect(() => {
         if (!matchId) return;
         getMatch(id || "", matchId).then(response => {
@@ -164,6 +169,9 @@ export default function TournamentMatchView() {
 
     useEffect(() => {
         setPresentPlayers(new Set([...(fight?.history?.players || [])]));
+        setRoundDraftDate(fight?.draftDate ? dayjs(fight.draftDate) : null);
+        setRoundDraftJoinDeadline(fight?.draftJoinDeadline ? dayjs(fight.draftJoinDeadline) : null);
+        setRoundMatchStartDeadline(fight?.matchStartDeadline ? dayjs(fight.matchStartDeadline) : null);
     }, [fight])
 
     useEffect(() => {
@@ -311,6 +319,42 @@ export default function TournamentMatchView() {
         refereeRoundResetDraft(id || "", matchId || "", tab).then(response => {
             notificationPopup(response);
             window.location.reload();
+        });
+    }
+
+    function validateRoundDates() {
+        refereeSetRoundDates(
+            id || "",
+            matchId || "",
+            tab,
+            roundDraftDate?.toISOString(),
+            roundDraftJoinDeadline?.toISOString(),
+            roundMatchStartDeadline?.toISOString()
+        ).then(response => {
+            if (response.success) {
+                const updatedRounds = match?.rounds.map((r, idx) => {
+                    if (idx === tab) {
+                        return {
+                            ...r,
+                            draftDate: roundDraftDate?.toISOString(),
+                            draftJoinDeadline: roundDraftJoinDeadline?.toISOString(),
+                            matchStartDeadline: roundMatchStartDeadline?.toISOString()
+                        };
+                    }
+                    return r;
+                });
+                setMatch({
+                    ...match,
+                    rounds: updatedRounds
+                } as TournamentMatchModel);
+                setFight({
+                    ...fight,
+                    draftDate: roundDraftDate?.toISOString(),
+                    draftJoinDeadline: roundDraftJoinDeadline?.toISOString(),
+                    matchStartDeadline: roundMatchStartDeadline?.toISOString()
+                } as TournamentMatchRoundModel);
+            }
+            notificationPopup(response);
         });
     }
 
@@ -791,13 +835,13 @@ export default function TournamentMatchView() {
                                     </CardContent>
                                 </Card>
 
-                                {(fight.draftStartDate || fight.draftJoinDeadline || fight.matchStartDeadline) && (
+                                {(fight.draftDate || fight.draftJoinDeadline || fight.matchStartDeadline) && (
                                     <Card sx={{backgroundColor: '#213943', borderRadius: 3, mb: 2, textAlign: "start"}}>
                                         <CardContent sx={{"&:last-child": {pb: 2}}}>
                                             <Typography variant="h6" sx={{mb: 1}}>{t('tournament.match.roundDates.title')}</Typography>
-                                            {fight.draftStartDate && (
+                                            {fight.draftDate && (
                                                 <Typography variant="body2" sx={{color: '#8299a1', mb: 0.5}}>
-                                                    {t('tournament.match.roundDates.draftStart')}: {t('date', {date: Date.parse(fight.draftStartDate), formatParams: dateFormat})}
+                                                    {t('tournament.match.roundDates.draftStart')}: {t('date', {date: Date.parse(fight.draftDate), formatParams: dateFormat})}
                                                 </Typography>
                                             )}
                                             {fight.draftJoinDeadline && (
@@ -956,6 +1000,33 @@ export default function TournamentMatchView() {
                                                 <Tab key={index} label={t('tournament.match.matchNb', {nb: index + 1})}/>
                                             ))}
                                         </Tabs>
+                                    </Grid>
+                                </Grid>
+
+                                {/* ── Sub-section: Round dates ── */}
+                                <Typography variant="subtitle1" sx={{mb: 1, fontWeight: 500, color: '#8299a1'}}>{t('tournament.match.roundDates.title')}</Typography>
+                                <Grid container sx={{borderRadius: 3, mb: 2, p: 1, backgroundColor: '#162329', alignItems: 'center'}}>
+                                    <Grid item xs={4}>
+                                        <DateTimePicker sx={{m: 1}} label={t('tournament.match.roundDates.draftStart')}
+                                                        value={roundDraftDate}
+                                                        onChange={(newDate) => setRoundDraftDate(newDate)}
+                                                        views={['year', 'day', 'hours', 'minutes', 'seconds']}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <DateTimePicker sx={{m: 1}} label={t('tournament.match.roundDates.draftJoinDeadline')}
+                                                        value={roundDraftJoinDeadline}
+                                                        onChange={(newDate) => setRoundDraftJoinDeadline(newDate)}
+                                                        views={['year', 'day', 'hours', 'minutes', 'seconds']}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <DateTimePicker sx={{m: 1}} label={t('tournament.match.roundDates.matchStartDeadline')}
+                                                        value={roundMatchStartDeadline}
+                                                        onChange={(newDate) => setRoundMatchStartDeadline(newDate)}
+                                                        views={['year', 'day', 'hours', 'minutes', 'seconds']}/>
+                                    </Grid>
+                                    <Grid item xs={12} sx={{textAlign: 'right', mt: 1}}>
+                                        <Button variant="outlined" sx={{m: 1}}
+                                                onClick={() => validateRoundDates()}>{t('tournament.admin.validateRoundDates')}</Button>
                                     </Grid>
                                 </Grid>
 

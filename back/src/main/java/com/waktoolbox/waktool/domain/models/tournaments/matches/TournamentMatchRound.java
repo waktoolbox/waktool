@@ -1,5 +1,6 @@
 package com.waktoolbox.waktool.domain.models.tournaments.matches;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.waktoolbox.waktool.domain.models.drafts.DraftTeamResult;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import java.time.Instant;
 
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TournamentMatchRound implements Serializable {
     int map;
     int round;
@@ -17,7 +19,6 @@ public class TournamentMatchRound implements Serializable {
     String draftFirstPicker;
     String winner;
     Instant draftDate;
-    Instant draftStartDate;
     Instant draftJoinDeadline;
     Instant matchStartDeadline;
     DraftTeamResult teamADraft;

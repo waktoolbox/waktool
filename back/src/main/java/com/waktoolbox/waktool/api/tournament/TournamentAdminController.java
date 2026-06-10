@@ -323,9 +323,15 @@ public class TournamentAdminController {
         if (optMatchRound.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
 
         TournamentMatchRound matchRound = optMatchRound.get();
-        if (request.draftStartDate() != null) matchRound.setDraftStartDate(Instant.parse(request.draftStartDate()));
-        if (request.draftJoinDeadline() != null) matchRound.setDraftJoinDeadline(Instant.parse(request.draftJoinDeadline()));
-        if (request.matchStartDeadline() != null) matchRound.setMatchStartDeadline(Instant.parse(request.matchStartDeadline()));
+        if (request.draftStartDate() != null) {
+            matchRound.setDraftDate(request.draftStartDate().isBlank() ? null : Instant.parse(request.draftStartDate()));
+        }
+        if (request.draftJoinDeadline() != null) {
+            matchRound.setDraftJoinDeadline(request.draftJoinDeadline().isBlank() ? null : Instant.parse(request.draftJoinDeadline()));
+        }
+        if (request.matchStartDeadline() != null) {
+            matchRound.setMatchStartDeadline(request.matchStartDeadline().isBlank() ? null : Instant.parse(request.matchStartDeadline()));
+        }
         _tournamentMatchRepository.save(tournamentId, match);
 
         return ResponseEntity.ok(new SuccessResponse(true));

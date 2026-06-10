@@ -56,7 +56,7 @@ FROM alpine:3.21
 
 RUN apk update && apk add --no-cache ca-certificates && update-ca-certificates
 
-ENV JAVA_OPTS="-XX:+ShowCodeDetailsInExceptionMessages"
+ENV JAVA_OPTS="-XX:+ShowCodeDetailsInExceptionMessages -Xms128m -Xmx320m -XX:MaxMetaspaceSize=96m -XX:+UseSerialGC -Xss512k -XX:MaxDirectMemorySize=32m -XX:+ExitOnOutOfMemoryError"
 
 WORKDIR /opt
 
