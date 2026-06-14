@@ -56,7 +56,7 @@ import {
     TournamentMatchRoundModel
 } from "../../chore/tournament.ts";
 import {useAtomState, useAtomValue} from "@zedux/react";
-import {myTournamentTeamState, teamCacheState} from "../../atoms/atoms-tournament.ts";
+import {teamCacheState} from "../../atoms/atoms-tournament.ts";
 import {useTranslation} from "react-i18next";
 import {dateFormat} from "../../utils/date.ts";
 import {streamerCacheState} from "../../atoms/atoms-accounts.ts";
@@ -82,7 +82,7 @@ export default function TournamentMatchView() {
     const {id, matchId} = useParams();
     const tournament = (useLoaderData() as LoaderResponse).tournament;
 
-    const myTeam = useAtomValue(myTournamentTeamState);
+
     const [teams, setTeamsCache] = useAtomState(teamCacheState);
     const [streamerCache, setStreamerCache] = useAtomState(streamerCacheState);
     const [teamAPlayers, setTeamAPlayers] = useState<Map<string, string>>(new Map());
@@ -401,6 +401,10 @@ export default function TournamentMatchView() {
     const isRefereeOrAdmin = !!(me && (tournament.referees?.includes(me) || tournament.admins?.includes(me)));
     const myTeamSide = me && match ? (teamAPlayers.has(me) ? "A" : teamBPlayers.has(me) ? "B" : null) : null;
     const isTeamMember = myTeamSide !== null;
+    const isPriorityTeam = !!(myTeamSide && fight && (
+        (myTeamSide === "A" && fight.draftFirstPicker === match?.teamA) ||
+        (myTeamSide === "B" && fight.draftFirstPicker === match?.teamB)
+    ));
     const matchDatePassed = match?.date ? Date.parse(match.date) < Date.now() : false;
 
     const currentReport = matchReports.find(r => r.round === tab);
@@ -626,13 +630,13 @@ export default function TournamentMatchView() {
                                             <Typography sx={{mb: 2}}
                                                         variant="h5">{t('tournament.match.draft.teamHasPriority', {team: teams.get(fight.draftFirstPicker)})}</Typography>
                                         }
-                                        {!match.done && match.date && !fight.teamADraft && (!fight.draftFirstPicker || fight.draftDate) && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && (fight.draftDate || (match.teamA === myTeam?.id || match.teamB === myTeam?.id)) &&
+                                        {!match.done && match.date && !fight.teamADraft && (!fight.draftFirstPicker || fight.draftDate) && (!fight.draftDate || fight.draftDate && Date.parse(fight.draftDate).toString() < Date.now().toString()) && (!fight.draftFirstPicker || fight.draftTeamA) &&
                                             <Button sx={{width: "50%", pt: 2, pb: 2}} variant="contained"
                                                     onClick={() => startDraft(undefined)}>
                                                 {t('tournament.match.draft.goTo')}
                                             </Button>
                                         }
-                                        {!match.done && match.date && !fight.teamADraft && fight.draftFirstPicker && !fight.draftDate && fight.draftFirstPicker === myTeam?.id &&
+                                        {!match.done && match.date && !fight.teamADraft && fight.draftFirstPicker && !fight.draftTeamA && isPriorityTeam &&
                                             <>
                                                 <Button sx={{width: "40%", pt: 2, pb: 2, mr: 1}} variant="contained"
                                                         onClick={() => startDraft(DraftTeam.TEAM_A)}>
@@ -1048,11 +1052,11 @@ export default function TournamentMatchView() {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <Button variant="contained" color="error" sx={{m: 1}}
-                                                onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_A)}>{t('tournament.admin.teamA')}</Button>
+                                                onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_A)}>{(match?.teamA && teams.get(match.teamA)) || t('tournament.admin.teamA')}</Button>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <Button variant="contained" color="error" sx={{m: 1}}
-                                                onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_B)}>{t('tournament.admin.teamB')}</Button>
+                                                onClick={() => roundDraftFirstPicker(DraftTeam.TEAM_B)}>{(match?.teamB && teams.get(match.teamB)) || t('tournament.admin.teamB')}</Button>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <Button variant="contained" color="error" sx={{m: 1}}
@@ -1084,11 +1088,11 @@ export default function TournamentMatchView() {
                                     </Grid>
                                     <Grid item xs={3}>
                                         <Button variant="outlined" sx={{m: 1}}
-                                                onClick={() => setRoundWinner(DraftTeam.TEAM_A)}>{t('tournament.admin.teamA')}</Button>
+                                                onClick={() => setRoundWinner(DraftTeam.TEAM_A)}>{(match?.teamA && teams.get(match.teamA)) || t('tournament.admin.teamA')}</Button>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <Button variant="outlined" sx={{m: 1}}
-                                                onClick={() => setRoundWinner(DraftTeam.TEAM_B)}>{t('tournament.admin.teamB')}</Button>
+                                                onClick={() => setRoundWinner(DraftTeam.TEAM_B)}>{(match?.teamB && teams.get(match.teamB)) || t('tournament.admin.teamB')}</Button>
                                     </Grid>
                                     <Grid item xs={3}>
                                         <TextField size="small" sx={{m: 1}} label={t('tournament.admin.roundTurnNumber')}

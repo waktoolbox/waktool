@@ -161,7 +161,7 @@ public class TournamentAdminController {
     @PostMapping("/tournaments/{tournamentId}/matches/{matchId}/rounds/{round}/referee-reroll-map")
     public ResponseEntity<SuccessResponse> postRefereeRerollMap(@RequestAttribute Optional<String> discordId, @PathVariable String tournamentId, @PathVariable String matchId, @PathVariable int round) {
         if (discordId.isEmpty()) return ResponseEntity.ok(new SuccessResponse(false));
-        if (!_tournamentRepository.isReferee(tournamentId, discordId.get()))
+        if (!_tournamentRepository.isAdmin(tournamentId, discordId.get()) && !_tournamentRepository.isReferee(tournamentId, discordId.get()))
             return ResponseEntity.ok(new SuccessResponse(false));
 
         Optional<Tournament> optTournament = _tournamentRepository.getTournament(tournamentId);
