@@ -26,10 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.decathlon.tzatziki.utils.Guard.GUARD;
@@ -272,5 +269,38 @@ public class TournamentSteps {
 
         boolean hasThirdPlaceMatch = matches.stream().anyMatch(m -> Boolean.TRUE.equals(m.getThirdPlaceMatch()));
         Assertions.assertTrue(hasThirdPlaceMatch, "No third place match found in current round");
+    }
+
+    @Then(THAT + "the third place match of tournament " + VARIABLE + " phase " + NUMBER + " has the losers of the semi-finals$")
+    public void thirdPlaceMatchHasSemiFinalLosers(String id, Number phase) {
+        List<TournamentData> tournamentData = _tournamentPhaseRepository.getTournamentData(id);
+        TournamentData currentPhase = tournamentData.stream()
+                .filter(d -> d.getPhase() == phase.intValue())
+                .findFirst().orElseThrow();
+        int currentRound = currentPhase.getContent().getCurrentRound();
+        int previousRound = currentRound - 1;
+
+        List<TournamentMatch> allMatches = _tournamentMatchSpringDataRepository.findAllMatchesByTournamentIdAndPhase(id, phase.intValue())
+                .stream()
+                .map(TournamentMatchEntity::getContent)
+                .toList();
+
+        List<TournamentMatch> semiFinals = allMatches.stream()
+                .filter(m -> m.getRound() == previousRound && !Boolean.TRUE.equals(m.getThirdPlaceMatch()))
+                .toList();
+
+        Set<String> expectedLosers = semiFinals.stream()
+                .map(m -> Objects.equals(m.getWinner(), m.getTeamA()) ? m.getTeamB() : m.getTeamA())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        TournamentMatch thirdPlaceMatch = allMatches.stream()
+                .filter(m -> m.getRound() == currentRound && Boolean.TRUE.equals(m.getThirdPlaceMatch()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No third place match found"));
+
+        Set<String> actualTeams = Set.of(thirdPlaceMatch.getTeamA(), thirdPlaceMatch.getTeamB());
+
+        Assertions.assertEquals(expectedLosers, actualTeams, "Third place match does not have the losers of the semi-finals");
     }
 }

@@ -201,8 +201,24 @@ public class WCBracketPhaseController extends PhaseTypeController {
         matchesToSave.add(finaleMatch);
 
         // Petite finale (3rd place match) - teams who lost in the previous round (semi-final losers)
-        List<TournamentPhaseDataTeam> semiLosers = allTeams.stream()
-                .filter(t -> t.getLost() == 1)
+        int previousRound = phaseData.getCurrentRound() - 1;
+        MatchesSearchParameters params = new MatchesSearchParameters();
+        params.setType(MatchesSearchType.RESULTS);
+        params.setPhase(context.getPhase());
+        List<TournamentMatch> allMatches = context.getTournamentMatchRepository().getMatches(context.getTournament().getId(), params);
+
+        Map<String, TournamentPhaseDataTeam> teamById = allTeams.stream()
+                .collect(Collectors.toMap(TournamentPhaseDataTeam::getId, t -> t));
+
+        List<TournamentPhaseDataTeam> semiLosers = allMatches.stream()
+                .filter(m -> Objects.equals(m.getRound(), previousRound)
+                        && !Boolean.TRUE.equals(m.getThirdPlaceMatch()))
+                .map(m -> {
+                    if (m.getWinner() == null) return null;
+                    String loserId = Objects.equals(m.getWinner(), m.getTeamA()) ? m.getTeamB() : m.getTeamA();
+                    return teamById.get(loserId);
+                })
+                .filter(Objects::nonNull)
                 .toList();
 
         if (semiLosers.size() >= 2) {

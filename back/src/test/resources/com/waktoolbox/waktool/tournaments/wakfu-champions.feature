@@ -121,6 +121,7 @@ Feature: Wakfu Champions workflow
 
     Then there is 2 pending matches in tournament wc
     And there is a third place match in tournament wc phase 2
+    And the third place match of tournament wc phase 2 has the losers of the semi-finals
     Given all teams A of tournament wc win their match
 
     # Tournament is over
